@@ -53,9 +53,8 @@
           <div class="hero-top">
             <div>
               <div class="hero-label">إجمالي الرصيد في جميع الحسابات</div>
-              <div class="hero-amount" id="total-balance">— <span class="cur">ر.س</span></div>
+              <div class="hero-amount" id="total-balance">—</div>
             </div>
-            <div class="hero-stamp">موثّق<br>الآن</div>
           </div>
           <div class="hero-sub-row">
             <div class="item">عدد الحسابات <b id="acc-count">0</b></div>
@@ -109,14 +108,14 @@ requireAuth();
 
 function renderHome(){
   const total = accounts.reduce((s,a)=>s+a.balance,0);
-  animateCount(document.getElementById('total-balance'), total, ' <span class="cur">ر.س</span>');
+  animateCount(document.getElementById('total-balance'), total, ` <span class="cur">${SAR}</span>`);
   document.getElementById('acc-count').textContent = accounts.length;
   document.getElementById('accounts-count-sub').textContent = accounts.length + ' حسابات نشطة';
   document.getElementById('tx-count-mini').textContent = transactions.length;
-  document.getElementById('debts-total-mini').textContent = fmt(debtsTotal)+' ر.س';
+  document.getElementById('debts-total-mini').innerHTML = fmt(debtsTotal)+' '+SAR;
 
   const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
-  document.getElementById('stocks-networth-mini').textContent = fmt(stocksNet)+' ر.س';
+  document.getElementById('stocks-networth-mini').innerHTML = fmt(stocksNet)+' '+SAR;
 
   const accList = document.getElementById('accounts-list');
   accList.innerHTML = accounts.map(a=>`
@@ -125,7 +124,7 @@ function renderHome(){
         <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
         <div><div class="acc-name">${a.bank}</div><div class="acc-type">${a.type}</div></div>
       </div>
-      <div class="acc-amount">${fmt(a.balance)} ر.س</div>
+      <div class="acc-amount">${fmt(a.balance)} ${SAR}</div>
     </div>`).join('');
 
   const txList = document.getElementById('tx-list');
@@ -135,7 +134,7 @@ function renderHome(){
         <div class="tx-ic">${t.ic}</div>
         <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
       </div>
-      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ر.س</div>
+      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ${SAR}</div>
     </div>`).join('');
 }
 

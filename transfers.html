@@ -74,7 +74,7 @@ function renderTransfers(){
         <div class="tx-ic">${t.ic}</div>
         <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
       </div>
-      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ر.س</div>
+      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ${SAR}</div>
     </div>`).join('');
 
   document.getElementById('automations-list').innerHTML = automations.map((a,i)=>`

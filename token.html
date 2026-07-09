@@ -89,7 +89,7 @@ function renderTokenAccounts(){
       <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
       <div style="flex:1;">
         <div class="acc-name">${a.bank}</div>
-        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ر.س</div>
+        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ${SAR}</div>
       </div>
       <input type="number" class="amt-input" id="tok-amt-${i}" placeholder="0.00">
     </div>`).join('');
@@ -118,11 +118,11 @@ function generateToken(){
   const wrap = document.getElementById('token-receipt-wrap');
   wrap.style.display='block';
   document.getElementById('token-receipt').innerHTML = `
-    <div style="text-align:center; font-size:11px; color:#9AA3BE; margin-bottom:8px;">إيصال توكن الدفع</div>
+    <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:8px;">إيصال توكن الدفع</div>
     <div class="code">${code}</div>
-    <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(255,255,255,0.25) 0 6px, transparent 6px 12px);"></div>
-    ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${fmt(c.amt)} ر.س</span></div>`).join('')}
-    <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:#B8863E;">${fmt(total)} ر.س</span></div>
+    <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(36,48,61,0.2) 0 6px, transparent 6px 12px);"></div>
+    ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${fmt(c.amt)} ${SAR}</span></div>`).join('')}
+    <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:var(--gold);">${fmt(total)} ${SAR}</span></div>
     <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${duration}</span></div>
   `;
 }

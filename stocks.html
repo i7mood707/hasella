@@ -74,14 +74,14 @@ requireAuth();
 function renderStocks(){
   document.getElementById('stocks-count-sub').textContent = stocks.length + ' شركات';
   const net = stocks.reduce((s,st)=>s+st.qty*st.price,0);
-  animateCount(document.getElementById('stocks-networth'), net, ' ر.س');
+  animateCount(document.getElementById('stocks-networth'), net, ' '+SAR);
   document.getElementById('stocks-tbody').innerHTML = stocks.map((s,i)=>`
     <tr>
       <td>${s.name}<span class="ticker">${s.ticker}</span></td>
       <td style="font-family:var(--font-mono);">${s.qty}</td>
-      <td style="font-family:var(--font-mono);">${s.price.toFixed(2)} ر.س</td>
+      <td style="font-family:var(--font-mono);">${s.price.toFixed(2)} ${SAR}</td>
       <td class="${s.chg>=0?'chg-pos':'chg-neg'}">${s.chg>=0?'+':''}${s.chg}%</td>
-      <td style="font-family:var(--font-mono); font-weight:600;">${fmt(s.qty*s.price)} ر.س</td>
+      <td style="font-family:var(--font-mono); font-weight:600;">${fmt(s.qty*s.price)} ${SAR}</td>
       <td>
         <button class="btn btn-sm btn-outline" onclick="tradeStock(${i},'buy')">شراء</button>
         <button class="btn btn-sm btn-outline" onclick="tradeStock(${i},'sell')">بيع</button>

@@ -1,3 +1,6 @@
+/* ---------------- Currency symbol (new official Saudi Riyal sign) ---------------- */
+const SAR = '<svg class="sar" viewBox="0 0 1124.14 1256.39" aria-hidden="true"><path d="M699.62,1113.02h0c-20.06,44.48-33.32,92.75-38.4,143.37l424.51-90.24c20.06-44.47,33.31-92.75,38.4-143.37l-424.51,90.24Z"/><path d="M1085.73,895.8c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.33v-135.2l292.27-62.11c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.27V66.13c-50.67,28.45-95.67,66.32-132.25,110.99v403.35l-132.25,28.11V0c-50.67,28.44-95.67,66.32-132.25,110.99v525.69l-295.91,62.88c-20.06,44.47-33.33,92.75-38.42,143.37l334.33-71.05v170.26l-358.3,76.14c-20.06,44.47-33.32,92.75-38.4,143.37l375.04-79.7c30.53-6.35,56.77-24.4,73.83-49.24l68.78-101.97v-.02c7.14-10.55,11.3-23.27,11.3-36.97v-149.98l132.25-28.11v270.4l424.53-90.28Z"/></svg>';
+
 /* ---------------- Auth guard ---------------- */
 function requireAuth(){
   if(localStorage.getItem('hasila_logged_in') !== '1'){
@@ -42,9 +45,14 @@ const transfersData = [
 ];
 
 const DEFAULT_AUTOMATIONS = [
-  {name:'تحويل الإيجار الشهري', detail:'3,000 ر.س — كل يوم 1 من الشهر', on:true},
-  {name:'ادخار تلقائي', detail:'500 ر.س أسبوعيًا إلى حساب التوفير', on:true},
-  {name:'دعم عائلي', detail:'1,000 ر.س شهريًا', on:false},
+  {name:'تحويل الإيجار الشهري', detail:`3,000 ${SAR} — كل يوم 1 من الشهر`, on:true},
+  {name:'ادخار تلقائي', detail:`500 ${SAR} أسبوعيًا إلى حساب التوفير`, on:true},
+  {name:'دعم عائلي', detail:`1,000 ${SAR} شهريًا`, on:false},
+];
+
+const DEFAULT_BNPL = [
+  {id:'b1', bank:'تابي', logo:'logos/tabby.png', linked:true, lastSync:'قبل ساعة'},
+  {id:'b2', bank:'تمارا', logo:'logos/tamara.jpg', linked:true, lastSync:'قبل يوم'},
 ];
 
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
@@ -62,11 +70,13 @@ function loadState(key, fallback){
 const accounts = loadState('hasila_accounts', DEFAULT_ACCOUNTS);
 const stocks = loadState('hasila_stocks', DEFAULT_STOCKS);
 const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
+const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
 
 function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
   localStorage.setItem('hasila_stocks', JSON.stringify(stocks));
   localStorage.setItem('hasila_automations', JSON.stringify(automations));
+  localStorage.setItem('hasila_bnpl', JSON.stringify(bnplProviders));
 }
 
 /* ---------------- Formatting ---------------- */
