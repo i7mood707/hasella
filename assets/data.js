@@ -14,7 +14,7 @@ function doLogout(){
 
 /* ---------------- Mock Data ---------------- */
 const DEFAULT_ACCOUNTS = [
-  {id:'a1', bank:'مصرف الراجحي', type:'حساب جاري', balance:12450.75, logo:'logos/alrajhi.png', iban:'SA•• •••• •••• •••• 2290', linked:true, lastSync:'قبل 4 دقائق'},
+  {id:'a1', bank:'مصرف الراجحي', type:'حساب جاري', balance:12450.75, logo:'logos/alrajhi.png', iban:'SA•• •••• •••• •••• 2290', linked:true, lastSync:'قبل 4 دقائق', primary:true},
   {id:'a2', bank:'البنك الأهلي السعودي', type:'حساب توفير', balance:34200.00, logo:'logos/snb.jpg', iban:'SA•• •••• •••• •••• 7714', linked:true, lastSync:'قبل ساعة'},
   {id:'a3', bank:'بنك الرياض', type:'حساب جاري', balance:5860.40, logo:'logos/riyadbank.webp', iban:'SA•• •••• •••• •••• 1038', linked:true, lastSync:'قبل ساعتين'},
   {id:'a4', bank:'STC Bank', type:'محفظة رقمية', balance:1240.00, logo:'logos/stc-bank.jpg', iban:'966•• •••• 5560', linked:true, lastSync:'قبل 30 دقيقة'},
@@ -31,10 +31,16 @@ const transactions = [
 ];
 
 const DEFAULT_STOCKS = [
-  {name:'أرامكو السعودية', ticker:'2222', qty:100, price:27.85, chg:0.6},
-  {name:'مصرف الراجحي', ticker:'1120', qty:30, price:89.40, chg:-0.3},
-  {name:'سابك', ticker:'2010', qty:50, price:66.10, chg:1.2},
-  {name:'stc', ticker:'7010', qty:40, price:38.20, chg:0.4},
+  {name:'أرامكو السعودية', ticker:'2222', qty:100, price:27.85, chg:0.6, logo:'logos/aramco.jpg'},
+  {name:'مصرف الراجحي', ticker:'1120', qty:30, price:89.40, chg:-0.3, logo:'logos/alrajhi.png'},
+  {name:'سابك', ticker:'2010', qty:50, price:66.10, chg:1.2, logo:'logos/sabic.png'},
+  {name:'stc', ticker:'7010', qty:40, price:38.20, chg:0.4, logo:'logos/stc-stock.jpg'},
+  {name:'معادن', ticker:'1211', qty:0, price:52.30, chg:-0.8, logo:'logos/maaden.webp'},
+  {name:'المراعي', ticker:'2280', qty:0, price:58.90, chg:0.5, logo:'logos/almarai.jpg'},
+  {name:'موبايلي', ticker:'7020', qty:0, price:42.15, chg:1.5, logo:'logos/mobily.png'},
+  {name:'بنك البلاد', ticker:'1140', qty:0, price:33.60, chg:-0.2, logo:'logos/albilad.png'},
+  {name:'جرير للتسويق', ticker:'4190', qty:0, price:165.00, chg:0.9, logo:'logos/jarir.jpg'},
+  {name:'مصرف الإنماء', ticker:'1150', qty:0, price:28.75, chg:0.3, logo:'logos/alinma.jpg'},
 ];
 
 const transfersData = [
@@ -55,9 +61,19 @@ const DEFAULT_BNPL = [
   {id:'b2', bank:'تمارا', logo:'logos/tamara.jpg', linked:true, lastSync:'قبل يوم'},
 ];
 
+const DEFAULT_INVESTMENTS = [
+  {id:'v1', bank:'عوائد', logo:'logos/awaed.jpg', linked:true, lastSync:'قبل 20 دقيقة'},
+];
+
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
+const DATA_VERSION = '3';
+if(localStorage.getItem('hasila_data_version') !== DATA_VERSION){
+  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments'].forEach(k=>localStorage.removeItem(k));
+  localStorage.setItem('hasila_data_version', DATA_VERSION);
+}
+
 function loadState(key, fallback){
   try{
     const raw = localStorage.getItem(key);
@@ -71,12 +87,14 @@ const accounts = loadState('hasila_accounts', DEFAULT_ACCOUNTS);
 const stocks = loadState('hasila_stocks', DEFAULT_STOCKS);
 const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
 const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
+const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS);
 
 function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
   localStorage.setItem('hasila_stocks', JSON.stringify(stocks));
   localStorage.setItem('hasila_automations', JSON.stringify(automations));
   localStorage.setItem('hasila_bnpl', JSON.stringify(bnplProviders));
+  localStorage.setItem('hasila_investments', JSON.stringify(investmentPlatforms));
 }
 
 /* ---------------- Formatting ---------------- */

@@ -122,7 +122,7 @@ function renderHome(){
     <div class="account-row">
       <div class="acc-left">
         <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
-        <div><div class="acc-name">${a.bank}</div><div class="acc-type">${a.type}</div></div>
+        <div><div class="acc-name">${a.bank}${a.primary ? ' <span class="demo-pill" style="font-size:9.5px; padding:1px 7px; vertical-align:1px;">الحساب الرئيسي</span>' : ''}</div><div class="acc-type">${a.type}</div></div>
       </div>
       <div class="acc-amount">${fmt(a.balance)} ${SAR}</div>
     </div>`).join('');

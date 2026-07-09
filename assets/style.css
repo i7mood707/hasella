@@ -143,7 +143,8 @@ nav.nav-list{display:flex; flex-direction:column; gap:3px; flex:1;}
 @keyframes pagein{from{opacity:0; transform:translateY(14px) scale(.99);} to{opacity:1; transform:translateY(0) scale(1);}}
 .page .card,
 .page .hero-balance,
-.page .chat-wrap{
+.page .chat-wrap,
+.page .watchlist-card{
   animation:cardin .5s cubic-bezier(.22,.8,.32,1) backwards;
 }
 .page .grid-3 > .card:nth-child(1),
@@ -254,6 +255,31 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .chg-neg{color:var(--brick); font-family:var(--font-mono); font-weight:600;}
 .ticker{font-family:var(--font-mono); font-size:11px; color:var(--text-muted); display:block;}
 
+/* ---------- Watchlist (stock rows) ---------- */
+.watchlist-card{background:#fff; border-radius:var(--radius); padding:6px 22px 10px; color:var(--text-dark); border:1px solid #E7E1D1; box-shadow:0 1px 3px rgba(36,48,61,0.04); transition:box-shadow .3s ease, transform .3s ease, border-color .3s ease;}
+.watchlist-card:hover{box-shadow:0 14px 32px rgba(36,48,61,0.10); transform:translateY(-3px); border-color:#D9E6E1;}
+.watchlist-card h3{color:var(--text-dark); padding-top:16px;}
+.watchlist-card h3 .sub{color:var(--text-muted);}
+.watch-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid #F0ECDF; transition:background .2s ease;}
+.watch-row:last-child{border-bottom:none;}
+.watch-row:hover{background:var(--paper-dim); margin:0 -12px; padding-inline:12px; border-radius:10px;}
+.watch-id{display:flex; align-items:center; gap:10px; min-width:0;}
+.watch-logo{width:34px; height:34px; border-radius:9px; object-fit:contain; background:#fff; box-shadow:inset 0 0 0 1px rgba(36,48,61,0.12); flex-shrink:0; padding:4px;}
+.watch-id-text{display:flex; flex-direction:column; gap:3px; min-width:0;}
+.watch-ticker{font-family:var(--font-mono); font-weight:700; font-size:15px; color:var(--text-dark);}
+.watch-name{font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px;}
+.watch-spark{width:64px; height:30px; flex-shrink:0;}
+.watch-right{display:flex; align-items:center; gap:12px;}
+.watch-nums{display:flex; flex-direction:column; align-items:flex-end; gap:4px;}
+.watch-price{font-family:var(--font-mono); font-weight:700; font-size:15px; color:var(--text-dark);}
+.watch-chg{font-family:var(--font-mono); font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:6px; display:inline-block; direction:ltr;}
+.watch-chg.pos{background:rgba(44,93,82,0.12); color:var(--emerald-deep);}
+.watch-chg.neg{background:rgba(192,107,79,0.12); color:var(--brick);}
+.watch-actions{display:flex; gap:6px; flex-shrink:0;}
+.watch-actions button{width:26px; height:26px; border-radius:50%; border:1px solid var(--ink-line); background:var(--paper-dim); color:var(--text-dark); font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center; transition:background .2s ease, transform .15s ease;}
+.watch-actions button:hover{background:#E7E1D1; transform:translateY(-1px);}
+.watch-qty{font-size:10.5px; color:var(--text-muted); font-family:var(--font-mono);}
+
 /* ---------- Financing ---------- */
 .offer-card{border:1.5px solid #E7E1D1; border-radius:12px; padding:18px; position:relative;}
 .offer-card.best{border-color:var(--gold); background:linear-gradient(180deg,#FFFBF3,#fff);}
@@ -279,6 +305,22 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .suggest-chip{font-size:11.5px; padding:6px 12px; border-radius:99px; border:1px solid #DAD4C2; background:#fff; color:var(--text-muted);}
 .suggest-chip:hover{border-color:var(--emerald); color:var(--emerald-deep);}
 .suggest-row{display:flex; gap:8px; flex-wrap:wrap; padding:0 16px 12px;}
+
+/* ---------- Trade modal ---------- */
+.modal-overlay{position:fixed; inset:0; background:rgba(36,48,61,0.45); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px;}
+.modal-box{background:#fff; border-radius:16px; padding:26px; width:100%; max-width:380px; box-shadow:0 30px 80px rgba(36,48,61,0.3); animation:loginin .3s cubic-bezier(.22,.8,.32,1);}
+.modal-box h3{font-family:var(--font-display); font-size:17px; font-weight:700; margin-bottom:16px;}
+.modal-total-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px dashed #DDD6C2; margin-bottom:16px;}
+.modal-total-row span:first-child{font-size:13px; color:var(--text-muted);}
+.modal-total-row span:last-child{font-family:var(--font-mono); font-weight:700; font-size:15px;}
+
+.toast{
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:#fff; padding:13px 22px; border-radius:12px; font-size:13px;
+  box-shadow:0 14px 32px rgba(36,48,61,0.3); opacity:0; pointer-events:none; z-index:200;
+  transition:opacity .25s ease, transform .25s ease; max-width:90vw; text-align:center;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
 /* ---------- Token ---------- */
 .token-account{display:flex; align-items:center; gap:12px; padding:12px; border:1.5px solid #E7E1D1; border-radius:11px; margin-bottom:10px;}
