@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — لوحة الماليات الشخصية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%233B2415'/%3E%3Ccircle cx='20' cy='20' r='19' fill='none' stroke='%23D9A94E' stroke-width='1.5'/%3E%3Cg transform='translate(20,26)' stroke='%23D9A94E' stroke-width='1.3' fill='%23D9A94E'%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z' transform='rotate(-24)'/%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z'/%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z' transform='rotate(24)'/%3E%3Cpath d='M-7,2 Q0,6 7,2' fill='none'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#3B2415;
+  --ink-soft:#4E2F1B;
+  --ink-line:#6B4A2C;
+  --paper:#FBF5EA;
+  --paper-dim:#F1E3C8;
+  --emerald:#B3812C;
+  --emerald-deep:#8C6420;
+  --gold:#D9A94E;
+  --brick:#A5502E;
+  --text-dark:#3A2A1C;
+  --text-muted:#8A7561;
+  --text-on-dark:#F5ECDD;
+  --text-on-dark-muted:#CBAE87;
+  --radius:14px;
+  --font-display:'Almarai',sans-serif;
+  --font-decorative:'Aref Ruqaa', serif;
+  --font-body:'IBM Plex Sans Arabic',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font-family:var(--font-body);
+  background:var(--paper);
+  color:var(--text-dark);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::selection{background:var(--emerald); color:#fff;}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:6px;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+}
+
+/* ---------- Login ---------- */
+#login-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(184,134,62,0.12), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(217,169,78,0.16), transparent 45%),
+    var(--ink);
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+}
+#login-screen::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(var(--ink-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ink-line) 1px, transparent 1px);
+  background-size:42px 42px;
+  opacity:0.15;
+  pointer-events:none;
+}
+.login-card{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  background:var(--paper);
+  border-radius:20px;
+  padding:40px 36px 32px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.45);
+  animation:loginin .6s cubic-bezier(.22,.8,.32,1);
+}
+@keyframes loginin{from{opacity:0; transform:translateY(18px) scale(.97);} to{opacity:1; transform:translateY(0) scale(1);}}
+.login-logo{
+  display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:10px;
+}
+.login-logo .emblem{width:64px; height:64px; flex-shrink:0;}
+.login-logo h1{font-family:var(--font-decorative); font-size:46px; font-weight:700; color:var(--ink); line-height:1;}
+.seal{
+  width:46px; height:46px; border-radius:50%;
+  background:var(--emerald);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-family:var(--font-mono); font-weight:600; font-size:15px;
+  border:2px solid var(--gold);
+  flex-shrink:0;
+}
+.seal svg{width:60%; height:60%;}
+.login-tag{font-size:12.5px; color:var(--text-muted); margin-bottom:26px; text-align:center;}
+.demo-badge{
+  display:table; margin:0 auto 22px; font-size:11px; font-family:var(--font-mono);
+  background:rgba(184,134,62,0.15); color:var(--gold); border:1px solid rgba(184,134,62,0.4);
+  padding:3px 10px; border-radius:999px;
+}
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:13px; color:var(--text-muted); margin-bottom:6px; font-weight:500;}
+.field input{
+  width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid #DAD4C2;
+  background:#fff; font-size:14.5px; color:var(--text-dark); transition:border-color .15s;
+}
+.field input:focus{outline:none; border-color:var(--emerald);}
+.btn-primary{
+  width:100%; padding:13px; border-radius:10px; border:none;
+  background:var(--emerald); color:#fff; font-size:15px; font-weight:700;
+  margin-top:6px; transition:background .15s, transform .1s;
+  font-family:var(--font-display);
+}
+.btn-primary:hover{background:var(--emerald-deep);}
+.btn-primary:active{transform:scale(0.98);}
+.login-foot{margin-top:18px; font-size:12px; color:var(--text-muted); text-align:center; line-height:1.7;}
+
+/* ---------- App shell ---------- */
+#app{display:none; min-height:100vh; flex-direction:row-reverse;}
+#app.active{display:flex;}
+
+.sidebar{
+  width:250px; flex-shrink:0; background:var(--ink); color:var(--text-on-dark);
+  min-height:100vh; display:flex; flex-direction:column; padding:22px 16px;
+  position:sticky; top:0; height:100vh;
+}
+.sidebar-brand{display:flex; align-items:center; gap:10px; padding:6px 8px 22px; border-bottom:1px solid var(--ink-line); margin-bottom:14px;}
+.sidebar-brand h2{font-family:var(--font-decorative); font-size:26px; font-weight:700; color:var(--gold); line-height:1;}
+.sidebar-brand .seal{width:36px; height:36px; font-size:12px;}
+nav.nav-list{display:flex; flex-direction:column; gap:3px; flex:1;}
+.nav-item{
+  display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px;
+  color:var(--text-on-dark-muted); font-size:14px; font-weight:500; background:none; border:none;
+  text-align:right; width:100%; position:relative;
+  transition:background .25s ease, color .2s ease, transform .2s ease, padding-right .25s ease;
+}
+.nav-item .ic{width:18px; text-align:center; font-size:15px; transition:transform .25s ease;}
+.nav-item:hover{background:var(--ink-soft); color:var(--text-on-dark); transform:translateX(-2px);}
+.nav-item:hover .ic{transform:scale(1.15);}
+.nav-item.active{background:var(--emerald); color:#fff; box-shadow:0 4px 14px rgba(179,129,44,0.35);}
+.nav-item.active .ic{transform:scale(1.05);}
+.sidebar-foot{border-top:1px solid var(--ink-line); padding-top:14px; margin-top:10px;}
+.user-chip{display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px;}
+.user-chip .avatar{width:34px; height:34px; border-radius:50%; background:var(--gold); color:#1B2430; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0;}
+.user-chip .uname{font-size:13px; font-weight:600;}
+.user-chip .urole{font-size:11px; color:var(--text-on-dark-muted);}
+.logout-btn{width:100%; margin-top:10px; background:none; border:1px solid var(--ink-line); color:var(--text-on-dark-muted); padding:9px; border-radius:9px; font-size:12.5px;}
+.logout-btn:hover{color:#fff; border-color:var(--brick);}
+
+.main{flex:1; padding:30px 36px 60px; min-width:0; scroll-behavior:smooth;}
+.page{display:none;}
+.page.active{display:block; animation:pagein .45s cubic-bezier(.22,.8,.32,1);}
+@keyframes pagein{from{opacity:0; transform:translateY(14px) scale(.99);} to{opacity:1; transform:translateY(0) scale(1);}}
+.page.active .card,
+.page.active .hero-balance,
+.page.active .chat-wrap{
+  animation:cardin .5s cubic-bezier(.22,.8,.32,1) backwards;
+}
+.page.active .grid-3 > .card:nth-child(1),
+.page.active .grid-2 > div:nth-child(1) .card:nth-child(1){animation-delay:.03s;}
+.page.active .grid-3 > .card:nth-child(2),
+.page.active .grid-2 > div:nth-child(1) .card:nth-child(2){animation-delay:.09s;}
+.page.active .grid-3 > .card:nth-child(3){animation-delay:.15s;}
+.page.active .grid-2 > div:nth-child(2) .card:nth-child(1){animation-delay:.12s;}
+.page.active .grid-2 > div:nth-child(2) .card:nth-child(2){animation-delay:.18s;}
+@keyframes cardin{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+@media (prefers-reduced-motion: reduce){
+  .page.active, .page.active .card, .page.active .hero-balance, .page.active .chat-wrap{animation:none;}
+}
+
+.page-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:10px;}
+.page-head h1{font-family:var(--font-display); font-size:26px; font-weight:800;}
+.page-head p{color:var(--text-muted); font-size:13.5px; margin-top:4px;}
+.demo-pill{font-size:10.5px; font-family:var(--font-mono); background:var(--paper-dim); border:1px solid #DAD4C2; color:var(--text-muted); padding:3px 10px; border-radius:999px;}
+
+/* ---------- Grid / Cards ---------- */
+.grid{display:grid; gap:18px;}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-2{grid-template-columns:2fr 1fr;}
+@media(max-width:980px){.grid-3{grid-template-columns:1fr;} .grid-4{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;}}
+@media(max-width:640px){.grid-4{grid-template-columns:1fr;}}
+
+.card{background:#fff; border-radius:var(--radius); padding:22px; border:1px solid #E7E1D1; box-shadow:0 1px 3px rgba(20,20,10,0.04); transition:box-shadow .3s ease, transform .3s ease, border-color .3s ease;}
+.card:hover{box-shadow:0 14px 32px rgba(80,55,20,0.10); transform:translateY(-3px); border-color:#E0CFA6;}
+.card h3{font-family:var(--font-display); font-size:15.5px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;}
+.card h3 .sub{font-size:11px; color:var(--text-muted); font-weight:500; font-family:var(--font-body);}
+
+.hero-balance{
+  background:linear-gradient(135deg, var(--ink) 0%, #5A3B22 100%);
+  transition:box-shadow .3s ease, transform .3s ease;
+  color:#fff; border-radius:18px; padding:28px 30px; position:relative; overflow:hidden;
+  grid-column:1/-1;
+}
+.hero-balance:hover{transform:translateY(-3px); box-shadow:0 18px 40px rgba(59,36,21,0.28);}
+.hero-balance::after{
+  content:""; position:absolute; left:-40px; top:-40px; width:180px; height:180px; border-radius:50%;
+  background:radial-gradient(circle, rgba(184,134,62,0.25), transparent 70%);
+}
+.hero-top{display:flex; justify-content:space-between; align-items:flex-start; position:relative; z-index:1;}
+.hero-label{font-size:13px; color:var(--text-on-dark-muted); margin-bottom:6px;}
+.hero-amount{font-family:var(--font-mono); font-size:42px; font-weight:600; display:flex; align-items:baseline; gap:8px;}
+.hero-amount .cur{font-size:18px; color:var(--gold); font-family:var(--font-body); font-weight:700;}
+.hero-stamp{
+  width:64px; height:64px; border-radius:50%; border:2px dashed rgba(184,134,62,0.6);
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:11px; color:var(--gold); text-align:center; line-height:1.3; flex-shrink:0;
+}
+.hero-sub-row{display:flex; gap:28px; margin-top:20px; position:relative; z-index:1; flex-wrap:wrap;}
+.hero-sub-row .item{font-size:12.5px; color:var(--text-on-dark-muted);}
+.hero-sub-row .item b{display:block; font-family:var(--font-mono); font-size:16px; color:#fff; margin-top:2px;}
+
+.account-row{display:flex; align-items:center; justify-content:space-between; padding:12px 8px; margin:0 -8px; border-radius:10px; border-bottom:1px solid #F0ECDF; transition:background .2s ease;}
+.account-row:hover{background:var(--paper-dim);}
+.account-row:last-child{border-bottom:none;}
+.acc-left{display:flex; align-items:center; gap:12px;}
+.bank-dot{width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#fff; flex-shrink:0; font-family:var(--font-display); letter-spacing:0; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.15);}
+.acc-name{font-size:13.5px; font-weight:600;}
+.acc-type{font-size:11.5px; color:var(--text-muted);}
+.acc-amount{font-family:var(--font-mono); font-size:15px; font-weight:600;}
+
+.tx-list .tx-row{
+  display:flex; align-items:center; justify-content:space-between; padding:13px 8px;
+  margin:0 -8px; border-radius:10px;
+  border-bottom:1px dashed #DDD6C2; transition:background .2s ease, transform .2s ease;
+}
+.tx-list .tx-row:hover{background:var(--paper-dim); transform:translateX(-3px);}
+.tx-list .tx-row:last-child{border-bottom:none;}
+.tx-left{display:flex; align-items:center; gap:12px;}
+.tx-ic{width:34px; height:34px; border-radius:9px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; transition:transform .25s ease;}
+.tx-row:hover .tx-ic{transform:scale(1.1) rotate(-4deg);}
+.tx-name{font-size:13.5px; font-weight:600;}
+.tx-date{font-size:11px; color:var(--text-muted); font-family:var(--font-mono);}
+.tx-amt{font-family:var(--font-mono); font-size:14px; font-weight:600;}
+.tx-amt.neg{color:var(--brick);}
+.tx-amt.pos{color:var(--emerald-deep);}
+
+.advisor-mini{display:flex; flex-direction:column; gap:10px;}
+.advisor-mini .bubble{background:var(--paper-dim); border-radius:12px; padding:12px 14px; font-size:12.5px; line-height:1.7; color:var(--text-dark);}
+.mini-input-row{display:flex; gap:8px; margin-top:6px;}
+.mini-input-row input{flex:1; padding:10px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13px;}
+.mini-input-row button{padding:0 16px; border-radius:9px; border:none; background:var(--emerald); color:#fff; font-size:13px; font-weight:600;}
+
+.btn{padding:9px 16px; border-radius:9px; border:1.5px solid var(--ink-line); background:#fff; font-size:12.5px; font-weight:600; color:var(--text-dark); transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;}
+.btn:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(80,55,20,0.14);}
+.btn:active{transform:translateY(0) scale(.97);}
+.btn-emerald{background:var(--emerald); color:#fff; border-color:var(--emerald);}
+.btn-emerald:hover{background:var(--emerald-deep);}
+.btn-outline{background:#fff; border-color:#DAD4C2; color:var(--text-dark);}
+.btn-outline:hover{border-color:var(--emerald); color:var(--emerald-deep);}
+.btn-brick{background:var(--brick); color:#fff; border-color:var(--brick);}
+.btn-sm{padding:6px 12px; font-size:11.5px;}
+
+/* ---------- Debts ---------- */
+.debt-card{border-right:4px solid var(--brick); position:relative;}
+.debt-card.bnpl-tabby{border-right-color:#5B4FD6;}
+.debt-card.bnpl-tamara{border-right-color:#1F9A83;}
+.debt-progress{height:8px; background:var(--paper-dim); border-radius:99px; overflow:hidden; margin:12px 0;}
+.debt-progress .fill{height:100%; background:var(--emerald);}
+.debt-meta{display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);}
+.debt-meta b{color:var(--text-dark); font-family:var(--font-mono);}
+
+/* ---------- Stocks ---------- */
+table.stocks-table{width:100%; border-collapse:collapse; font-size:13.5px;}
+table.stocks-table th{text-align:right; padding:10px 8px; font-size:11.5px; color:var(--text-muted); border-bottom:2px solid var(--paper-dim); font-weight:600;}
+table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
+.chg-pos{color:var(--emerald-deep); font-family:var(--font-mono); font-weight:600;}
+.chg-neg{color:var(--brick); font-family:var(--font-mono); font-weight:600;}
+.ticker{font-family:var(--font-mono); font-size:11px; color:var(--text-muted); display:block;}
+
+/* ---------- Financing ---------- */
+.offer-card{border:1.5px solid #E7E1D1; border-radius:12px; padding:18px; position:relative;}
+.offer-card.best{border-color:var(--gold); background:linear-gradient(180deg,#FFFBF3,#fff);}
+.offer-badge{position:absolute; top:-10px; right:14px; background:var(--gold); color:#fff; font-size:10.5px; padding:3px 10px; border-radius:99px; font-weight:700;}
+.offer-rate{font-family:var(--font-mono); font-size:22px; font-weight:600; margin:8px 0;}
+
+/* ---------- Transfers ---------- */
+.toggle{position:relative; width:40px; height:22px; background:#DAD4C2; border-radius:99px; border:none; flex-shrink:0; transition:background .3s ease;}
+.toggle::after{content:""; position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.2); transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.toggle.on{background:var(--emerald);}
+.toggle.on::after{transform:translateX(-18px);}
+
+/* ---------- Advisor Chat ---------- */
+.chat-wrap{display:flex; flex-direction:column; height:560px; background:#fff; border-radius:var(--radius); border:1px solid #E7E1D1; overflow:hidden;}
+.chat-head{padding:16px 20px; border-bottom:1px solid #F0ECDF; display:flex; align-items:center; gap:12px;}
+.chat-body{flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px;}
+.msg{max-width:75%; padding:11px 15px; border-radius:14px; font-size:13.5px; line-height:1.8; animation:msgin .35s cubic-bezier(.22,.8,.32,1);}
+@keyframes msgin{from{opacity:0; transform:translateY(8px) scale(.96);} to{opacity:1; transform:translateY(0) scale(1);}}
+.msg.bot{background:var(--paper-dim); align-self:flex-start; border-bottom-right-radius:4px;}
+.msg.user{background:var(--emerald); color:#fff; align-self:flex-end; border-bottom-left-radius:4px;}
+.chat-input-row{display:flex; gap:10px; padding:14px 16px; border-top:1px solid #F0ECDF;}
+.chat-input-row input{flex:1; padding:11px 14px; border-radius:10px; border:1.5px solid #DAD4C2; font-size:13.5px;}
+.suggest-chip{font-size:11.5px; padding:6px 12px; border-radius:99px; border:1px solid #DAD4C2; background:#fff; color:var(--text-muted);}
+.suggest-chip:hover{border-color:var(--emerald); color:var(--emerald-deep);}
+.suggest-row{display:flex; gap:8px; flex-wrap:wrap; padding:0 16px 12px;}
+
+/* ---------- Token ---------- */
+.token-account{display:flex; align-items:center; gap:12px; padding:12px; border:1.5px solid #E7E1D1; border-radius:11px; margin-bottom:10px;}
+.token-account input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+.token-account .amt-input{width:110px; padding:8px 10px; border-radius:8px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); font-size:13px;}
+.token-receipt{
+  background:var(--ink); color:#fff; border-radius:14px; padding:22px;
+  font-family:var(--font-mono); position:relative;
+  background-image:radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size:14px 14px;
+}
+.token-receipt .tline{border-bottom:1px dashed rgba(255,255,255,0.25); padding:8px 0; display:flex; justify-content:space-between; font-size:12.5px;}
+.token-receipt .code{font-size:19px; letter-spacing:2px; color:var(--gold); text-align:center; padding:14px 0; font-weight:600;}
+.perforation{height:1px; background:repeating-linear-gradient(90deg, #DAD4C2 0 6px, transparent 6px 12px); margin:14px 0;}
+
+select.sel{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; background:#fff;}
+textarea.ta{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; min-height:80px; resize:vertical;}
+label.flabel{display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:6px; font-weight:500;}
+.field-block{margin-bottom:16px;}
+
+@media(max-width:860px){
+  #app.active{flex-direction:column;}
+  .sidebar{width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; padding:14px;}
+  nav.nav-list{flex-direction:row;}
+  .sidebar-brand,.sidebar-foot{display:none;}
+  .main{padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg class="emblem" viewBox="0 0 200 200" role="img" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#EFC876"/>
+            <stop offset="100%" stop-color="#B3812C"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="94" fill="#3B2415"/>
+        <circle cx="100" cy="100" r="94" fill="none" stroke="url(#ringGrad)" stroke-width="4"/>
+        <circle cx="100" cy="100" r="78" fill="none" stroke="#D9A94E" stroke-width="1.4" stroke-dasharray="3 7" opacity="0.65"/>
+        <g transform="translate(100,132)" fill="#D9A94E" stroke="#D9A94E">
+          <path d="M0,0 C8,-13 10,-31 0,-50 C-10,-31 -8,-13 0,0 Z" transform="rotate(-38)" stroke-width="0.6"/>
+          <path d="M0,0 C8,-14 10,-36 0,-60 C-10,-36 -8,-14 0,0 Z" transform="rotate(-19)" stroke-width="0.6"/>
+          <path d="M0,0 C8,-16 10,-39 0,-66 C-10,-39 -8,-16 0,0 Z" stroke-width="0.6"/>
+          <path d="M0,0 C8,-14 10,-36 0,-60 C-10,-36 -8,-14 0,0 Z" transform="rotate(19)" stroke-width="0.6"/>
+          <path d="M0,0 C8,-13 10,-31 0,-50 C-10,-31 -8,-13 0,0 Z" transform="rotate(38)" stroke-width="0.6"/>
+          <ellipse cx="0" cy="-69" rx="4" ry="6.5"/>
+          <ellipse cx="-8" cy="-59" rx="3.5" ry="5.6" transform="rotate(-22 -8 -59)"/>
+          <ellipse cx="8" cy="-59" rx="3.5" ry="5.6" transform="rotate(22 8 -59)"/>
+          <path d="M-22,5 Q0,18 22,5" fill="none" stroke-width="5" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <h1>حصيلة</h1>
+    </div>
+    <div class="login-tag">لوحة ماليّاتك الشخصية في مكان واحد</div>
+    <span class="demo-badge">نسخة تجريبية — بيانات وهمية</span>
+    <div class="field">
+      <label>رقم الجوال أو الهوية الوطنية</label>
+      <input id="login-id" type="text" placeholder="05xxxxxxxx" value="0555123456">
+    </div>
+    <div class="field">
+      <label>كلمة المرور</label>
+      <input id="login-pass" type="password" placeholder="••••••••" value="password">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">دخول</button>
+    <div class="login-foot">هذه واجهة تجريبية لعرض الفكرة فقط ولا تتصل بأي بنك حقيقي.<br>جميع الأرقام والحسابات افتراضية.</div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="seal"><svg viewBox="0 0 40 40"><g transform="translate(20,26)" stroke="currentColor" stroke-width="1.4" fill="currentColor"><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z" transform="rotate(-24)"/><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z"/><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z" transform="rotate(24)"/><path d="M-7,2 Q0,6 7,2" fill="none"/></g></svg></div>
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <button class="nav-item active" data-page="home"><span class="ic">⌂</span> الرئيسية</button>
+      <button class="nav-item" data-page="debts"><span class="ic">▤</span> الديون</button>
+      <button class="nav-item" data-page="stocks"><span class="ic">▲</span> الأسهم</button>
+      <button class="nav-item" data-page="financing"><span class="ic">◈</span> التمويل</button>
+      <button class="nav-item" data-page="transfers"><span class="ic">⇄</span> الحوالات</button>
+      <button class="nav-item" data-page="advisor"><span class="ic">☰</span> المستشار المالي</button>
+      <button class="nav-item" data-page="token"><span class="ic">◎</span> التوكن</button>
+      <button class="nav-item" data-page="link"><span class="ic">⛓</span> ربط الحسابات</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ---------- HOME ---------- -->
+    <section class="page active" id="page-home">
+      <div class="page-head">
+        <div>
+          <h1>الرئيسية</h1>
+          <p>نظرة عامة على وضعك المالي اليوم</p>
+        </div>
+        <span class="demo-pill">آخر تحديث: الآن — بيانات تجريبية</span>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="hero-balance">
+          <div class="hero-top">
+            <div>
+              <div class="hero-label">إجمالي الرصيد في جميع الحسابات</div>
+              <div class="hero-amount" id="total-balance">— <span class="cur">ر.س</span></div>
+            </div>
+            <div class="hero-stamp">موثّق<br>الآن</div>
+          </div>
+          <div class="hero-sub-row">
+            <div class="item">عدد الحسابات <b id="acc-count">0</b></div>
+            <div class="item">صافي الأسهم <b id="stocks-networth-mini">0</b></div>
+            <div class="item">إجمالي الديون <b id="debts-total-mini">0</b></div>
+            <div class="item">عمليات هذا الشهر <b id="tx-count-mini">0</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div class="card">
+            <h3>حساباتك والبنوك <span class="sub">5 حسابات نشطة</span></h3>
+            <div id="accounts-list"></div>
+          </div>
+          <div class="card">
+            <h3>أرشيف العمليات <span class="sub">آخر 6 عمليات</span></h3>
+            <div class="tx-list" id="tx-list"></div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div class="card">
+            <h3>إصدار توكن دفع</h3>
+            <p style="font-size:12.5px; color:var(--text-muted); line-height:1.8; margin-bottom:14px;">
+              أصدر توكن دفع مؤقت من عدة حسابات بمبلغ ومدة محددة دون كشف بياناتك البنكية الكاملة.
+            </p>
+            <button class="btn btn-emerald" style="width:100%;" onclick="go('token')">إصدار توكن جديد ←</button>
+          </div>
+          <div class="card">
+            <h3>مستشار مالي سريع</h3>
+            <div class="advisor-mini">
+              <div class="bubble">أهلًا فيصل، رصيدك الإجمالي اليوم يكفي لتغطية التزاماتك لهذا الشهر بعد خصم الأقساط. هل تحتاج نصيحة سريعة؟</div>
+              <div class="mini-input-row">
+                <input id="mini-advisor-input" type="text" placeholder="اسأل عن وضعك المالي...">
+                <button onclick="miniAdvisorAsk()">اسأل</button>
+              </div>
+              <button class="btn btn-outline btn-sm" style="align-self:flex-start;" onclick="go('advisor')">فتح المحادثة الكاملة ←</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- DEBTS ---------- -->
+    <section class="page" id="page-debts">
+      <div class="page-head">
+        <div>
+          <h1>الديون</h1>
+          <p>تابي، تمارا، وأقساط البنوك في جميع حساباتك</p>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card debt-card bnpl-tabby">
+          <h3>تابي <span class="sub">Tabby</span></h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;">640 <span style="font-size:13px; color:var(--text-muted);">ر.س متبقي</span></div>
+          <div class="debt-progress"><div class="fill" style="width:50%; background:#5B4FD6;"></div></div>
+          <div class="debt-meta"><span>قسطان من أصل 4</span><b>160 ر.س / قسط</b></div>
+          <div class="debt-meta" style="margin-top:6px;"><span>القسط القادم خلال</span><b>12 يوم</b></div>
+        </div>
+
+        <div class="card debt-card bnpl-tamara">
+          <h3>تمارا <span class="sub">Tamara</span></h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;">900 <span style="font-size:13px; color:var(--text-muted);">ر.س متبقي</span></div>
+          <div class="debt-progress"><div class="fill" style="width:33%; background:#1F9A83;"></div></div>
+          <div class="debt-meta"><span>3 أشهر متبقية</span><b>300 ر.س / شهر</b></div>
+          <div class="debt-meta" style="margin-top:6px;"><span>القسط القادم خلال</span><b>18 يوم</b></div>
+        </div>
+
+        <div class="card debt-card">
+          <h3>إجمالي الديون <span class="sub">جميع الجهات</span></h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--brick);" id="debts-grand-total">—</div>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:10px; line-height:1.8;">يشمل تابي، تمارا، والتمويل الشخصي وبطاقات الائتمان في جميع البنوك المرتبطة بحسابك.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>أقساط البنوك <span class="sub">في جميع الحسابات</span></h3>
+        <table class="stocks-table">
+          <thead><tr><th>الجهة</th><th>نوع التمويل</th><th>المتبقي</th><th>القسط الشهري</th><th>المدة المتبقية</th><th>الحالة</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex; align-items:center; gap:10px;"><div class="bank-dot" style="width:28px; height:28px; border-radius:8px; font-size:11px; background:#0C6650;">را</div> مصرف الراجحي</div></td><td>تمويل شخصي</td>
+              <td class="chg-neg">18,500 ر.س</td><td style="font-family:var(--font-mono);">1,250 ر.س</td><td>15 شهر</td>
+              <td><span class="demo-pill">منتظم</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex; align-items:center; gap:10px;"><div class="bank-dot" style="width:28px; height:28px; border-radius:8px; font-size:11px; background:#1F3A5F;">أه</div> البنك الأهلي السعودي</div></td><td>بطاقة ائتمان — أقساط</td>
+              <td class="chg-neg">2,100 ر.س</td><td style="font-family:var(--font-mono);">700 ر.س</td><td>3 أشهر</td>
+              <td><span class="demo-pill">منتظم</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex; align-items:center; gap:10px;"><div class="bank-dot" style="width:28px; height:28px; border-radius:8px; font-size:11px; background:#B5322A;">ري</div> بنك الرياض</div></td><td>تمويل سيارة</td>
+              <td class="chg-neg">31,200 ر.س</td><td style="font-family:var(--font-mono);">1,780 ر.س</td><td>18 شهر</td>
+              <td><span class="demo-pill">منتظم</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- STOCKS ---------- -->
+    <section class="page" id="page-stocks">
+      <div class="page-head">
+        <div>
+          <h1>الأسهم</h1>
+          <p>محفظتك في السوق السعودي (تداول)</p>
+        </div>
+        <span class="demo-pill">أسعار تجريبية غير حقيقية</span>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card" style="grid-column:1/-1;">
+          <h3>صافي ثروتك من الأسهم</h3>
+          <div style="font-family:var(--font-mono); font-size:30px; font-weight:600;" id="stocks-networth">—</div>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:6px;">القيمة السوقية الحالية لجميع الأسهم المملوكة</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>مقتنياتك <span class="sub">4 شركات</span></h3>
+        <table class="stocks-table" id="stocks-table">
+          <thead><tr><th>الشركة</th><th>الكمية</th><th>السعر</th><th>التغير</th><th>القيمة</th><th></th></tr></thead>
+          <tbody id="stocks-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- FINANCING ---------- -->
+    <section class="page" id="page-financing">
+      <div class="page-head">
+        <div>
+          <h1>التمويل</h1>
+          <p>قارن عروض الأقساط أو اطلب تمويلًا لشركتك</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <h3>مقارنة عروض الأقساط <span class="sub">حسب سياسة كل بنك</span></h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px; line-height:1.8;">
+          نسب الفائدة والحد الأقصى للتمويل تختلف من شخص لآخر بناءً على تقييمك الائتماني والراتب وسياسة كل بنك — العروض التالية تقديرية فقط.
+        </p>
+        <div class="grid grid-4">
+          <div class="offer-card best">
+            <span class="offer-badge">الأنسب لك</span>
+            <div class="bank-dot" style="width:34px; height:34px; margin-bottom:8px; font-size:12px; background:#0C6650;">را</div>
+            <div style="font-weight:700; font-size:14px;">مصرف الراجحي</div>
+            <div class="offer-rate">3.9% <span style="font-size:12px; color:var(--text-muted);">سنويًا</span></div>
+            <div style="font-size:12px; color:var(--text-muted);">حتى 48 شهر · سقف 150,000 ر.س</div>
+          </div>
+          <div class="offer-card">
+            <div class="bank-dot" style="width:34px; height:34px; margin-bottom:8px; font-size:12px; background:#1F3A5F;">أه</div>
+            <div style="font-weight:700; font-size:14px;">البنك الأهلي السعودي</div>
+            <div class="offer-rate">4.6% <span style="font-size:12px; color:var(--text-muted);">سنويًا</span></div>
+            <div style="font-size:12px; color:var(--text-muted);">حتى 60 شهر · سقف 200,000 ر.س</div>
+          </div>
+          <div class="offer-card">
+            <div class="bank-dot" style="width:34px; height:34px; margin-bottom:8px; font-size:12px; background:#B5322A;">ري</div>
+            <div style="font-weight:700; font-size:14px;">بنك الرياض</div>
+            <div class="offer-rate">5.1% <span style="font-size:12px; color:var(--text-muted);">سنويًا</span></div>
+            <div style="font-size:12px; color:var(--text-muted);">حتى 36 شهر · سقف 100,000 ر.س</div>
+          </div>
+          <div class="offer-card">
+            <div class="bank-dot" style="width:34px; height:34px; margin-bottom:8px; font-size:12px; background:#6B3F70;">إن</div>
+            <div style="font-weight:700; font-size:14px;">مصرف الإنماء</div>
+            <div class="offer-rate">4.2% <span style="font-size:12px; color:var(--text-muted);">سنويًا</span></div>
+            <div style="font-size:12px; color:var(--text-muted);">حتى 48 شهر · سقف 120,000 ر.س</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>طلب تمويل للشركات <span class="sub">اختياري</span></h3>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="field-block">
+            <label class="flabel">اسم الشركة</label>
+            <input style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2;" placeholder="مثال: مؤسسة الأفق التجارية">
+          </div>
+          <div class="field-block">
+            <label class="flabel">رقم السجل التجاري</label>
+            <input style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2;" placeholder="1010xxxxxx">
+          </div>
+          <div class="field-block">
+            <label class="flabel">المبلغ المطلوب</label>
+            <input style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2;" placeholder="ر.س">
+          </div>
+          <div class="field-block">
+            <label class="flabel">الغرض من التمويل</label>
+            <select class="sel"><option>رأس مال تشغيلي</option><option>توسّع</option><option>شراء معدات</option><option>أخرى</option></select>
+          </div>
+        </div>
+        <button class="btn btn-emerald" onclick="alert('تم إرسال طلب التمويل التجريبي، سيتم التواصل معك من قبل البنك المختار.')">إرسال الطلب</button>
+      </div>
+    </section>
+
+    <!-- ---------- TRANSFERS ---------- -->
+    <section class="page" id="page-transfers">
+      <div class="page-head">
+        <div>
+          <h1>الحوالات</h1>
+          <p>حوالاتك المحلية والدولية وإمكانية أتمتتها</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>سجل الحوالات</h3>
+          <div class="tx-list" id="transfers-list"></div>
+          <button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="alert('نموذج إنشاء حوالة جديدة — تجريبي')">+ حوالة جديدة</button>
+        </div>
+        <div class="card">
+          <h3>الحوالات التلقائية</h3>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.8;">فعّل التحويل التلقائي المتكرر لأي جهة أو حساب.</p>
+          <div id="automations-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ADVISOR ---------- -->
+    <section class="page" id="page-advisor">
+      <div class="page-head">
+        <div>
+          <h1>المستشار المالي</h1>
+          <p>يرى حساباتك وديونك، ويتوقع احتياجك القادم</p>
+        </div>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-head">
+          <div class="seal" style="background:var(--emerald);">🤖</div>
+          <div>
+            <div style="font-weight:700; font-size:14px;">المستشار المالي</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">متصل بحساباتك وديونك الحالية</div>
+          </div>
+        </div>
+        <div class="chat-body" id="chat-body"></div>
+        <div class="suggest-row">
+          <button class="suggest-chip" onclick="askAdvisor('كيف وضعي المالي هذا الشهر؟')">كيف وضعي المالي هذا الشهر؟</button>
+          <button class="suggest-chip" onclick="askAdvisor('هل أقدر أسدد ديوني الحين؟')">هل أقدر أسدد ديوني الحين؟</button>
+          <button class="suggest-chip" onclick="askAdvisor('وش أفضل وقت أبيع فيه أسهمي؟')">أفضل وقت لبيع أسهمي؟</button>
+        </div>
+        <div class="chat-input-row">
+          <input id="chat-input" type="text" placeholder="اكتب سؤالك عن وضعك المالي...">
+          <button class="btn btn-emerald" onclick="sendChat()">إرسال</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- TOKEN ---------- -->
+    <section class="page" id="page-token">
+      <div class="page-head">
+        <div>
+          <h1>إصدار توكن الدفع</h1>
+          <p>حدد الحسابات، المبلغ من كل حساب، ومدة صلاحية التوكن</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>اختر الحسابات <span class="sub">حتى 3 حسابات</span></h3>
+          <div id="token-accounts"></div>
+
+          <div class="field-block" style="margin-top:18px;">
+            <label class="flabel">مدة صلاحية التوكن</label>
+            <select class="sel" id="token-duration">
+              <option value="ساعة واحدة">ساعة واحدة</option>
+              <option value="24 ساعة" selected>24 ساعة</option>
+              <option value="7 أيام">7 أيام</option>
+              <option value="30 يوم">30 يوم</option>
+            </select>
+          </div>
+          <button class="btn btn-emerald" style="width:100%; margin-top:10px;" onclick="generateToken()">إصدار التوكن</button>
+        </div>
+
+        <div class="card">
+          <h3>إيصال التوكن</h3>
+          <div id="token-receipt-wrap" style="display:none;">
+            <div class="token-receipt" id="token-receipt"></div>
+          </div>
+          <p id="token-placeholder" style="font-size:12.5px; color:var(--text-muted); line-height:1.8;">
+            بعد اختيار الحسابات والمبالغ وضغط "إصدار التوكن"، سيظهر هنا رمز التوكن مع تفاصيله وصلاحيته.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- LINK ACCOUNTS ---------- -->
+    <section class="page" id="page-link">
+      <div class="page-head">
+        <div>
+          <h1>ربط الحسابات</h1>
+          <p>أدر اتصال حساباتك البنكية الخمسة في مكان واحد</p>
+        </div>
+        <span class="demo-pill">تجريبي — لا يتصل بأي بنك حقيقي</span>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card" style="grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="margin-bottom:4px;">حساباتك المرتبطة</h3>
+            <p style="font-size:12.5px; color:var(--text-muted);" id="linked-summary">—</p>
+          </div>
+          <button class="btn btn-emerald" onclick="alert('نموذج ربط بنك جديد — تجريبي، يفتح عادة صفحة تسجيل دخول آمنة من البنك نفسه.')">+ ربط بنك جديد</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>البنوك <span class="sub">5 جهات</span></h3>
+        <div id="link-accounts-list"></div>
+        <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
+          🔒 بياناتك مشفّرة من طرفك إلى طرفك، ولا نطّلع أو نخزّن كلمات مرور حساباتك البنكية. تقدر تفصل أي حساب في أي وقت.
+        </p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- Mock Data ---------------- */
+const accounts = [
+  {id:'a1', bank:'مصرف الراجحي', type:'حساب جاري', balance:12450.75, mono:'را', color:'#0C6650', iban:'SA•• •••• •••• •••• 2290', linked:true, lastSync:'قبل 4 دقائق'},
+  {id:'a2', bank:'البنك الأهلي السعودي', type:'حساب توفير', balance:34200.00, mono:'أه', color:'#1F3A5F', iban:'SA•• •••• •••• •••• 7714', linked:true, lastSync:'قبل ساعة'},
+  {id:'a3', bank:'بنك الرياض', type:'حساب جاري', balance:5860.40, mono:'ري', color:'#B5322A', iban:'SA•• •••• •••• •••• 1038', linked:true, lastSync:'قبل ساعتين'},
+  {id:'a4', bank:'STC Bank', type:'محفظة رقمية', balance:1240.00, mono:'STC', color:'#4B2C82', iban:'966•• •••• 5560', linked:true, lastSync:'قبل 30 دقيقة'},
+  {id:'a5', bank:'مصرف الإنماء', type:'حساب توفير', balance:8930.20, mono:'إن', color:'#6B3F70', iban:'SA•• •••• •••• •••• 4821', linked:false, lastSync:'—'},
+];
+
+const transactions = [
+  {name:'مطعم نجد الأصيل', date:'٦ يوليو', amount:-186.00, ic:'🍽️'},
+  {name:'راتب شهري', date:'٥ يوليو', amount:11200.00, ic:'💼'},
+  {name:'اشتراك STC', date:'٤ يوليو', amount:-249.00, ic:'📶'},
+  {name:'تحويل إلى محمد', date:'٢ يوليو', amount:-500.00, ic:'↗️'},
+  {name:'خصم تابي', date:'١ يوليو', amount:-160.00, ic:'🛍️'},
+  {name:'بيع سهم سابك', date:'٢٩ يونيو', amount:1322.00, ic:'📈'},
+];
+
+const stocks = [
+  {name:'أرامكو السعودية', ticker:'2222', qty:100, price:27.85, chg:0.6},
+  {name:'مصرف الراجحي', ticker:'1120', qty:30, price:89.40, chg:-0.3},
+  {name:'سابك', ticker:'2010', qty:50, price:66.10, chg:1.2},
+  {name:'stc', ticker:'7010', qty:40, price:38.20, chg:0.4},
+];
+
+const transfersData = [
+  {name:'إيجار الشقة — تحويل آيبان', date:'١ يوليو', amount:-3000, ic:'🏠'},
+  {name:'حوالة دولية — SWIFT', date:'٢٨ يونيو', amount:-1200, ic:'🌍'},
+  {name:'من: سارة العتيبي', date:'٢٥ يونيو', amount:800, ic:'↙️'},
+  {name:'STC Bank إلى عبدالله', date:'٢٠ يونيو', amount:-250, ic:'↗️'},
+];
+
+const automations = [
+  {name:'تحويل الإيجار الشهري', detail:'3,000 ر.س — كل يوم 1 من الشهر', on:true},
+  {name:'ادخار تلقائي', detail:'500 ر.س أسبوعيًا إلى حساب التوفير', on:true},
+  {name:'دعم عائلي', detail:'1,000 ر.س شهريًا', on:false},
+];
+
+const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
+
+/* ---------------- Login ---------------- */
+function doLogin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('active');
+  renderAll();
+}
+function doLogout(){
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').style.display='flex';
+}
+
+/* ---------------- Nav ---------------- */
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click', ()=> go(btn.dataset.page));
+});
+function go(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navBtn = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+  if(navBtn) navBtn.classList.add('active');
+}
+
+/* ---------------- Formatting ---------------- */
+const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+function animateCount(el, target, suffixHtml, duration){
+  duration = duration || 900;
+  const start = 0;
+  const startTime = performance.now();
+  function tick(now){
+    const p = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+    const value = start + (target - start) * eased;
+    el.innerHTML = fmt(value) + (suffixHtml || '');
+    if(p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ---------------- Render: Home ---------------- */
+function renderHome(){
+  const total = accounts.reduce((s,a)=>s+a.balance,0);
+  animateCount(document.getElementById('total-balance'), total, ' <span class="cur">ر.س</span>');
+  document.getElementById('acc-count').textContent = accounts.length;
+  document.getElementById('tx-count-mini').textContent = transactions.length;
+  document.getElementById('debts-total-mini').textContent = fmt(debtsTotal)+' ر.س';
+
+  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  document.getElementById('stocks-networth-mini').textContent = fmt(stocksNet)+' ر.س';
+
+  const accList = document.getElementById('accounts-list');
+  accList.innerHTML = accounts.map(a=>`
+    <div class="account-row">
+      <div class="acc-left">
+        <div class="bank-dot" style="background:${a.color};" title="${a.bank}">${a.mono}</div>
+        <div><div class="acc-name">${a.bank}</div><div class="acc-type">${a.type}</div></div>
+      </div>
+      <div class="acc-amount">${fmt(a.balance)} ر.س</div>
+    </div>`).join('');
+
+  const txList = document.getElementById('tx-list');
+  txList.innerHTML = transactions.map(t=>`
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="tx-ic">${t.ic}</div>
+        <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
+      </div>
+      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ر.س</div>
+    </div>`).join('');
+}
+
+/* ---------------- Render: Debts ---------------- */
+function renderDebts(){
+  document.getElementById('debts-grand-total').textContent = fmt(debtsTotal)+' ر.س';
+}
+
+/* ---------------- Render: Stocks ---------------- */
+function renderStocks(){
+  const net = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  animateCount(document.getElementById('stocks-networth'), net, ' ر.س');
+  document.getElementById('stocks-tbody').innerHTML = stocks.map((s,i)=>`
+    <tr>
+      <td>${s.name}<span class="ticker">${s.ticker}</span></td>
+      <td style="font-family:var(--font-mono);">${s.qty}</td>
+      <td style="font-family:var(--font-mono);">${s.price.toFixed(2)} ر.س</td>
+      <td class="${s.chg>=0?'chg-pos':'chg-neg'}">${s.chg>=0?'+':''}${s.chg}%</td>
+      <td style="font-family:var(--font-mono); font-weight:600;">${fmt(s.qty*s.price)} ر.س</td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="tradeStock(${i},'buy')">شراء</button>
+        <button class="btn btn-sm btn-outline" onclick="tradeStock(${i},'sell')">بيع</button>
+      </td>
+    </tr>`).join('');
+}
+function tradeStock(i, action){
+  const s = stocks[i];
+  const qty = prompt(`كم عدد الأسهم التي تريد ${action==='buy'?'شراءها':'بيعها'} من ${s.name}؟`, '1');
+  if(qty===null) return;
+  const n = parseInt(qty);
+  if(!n || n<=0){ alert('كمية غير صحيحة'); return; }
+  if(action==='buy'){ s.qty += n; }
+  else { if(n>s.qty){ alert('لا تملك هذا العدد من الأسهم'); return; } s.qty -= n; }
+  renderStocks(); renderHome();
+  alert(`تم ${action==='buy'?'شراء':'بيع'} ${n} سهم من ${s.name} (تجريبي).`);
+}
+
+/* ---------------- Render: Transfers ---------------- */
+function renderTransfers(){
+  document.getElementById('transfers-list').innerHTML = transfersData.map(t=>`
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="tx-ic">${t.ic}</div>
+        <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
+      </div>
+      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ر.س</div>
+    </div>`).join('');
+
+  document.getElementById('automations-list').innerHTML = automations.map((a,i)=>`
+    <div class="account-row">
+      <div><div class="acc-name">${a.name}</div><div class="acc-type">${a.detail}</div></div>
+      <button class="toggle ${a.on?'on':''}" onclick="toggleAuto(${i})"></button>
+    </div>`).join('');
+}
+function toggleAuto(i){
+  automations[i].on = !automations[i].on;
+  renderTransfers();
+}
+
+/* ---------------- Link Accounts ---------------- */
+function renderLinkAccounts(){
+  const linkedCount = accounts.filter(a=>a.linked).length;
+  document.getElementById('linked-summary').textContent = `${linkedCount} من ${accounts.length} حسابات متصلة الآن`;
+
+  document.getElementById('link-accounts-list').innerHTML = accounts.map((a,i)=>`
+    <div class="account-row">
+      <div class="acc-left">
+        <div class="bank-dot" style="background:${a.color};" title="${a.bank}">${a.mono}</div>
+        <div>
+          <div class="acc-name">${a.bank}</div>
+          <div class="acc-type" style="font-family:var(--font-mono); direction:ltr; display:inline-block;">${a.iban}</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="text-align:left;">
+          <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
+          <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
+        </div>
+        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleLink(${i})" aria-label="ربط ${a.bank}"></button>
+      </div>
+    </div>`).join('');
+}
+function toggleLink(i){
+  const a = accounts[i];
+  a.linked = !a.linked;
+  a.lastSync = a.linked ? 'الآن' : '—';
+  renderLinkAccounts();
+  renderHome();
+}
+
+/* ---------------- Advisor Chat ---------------- */
+const chatLog = [
+  {who:'bot', text:'أهلًا فيصل 👋 أنا مستشارك المالي، أقدر أطّلع على حساباتك وديونك وأسهمك لأعطيك توقعات ونصائح دقيقة. وش تحب تعرف؟'}
+];
+function renderChat(){
+  document.getElementById('chat-body').innerHTML = chatLog.map(m=>`<div class="msg ${m.who}">${m.text}</div>`).join('');
+  const body = document.getElementById('chat-body');
+  body.scrollTop = body.scrollHeight;
+}
+function advisorReply(q){
+  const total = accounts.reduce((s,a)=>s+a.balance,0);
+  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  if(q.includes('وضعي') || q.includes('شهر')){
+    return `رصيدك الحالي ${fmt(total)} ر.س، والتزاماتك الشهرية (أقساط + تابي/تمارا) تقارب 3,890 ر.س. بعد خصمها يبقى لديك هامش جيد للادخار، وأنصحك بتحويل جزء منه تلقائيًا لحساب التوفير.`;
+  }
+  if(q.includes('ديون') || q.includes('اسدد') || q.includes('أسدد')){
+    return `إجمالي ديونك الحالية ${fmt(debtsTotal)} ر.س. بناءً على رصيدك، تقدر تسدد دفعة تابي القادمة (160 ر.س) وتمارا (300 ر.س) بدون أي ضغط. تسديد التمويل الشخصي مبكرًا سيوفر عليك فوائد إضافية إذا رغبت.`;
+  }
+  if(q.includes('أسهم') || q.includes('سهم') || q.includes('بيع')){
+    return `صافي محفظتك من الأسهم حاليًا ${fmt(stocksNet)} ر.س. سهم سابك يسجل أعلى نمو هذا الأسبوع (+1.2%)، بينما الراجحي في تراجع طفيف (-0.3%). القرار يعتمد على أفقك الاستثماري، لكن لا يوجد مؤشر ضغط يستدعي بيعًا فوريًا.`;
+  }
+  return `بناءً على بياناتك: رصيدك الإجمالي ${fmt(total)} ر.س، وديونك ${fmt(debtsTotal)} ر.س، ومحفظة أسهمك ${fmt(stocksNet)} ر.س. وضعك المالي مستقر بشكل عام. تحب أفصّل لك أي جزء منها؟`;
+}
+function sendChat(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  askAdvisor(text);
+  input.value='';
+}
+function askAdvisor(q){
+  chatLog.push({who:'user', text:q});
+  chatLog.push({who:'bot', text:advisorReply(q)});
+  renderChat();
+}
+function miniAdvisorAsk(){
+  const input = document.getElementById('mini-advisor-input');
+  if(!input.value.trim()) return;
+  go('advisor');
+  askAdvisor(input.value.trim());
+  input.value='';
+}
+
+/* ---------------- Token ---------------- */
+function renderTokenAccounts(){
+  document.getElementById('token-accounts').innerHTML = accounts.map((a,i)=>`
+    <div class="token-account">
+      <input type="checkbox" id="tok-chk-${i}" onchange="tokenLimitCheck()">
+      <div class="bank-dot" style="width:32px; height:32px; border-radius:9px; font-size:11px; background:${a.color};" title="${a.bank}">${a.mono}</div>
+      <div style="flex:1;">
+        <div class="acc-name">${a.bank}</div>
+        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ر.س</div>
+      </div>
+      <input type="number" class="amt-input" id="tok-amt-${i}" placeholder="0.00">
+    </div>`).join('');
+}
+function tokenLimitCheck(){
+  const checked = accounts.map((_,i)=>document.getElementById('tok-chk-'+i).checked).filter(Boolean).length;
+  if(checked>3){
+    alert('يمكنك اختيار 3 حسابات كحد أقصى للتوكن الواحد.');
+  }
+}
+function generateToken(){
+  const chosen = [];
+  accounts.forEach((a,i)=>{
+    const chk = document.getElementById('tok-chk-'+i);
+    const amt = parseFloat(document.getElementById('tok-amt-'+i).value)||0;
+    if(chk.checked && amt>0) chosen.push({bank:a.bank, amt});
+  });
+  if(chosen.length===0){ alert('اختر حسابًا واحدًا على الأقل وحدد مبلغًا.'); return; }
+  if(chosen.length>3){ alert('الحد الأقصى 3 حسابات للتوكن الواحد.'); return; }
+
+  const total = chosen.reduce((s,c)=>s+c.amt,0);
+  const duration = document.getElementById('token-duration').value;
+  const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+
+  document.getElementById('token-placeholder').style.display='none';
+  const wrap = document.getElementById('token-receipt-wrap');
+  wrap.style.display='block';
+  document.getElementById('token-receipt').innerHTML = `
+    <div style="text-align:center; font-size:11px; color:#9AA3BE; margin-bottom:8px;">إيصال توكن الدفع</div>
+    <div class="code">${code}</div>
+    <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(255,255,255,0.25) 0 6px, transparent 6px 12px);"></div>
+    ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${fmt(c.amt)} ر.س</span></div>`).join('')}
+    <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:#B8863E;">${fmt(total)} ر.س</span></div>
+    <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${duration}</span></div>
+  `;
+}
+
+/* ---------------- Init ---------------- */
+function renderAll(){
+  renderHome();
+  renderDebts();
+  renderStocks();
+  renderTransfers();
+  renderChat();
+  renderTokenAccounts();
+  renderLinkAccounts();
+}
+
+document.getElementById('chat-input').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+document.getElementById('mini-advisor-input').addEventListener('keydown', e=>{ if(e.key==='Enter') miniAdvisorAsk(); });
+</script>
+</body>
+</html>

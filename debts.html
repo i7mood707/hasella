@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — الديون</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%233B2415'/%3E%3Ccircle cx='20' cy='20' r='19' fill='none' stroke='%23D9A94E' stroke-width='1.5'/%3E%3Cg transform='translate(20,26)' stroke='%23D9A94E' stroke-width='1.3' fill='%23D9A94E'%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z' transform='rotate(-24)'/%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z'/%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z' transform='rotate(24)'/%3E%3Cpath d='M-7,2 Q0,6 7,2' fill='none'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="seal"><svg viewBox="0 0 40 40"><g transform="translate(20,26)" stroke="currentColor" stroke-width="1.4" fill="currentColor"><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z" transform="rotate(-24)"/><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z"/><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z" transform="rotate(24)"/><path d="M-7,2 Q0,6 7,2" fill="none"/></g></svg></div>
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item active" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="token.html"><span class="ic">◎</span> التوكن</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-debts">
+      <div class="page-head">
+        <div>
+          <h1>الديون</h1>
+          <p>تابي، تمارا، وأقساط البنوك في جميع حساباتك</p>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card debt-card bnpl-tabby">
+          <h3>تابي <span class="sub">Tabby</span></h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;">640 <span style="font-size:13px; color:var(--text-muted);">ر.س متبقي</span></div>
+          <div class="debt-progress"><div class="fill" style="width:50%; background:#5B4FD6;"></div></div>
+          <div class="debt-meta"><span>قسطان من أصل 4</span><b>160 ر.س / قسط</b></div>
+          <div class="debt-meta" style="margin-top:6px;"><span>القسط القادم خلال</span><b>12 يوم</b></div>
+        </div>
+
+        <div class="card debt-card bnpl-tamara">
+          <h3>تمارا <span class="sub">Tamara</span></h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;">900 <span style="font-size:13px; color:var(--text-muted);">ر.س متبقي</span></div>
+          <div class="debt-progress"><div class="fill" style="width:33%; background:#1F9A83;"></div></div>
+          <div class="debt-meta"><span>3 أشهر متبقية</span><b>300 ر.س / شهر</b></div>
+          <div class="debt-meta" style="margin-top:6px;"><span>القسط القادم خلال</span><b>18 يوم</b></div>
+        </div>
+
+        <div class="card debt-card">
+          <h3>إجمالي الديون <span class="sub">جميع الجهات</span></h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--brick);" id="debts-grand-total">—</div>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:10px; line-height:1.8;">يشمل تابي، تمارا، والتمويل الشخصي وبطاقات الائتمان في جميع البنوك المرتبطة بحسابك.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>أقساط البنوك <span class="sub">في جميع الحسابات</span></h3>
+        <table class="stocks-table">
+          <thead><tr><th>الجهة</th><th>نوع التمويل</th><th>المتبقي</th><th>القسط الشهري</th><th>المدة المتبقية</th><th>الحالة</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex; align-items:center; gap:10px;"><img class="bank-logo" style="width:28px; height:28px; border-radius:8px; padding:3px;" src="logos/alrajhi.png" alt="مصرف الراجحي"> مصرف الراجحي</div></td><td>تمويل شخصي</td>
+              <td class="chg-neg">18,500 ر.س</td><td style="font-family:var(--font-mono);">1,250 ر.س</td><td>15 شهر</td>
+              <td><span class="demo-pill">منتظم</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex; align-items:center; gap:10px;"><img class="bank-logo" style="width:28px; height:28px; border-radius:8px; padding:3px;" src="logos/snb.jpg" alt="البنك الأهلي السعودي"> البنك الأهلي السعودي</div></td><td>بطاقة ائتمان — أقساط</td>
+              <td class="chg-neg">2,100 ر.س</td><td style="font-family:var(--font-mono);">700 ر.س</td><td>3 أشهر</td>
+              <td><span class="demo-pill">منتظم</span></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex; align-items:center; gap:10px;"><img class="bank-logo" style="width:28px; height:28px; border-radius:8px; padding:3px;" src="logos/riyadbank.webp" alt="بنك الرياض"> بنك الرياض</div></td><td>تمويل سيارة</td>
+              <td class="chg-neg">31,200 ر.س</td><td style="font-family:var(--font-mono);">1,780 ر.س</td><td>18 شهر</td>
+              <td><span class="demo-pill">منتظم</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script>
+requireAuth();
+document.getElementById('debts-grand-total').textContent = fmt(debtsTotal)+' ر.س';
+</script>
+</body>
+</html>

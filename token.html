@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — إصدار توكن الدفع</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%233B2415'/%3E%3Ccircle cx='20' cy='20' r='19' fill='none' stroke='%23D9A94E' stroke-width='1.5'/%3E%3Cg transform='translate(20,26)' stroke='%23D9A94E' stroke-width='1.3' fill='%23D9A94E'%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z' transform='rotate(-24)'/%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z'/%3E%3Cpath d='M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z' transform='rotate(24)'/%3E%3Cpath d='M-7,2 Q0,6 7,2' fill='none'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="seal"><svg viewBox="0 0 40 40"><g transform="translate(20,26)" stroke="currentColor" stroke-width="1.4" fill="currentColor"><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z" transform="rotate(-24)"/><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z"/><path d="M0,0 C4,-6 5,-14 0,-20 C-5,-14 -4,-6 0,0 Z" transform="rotate(24)"/><path d="M-7,2 Q0,6 7,2" fill="none"/></g></svg></div>
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item active" href="token.html"><span class="ic">◎</span> التوكن</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-token">
+      <div class="page-head">
+        <div>
+          <h1>إصدار توكن الدفع</h1>
+          <p>حدد الحسابات، المبلغ من كل حساب، ومدة صلاحية التوكن</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>اختر الحسابات <span class="sub">حتى 3 حسابات</span></h3>
+          <div id="token-accounts"></div>
+
+          <div class="field-block" style="margin-top:18px;">
+            <label class="flabel">مدة صلاحية التوكن</label>
+            <select class="sel" id="token-duration">
+              <option value="ساعة واحدة">ساعة واحدة</option>
+              <option value="24 ساعة" selected>24 ساعة</option>
+              <option value="7 أيام">7 أيام</option>
+              <option value="30 يوم">30 يوم</option>
+            </select>
+          </div>
+          <button class="btn btn-emerald" style="width:100%; margin-top:10px;" onclick="generateToken()">إصدار التوكن</button>
+        </div>
+
+        <div class="card">
+          <h3>إيصال التوكن</h3>
+          <div id="token-receipt-wrap" style="display:none;">
+            <div class="token-receipt" id="token-receipt"></div>
+          </div>
+          <p id="token-placeholder" style="font-size:12.5px; color:var(--text-muted); line-height:1.8;">
+            بعد اختيار الحسابات والمبالغ وضغط "إصدار التوكن"، سيظهر هنا رمز التوكن مع تفاصيله وصلاحيته.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script>
+requireAuth();
+
+function renderTokenAccounts(){
+  document.getElementById('token-accounts').innerHTML = accounts.map((a,i)=>`
+    <div class="token-account">
+      <input type="checkbox" id="tok-chk-${i}" onchange="tokenLimitCheck()">
+      <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+      <div style="flex:1;">
+        <div class="acc-name">${a.bank}</div>
+        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ر.س</div>
+      </div>
+      <input type="number" class="amt-input" id="tok-amt-${i}" placeholder="0.00">
+    </div>`).join('');
+}
+function tokenLimitCheck(){
+  const checked = accounts.map((_,i)=>document.getElementById('tok-chk-'+i).checked).filter(Boolean).length;
+  if(checked>3){
+    alert('يمكنك اختيار 3 حسابات كحد أقصى للتوكن الواحد.');
+  }
+}
+function generateToken(){
+  const chosen = [];
+  accounts.forEach((a,i)=>{
+    const chk = document.getElementById('tok-chk-'+i);
+    const amt = parseFloat(document.getElementById('tok-amt-'+i).value)||0;
+    if(chk.checked && amt>0) chosen.push({bank:a.bank, amt});
+  });
+  if(chosen.length===0){ alert('اختر حسابًا واحدًا على الأقل وحدد مبلغًا.'); return; }
+  if(chosen.length>3){ alert('الحد الأقصى 3 حسابات للتوكن الواحد.'); return; }
+
+  const total = chosen.reduce((s,c)=>s+c.amt,0);
+  const duration = document.getElementById('token-duration').value;
+  const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+
+  document.getElementById('token-placeholder').style.display='none';
+  const wrap = document.getElementById('token-receipt-wrap');
+  wrap.style.display='block';
+  document.getElementById('token-receipt').innerHTML = `
+    <div style="text-align:center; font-size:11px; color:#9AA3BE; margin-bottom:8px;">إيصال توكن الدفع</div>
+    <div class="code">${code}</div>
+    <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(255,255,255,0.25) 0 6px, transparent 6px 12px);"></div>
+    ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${fmt(c.amt)} ر.س</span></div>`).join('')}
+    <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:#B8863E;">${fmt(total)} ر.س</span></div>
+    <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${duration}</span></div>
+  `;
+}
+
+renderTokenAccounts();
+</script>
+</body>
+</html>
