@@ -43,7 +43,7 @@ const DEFAULT_STOCKS = [
   {name:'مصرف الإنماء', ticker:'1150', qty:0, price:28.75, chg:0.3, logo:'logos/alinma.jpg'},
 ];
 
-const transfersData = [
+const DEFAULT_TRANSFERS = [
   {name:'إيجار الشقة — تحويل آيبان', date:'١ يوليو', amount:-3000, ic:'🏠'},
   {name:'حوالة دولية — SWIFT', date:'٢٨ يونيو', amount:-1200, ic:'🌍'},
   {name:'من: سارة العتيبي', date:'٢٥ يونيو', amount:800, ic:'↙️'},
@@ -68,9 +68,9 @@ const DEFAULT_INVESTMENTS = [
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
-const DATA_VERSION = '3';
+const DATA_VERSION = '4';
 if(localStorage.getItem('hasila_data_version') !== DATA_VERSION){
-  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments'].forEach(k=>localStorage.removeItem(k));
+  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_transfers'].forEach(k=>localStorage.removeItem(k));
   localStorage.setItem('hasila_data_version', DATA_VERSION);
 }
 
@@ -88,6 +88,7 @@ const stocks = loadState('hasila_stocks', DEFAULT_STOCKS);
 const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
 const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
 const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS);
+const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
 
 function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
@@ -95,6 +96,7 @@ function persistState(){
   localStorage.setItem('hasila_automations', JSON.stringify(automations));
   localStorage.setItem('hasila_bnpl', JSON.stringify(bnplProviders));
   localStorage.setItem('hasila_investments', JSON.stringify(investmentPlatforms));
+  localStorage.setItem('hasila_transfers', JSON.stringify(transfersData));
 }
 
 /* ---------------- Formatting ---------------- */
