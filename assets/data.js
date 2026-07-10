@@ -66,21 +66,21 @@ const DEFAULT_INVESTMENTS = [
 ];
 
 const DEFAULT_OTHER_BANKS = [
-  {bank:'البنك السعودي الأول SAB', logo:'logos/sab.svg', linked:false, lastSync:'—'},
-  {bank:'البنك العربي الوطني', logo:'logos/anb.png', linked:false, lastSync:'—'},
-  {bank:'البنك السعودي الفرنسي', logo:'logos/bsf.svg', linked:false, lastSync:'—'},
-  {bank:'البنك السعودي للاستثمار', logo:'logos/saib.png', linked:false, lastSync:'—'},
-  {bank:'بنك الجزيرة', logo:'logos/aljazira.png', linked:false, lastSync:'—'},
-  {bank:'بنك الخليج الدولي - السعودية', logo:'logos/gib.svg', linked:false, lastSync:'—'},
-  {bank:'بنك البلاد', logo:'logos/albilad.png', linked:false, lastSync:'—'},
-  {bank:'بنك D360', logo:'logos/d360.png', linked:false, lastSync:'—'},
-  {bank:'بنك فيجن', logo:'logos/visionbank.png', linked:false, lastSync:'—'},
+  {bank:'البنك السعودي الأول SAB', logo:'logos/sab.svg'},
+  {bank:'البنك العربي الوطني', logo:'logos/anb.png'},
+  {bank:'البنك السعودي الفرنسي', logo:'logos/bsf.svg'},
+  {bank:'البنك السعودي للاستثمار', logo:'logos/saib.png'},
+  {bank:'بنك الجزيرة', logo:'logos/aljazira.png'},
+  {bank:'بنك الخليج الدولي - السعودية', logo:'logos/gib.svg'},
+  {bank:'بنك البلاد', logo:'logos/albilad.png'},
+  {bank:'بنك D360', logo:'logos/d360.png'},
+  {bank:'بنك فيجن', logo:'logos/visionbank.png'},
 ];
 
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
-const DATA_VERSION = '5';
+const DATA_VERSION = '6';
 if(localStorage.getItem('hasila_data_version') !== DATA_VERSION){
   ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_transfers','hasila_other_banks'].forEach(k=>localStorage.removeItem(k));
   localStorage.setItem('hasila_data_version', DATA_VERSION);

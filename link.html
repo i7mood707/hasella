@@ -85,12 +85,12 @@
 </div>
 
 <div class="modal-overlay" id="add-bank-modal" style="display:none;">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:640px;">
     <h3>ربط بنك جديد</h3>
     <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8;">
-      اختر أي بنك من البنوك السعودية المرخّصة من ساما لتربطه بحسابك.
+      اختر أي بنك من البنوك السعودية المرخّصة من ساما، وأدخل رقم حسابك لتربطه — بعدها ينضم مباشرة إلى قائمة بنوكك بالأسفل.
     </p>
-    <div id="add-bank-list" style="max-height:360px; overflow-y:auto;"></div>
+    <div id="add-bank-list" style="max-height:420px; overflow-y:auto; overflow-x:hidden;"></div>
     <div style="display:flex; gap:10px; margin-top:14px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closeAddBankModal()">إغلاق</button>
     </div>
@@ -172,15 +172,6 @@ function toggleLink(i){
   persistState();
   renderLinkAccounts();
 }
-function toggleOtherBank(i){
-  const a = otherBanks[i];
-  a.linked = !a.linked;
-  a.lastSync = a.linked ? 'الآن' : '—';
-  persistState();
-  renderLinkAccounts();
-  showToast(a.linked ? `تم ربط ${a.bank} بنجاح.` : `تم فصل ${a.bank}.`);
-}
-
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -189,23 +180,64 @@ function showToast(msg){
   t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
+let addBankFormIndex = null;
+
 function renderAddBankList(){
-  document.getElementById('add-bank-list').innerHTML = otherBanks.map((a,i)=>`
-    <div class="account-row">
-      <div class="acc-left">
-        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
-        <div>
+  if(otherBanks.length === 0){
+    document.getElementById('add-bank-list').innerHTML = `<p style="font-size:12.5px; color:var(--text-muted); padding:14px 4px;">ربطت كل البنوك المتاحة بالفعل 🎉</p>`;
+    return;
+  }
+  document.getElementById('add-bank-list').innerHTML = otherBanks.map((a,i)=>{
+    if(addBankFormIndex === i){
+      return `
+      <div class="account-row" style="display:block; padding:14px 8px;">
+        <div class="acc-left" style="margin-bottom:12px;">
+          <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
           <div class="acc-name">${a.bank}</div>
+        </div>
+        <label class="flabel">رقم الحساب / الآيبان</label>
+        <input type="text" id="new-bank-iban" placeholder="SA•• •••• •••• •••• ••••" style="width:100%; padding:10px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); direction:ltr; text-align:right; margin-bottom:12px;">
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="cancelAddBankForm()">إلغاء</button>
+          <button class="btn btn-emerald btn-sm" style="flex:1;" onclick="confirmAddBank(${i})">تأكيد الربط</button>
+        </div>
+      </div>`;
+    }
+    return `
+    <div class="account-row" style="flex-wrap:wrap;">
+      <div class="acc-left" style="min-width:0; flex:1;">
+        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+        <div style="min-width:0;">
+          <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
           <div class="acc-type">بنك مرخّص من ساما</div>
         </div>
       </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
-        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleOtherBank(${i})" aria-label="ربط ${a.bank}"></button>
-      </div>
-    </div>`).join('');
+      <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="startAddBankForm(${i})">+ ربط</button>
+    </div>`;
+  }).join('');
+}
+function startAddBankForm(i){
+  addBankFormIndex = i;
+  renderAddBankList();
+}
+function cancelAddBankForm(){
+  addBankFormIndex = null;
+  renderAddBankList();
+}
+function confirmAddBank(i){
+  const iban = document.getElementById('new-bank-iban').value.trim();
+  if(!iban){ showToast('اكتب رقم الحساب أو الآيبان أولاً.'); return; }
+  const a = otherBanks[i];
+  accounts.push({id:'a'+(accounts.length+1), bank:a.bank, type:'حساب جاري', balance:0, logo:a.logo, iban:iban, linked:true, lastSync:'الآن'});
+  otherBanks.splice(i, 1);
+  addBankFormIndex = null;
+  persistState();
+  renderLinkAccounts();
+  closeAddBankModal();
+  showToast(`تم ربط ${a.bank} وإضافته إلى قائمة بنوكك.`);
 }
 function openAddBankModal(){
+  addBankFormIndex = null;
   renderAddBankList();
   document.getElementById('add-bank-modal').style.display = 'flex';
 }
