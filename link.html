@@ -53,7 +53,7 @@
             <h3 style="margin-bottom:4px;">حساباتك المرتبطة</h3>
             <p style="font-size:12.5px; color:var(--text-muted);" id="linked-summary">—</p>
           </div>
-          <button class="btn btn-emerald" onclick="alert('نموذج ربط بنك جديد — تجريبي، يفتح عادة صفحة تسجيل دخول آمنة من البنك نفسه.')">+ ربط بنك جديد</button>
+          <button class="btn btn-emerald" onclick="openAddBankModal()">+ ربط بنك جديد</button>
         </div>
       </div>
 
@@ -62,14 +62,6 @@
         <div id="link-accounts-list"></div>
         <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
           🔒 بياناتك مشفّرة من طرفك إلى طرفك، ولا نطّلع أو نخزّن كلمات مرور حساباتك البنكية. تقدر تفصل أي حساب في أي وقت.
-        </p>
-      </div>
-
-      <div class="card" style="margin-bottom:18px;">
-        <h3>بنوك سعودية أخرى <span class="sub" id="other-banks-count-sub">9 جهات</span></h3>
-        <div id="link-other-banks-list"></div>
-        <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
-          🔒 جميع البنوك المرخّصة من البنك المركزي السعودي (ساما). اربط أي بنك إضافي متى ما احتجت.
         </p>
       </div>
 
@@ -92,6 +84,20 @@
   </main>
 </div>
 
+<div class="modal-overlay" id="add-bank-modal" style="display:none;">
+  <div class="modal-box">
+    <h3>ربط بنك جديد</h3>
+    <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8;">
+      اختر أي بنك من البنوك السعودية المرخّصة من ساما لتربطه بحسابك.
+    </p>
+    <div id="add-bank-list" style="max-height:360px; overflow-y:auto;"></div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeAddBankModal()">إغلاق</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
 <script src="assets/data.js"></script>
 <script>
 requireAuth();
@@ -99,6 +105,7 @@ requireAuth();
 function renderLinkAccounts(){
   const linkedCount = accounts.filter(a=>a.linked).length + bnplProviders.filter(a=>a.linked).length + investmentPlatforms.filter(a=>a.linked).length + otherBanks.filter(a=>a.linked).length;
   const totalCount = accounts.length + bnplProviders.length + investmentPlatforms.length + otherBanks.length;
+  renderAddBankList();
   document.getElementById('linked-summary').textContent = `${linkedCount} من ${totalCount} حسابات وخدمات متصلة الآن`;
   document.getElementById('banks-count-sub').textContent = accounts.length + ' جهات';
   document.getElementById('bnpl-count-sub').textContent = bnplProviders.length === 2 ? 'جهتان' : bnplProviders.length + ' جهات';
@@ -119,25 +126,6 @@ function renderLinkAccounts(){
           <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
         </div>
         <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleLink(${i})" aria-label="ربط ${a.bank}"></button>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('other-banks-count-sub').textContent = otherBanks.length + ' جهات';
-  document.getElementById('link-other-banks-list').innerHTML = otherBanks.map((a,i)=>`
-    <div class="account-row">
-      <div class="acc-left">
-        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
-        <div>
-          <div class="acc-name">${a.bank}</div>
-          <div class="acc-type">بنك مرخّص من ساما</div>
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <div style="text-align:left;">
-          <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
-          <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
-        </div>
-        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleOtherBank(${i})" aria-label="ربط ${a.bank}"></button>
       </div>
     </div>`).join('');
 
@@ -190,6 +178,39 @@ function toggleOtherBank(i){
   a.lastSync = a.linked ? 'الآن' : '—';
   persistState();
   renderLinkAccounts();
+  showToast(a.linked ? `تم ربط ${a.bank} بنجاح.` : `تم فصل ${a.bank}.`);
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function renderAddBankList(){
+  document.getElementById('add-bank-list').innerHTML = otherBanks.map((a,i)=>`
+    <div class="account-row">
+      <div class="acc-left">
+        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+        <div>
+          <div class="acc-name">${a.bank}</div>
+          <div class="acc-type">بنك مرخّص من ساما</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
+        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleOtherBank(${i})" aria-label="ربط ${a.bank}"></button>
+      </div>
+    </div>`).join('');
+}
+function openAddBankModal(){
+  renderAddBankList();
+  document.getElementById('add-bank-modal').style.display = 'flex';
+}
+function closeAddBankModal(){
+  document.getElementById('add-bank-modal').style.display = 'none';
 }
 function toggleBnplLink(i){
   const a = bnplProviders[i];
