@@ -154,9 +154,6 @@ function renderLinkAccounts(){
       </div>
       ` : `
       <div style="display:flex; align-items:center; gap:14px;">
-        <div style="text-align:left;">
-          <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
-        </div>
         <div class="acc-menu-wrap">
           <button class="acc-menu-btn" onclick="toggleAccMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
           ${openAccMenu === i ? `
@@ -187,9 +184,6 @@ function renderLinkAccounts(){
       </div>
       ` : `
       <div style="display:flex; align-items:center; gap:14px;">
-        <div style="text-align:left;">
-          <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
-        </div>
         <div class="acc-menu-wrap">
           <button class="acc-menu-btn" onclick="toggleBnplMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
           ${openBnplMenu === i ? `
@@ -218,9 +212,6 @@ function renderLinkAccounts(){
       </div>
       ` : `
       <div style="display:flex; align-items:center; gap:14px;">
-        <div style="text-align:left;">
-          <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
-        </div>
         <div class="acc-menu-wrap">
           <button class="acc-menu-btn" onclick="toggleInvMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
           ${openInvMenu === i ? `
