@@ -129,3 +129,30 @@ function animateCount(el, target, suffixHtml, duration){
   }
   requestAnimationFrame(tick);
 }
+
+/* ---------------- Mobile nav drawer ---------------- */
+function toggleMobileNav(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.querySelector('.sidebar-overlay');
+  if(sb) sb.classList.toggle('open');
+  if(ov) ov.classList.toggle('show');
+}
+function closeMobileNav(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.querySelector('.sidebar-overlay');
+  if(sb) sb.classList.remove('open');
+  if(ov) ov.classList.remove('show');
+}
+function initMobileNav(){
+  const brand = document.querySelector('.sidebar-brand');
+  if(brand && !brand.querySelector('.sidebar-close-btn')){
+    const btn = document.createElement('button');
+    btn.className = 'sidebar-close-btn';
+    btn.setAttribute('aria-label', 'إغلاق القائمة');
+    btn.textContent = '✕';
+    btn.onclick = closeMobileNav;
+    brand.appendChild(btn);
+  }
+  document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click', closeMobileNav));
+}
+initMobileNav();
