@@ -91,8 +91,13 @@ function renderTokenAccounts(){
         <div class="acc-name">${a.bank}</div>
         <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ${SAR}</div>
       </div>
-      <input type="number" class="amt-input" id="tok-amt-${i}" placeholder="0.00">
+      <input type="number" class="amt-input" id="tok-amt-${i}" placeholder="0.00" oninput="onTokenAmountInput(${i})">
     </div>`).join('');
+}
+function onTokenAmountInput(i){
+  const amt = parseFloat(document.getElementById('tok-amt-'+i).value);
+  document.getElementById('tok-chk-'+i).checked = !!(amt && amt>0);
+  tokenLimitCheck();
 }
 function tokenLimitCheck(){
   const checked = accounts.map((_,i)=>document.getElementById('tok-chk-'+i).checked).filter(Boolean).length;
