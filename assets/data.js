@@ -65,12 +65,24 @@ const DEFAULT_INVESTMENTS = [
   {id:'v1', bank:'عوائد', logo:'logos/awaed.jpg', linked:true, lastSync:'قبل 20 دقيقة'},
 ];
 
+const DEFAULT_OTHER_BANKS = [
+  {bank:'البنك السعودي الأول SAB', logo:'logos/sab.svg', linked:false, lastSync:'—'},
+  {bank:'البنك العربي الوطني', logo:'logos/anb.png', linked:false, lastSync:'—'},
+  {bank:'البنك السعودي الفرنسي', logo:'logos/bsf.svg', linked:false, lastSync:'—'},
+  {bank:'البنك السعودي للاستثمار', logo:'logos/saib.png', linked:false, lastSync:'—'},
+  {bank:'بنك الجزيرة', logo:'logos/aljazira.png', linked:false, lastSync:'—'},
+  {bank:'بنك الخليج الدولي - السعودية', logo:'logos/gib.svg', linked:false, lastSync:'—'},
+  {bank:'بنك البلاد', logo:'logos/albilad.png', linked:false, lastSync:'—'},
+  {bank:'بنك D360', logo:'logos/d360.png', linked:false, lastSync:'—'},
+  {bank:'بنك فيجن', logo:'logos/visionbank.png', linked:false, lastSync:'—'},
+];
+
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
-const DATA_VERSION = '4';
+const DATA_VERSION = '5';
 if(localStorage.getItem('hasila_data_version') !== DATA_VERSION){
-  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_transfers'].forEach(k=>localStorage.removeItem(k));
+  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_transfers','hasila_other_banks'].forEach(k=>localStorage.removeItem(k));
   localStorage.setItem('hasila_data_version', DATA_VERSION);
 }
 
@@ -89,6 +101,7 @@ const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
 const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
 const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS);
 const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
+const otherBanks = loadState('hasila_other_banks', DEFAULT_OTHER_BANKS);
 
 function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
@@ -97,6 +110,7 @@ function persistState(){
   localStorage.setItem('hasila_bnpl', JSON.stringify(bnplProviders));
   localStorage.setItem('hasila_investments', JSON.stringify(investmentPlatforms));
   localStorage.setItem('hasila_transfers', JSON.stringify(transfersData));
+  localStorage.setItem('hasila_other_banks', JSON.stringify(otherBanks));
 }
 
 /* ---------------- Formatting ---------------- */

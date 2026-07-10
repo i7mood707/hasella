@@ -66,6 +66,14 @@
       </div>
 
       <div class="card" style="margin-bottom:18px;">
+        <h3>بنوك سعودية أخرى <span class="sub" id="other-banks-count-sub">9 جهات</span></h3>
+        <div id="link-other-banks-list"></div>
+        <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
+          🔒 جميع البنوك المرخّصة من البنك المركزي السعودي (ساما). اربط أي بنك إضافي متى ما احتجت.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
         <h3>خدمات الدفع الآجل <span class="sub" id="bnpl-count-sub">جهتان</span></h3>
         <div id="link-bnpl-list"></div>
         <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
@@ -89,8 +97,8 @@
 requireAuth();
 
 function renderLinkAccounts(){
-  const linkedCount = accounts.filter(a=>a.linked).length + bnplProviders.filter(a=>a.linked).length + investmentPlatforms.filter(a=>a.linked).length;
-  const totalCount = accounts.length + bnplProviders.length + investmentPlatforms.length;
+  const linkedCount = accounts.filter(a=>a.linked).length + bnplProviders.filter(a=>a.linked).length + investmentPlatforms.filter(a=>a.linked).length + otherBanks.filter(a=>a.linked).length;
+  const totalCount = accounts.length + bnplProviders.length + investmentPlatforms.length + otherBanks.length;
   document.getElementById('linked-summary').textContent = `${linkedCount} من ${totalCount} حسابات وخدمات متصلة الآن`;
   document.getElementById('banks-count-sub').textContent = accounts.length + ' جهات';
   document.getElementById('bnpl-count-sub').textContent = bnplProviders.length === 2 ? 'جهتان' : bnplProviders.length + ' جهات';
@@ -111,6 +119,25 @@ function renderLinkAccounts(){
           <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
         </div>
         <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleLink(${i})" aria-label="ربط ${a.bank}"></button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('other-banks-count-sub').textContent = otherBanks.length + ' جهات';
+  document.getElementById('link-other-banks-list').innerHTML = otherBanks.map((a,i)=>`
+    <div class="account-row">
+      <div class="acc-left">
+        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+        <div>
+          <div class="acc-name">${a.bank}</div>
+          <div class="acc-type">بنك مرخّص من ساما</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="text-align:left;">
+          <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
+          <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
+        </div>
+        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleOtherBank(${i})" aria-label="ربط ${a.bank}"></button>
       </div>
     </div>`).join('');
 
@@ -152,6 +179,13 @@ function renderLinkAccounts(){
 }
 function toggleLink(i){
   const a = accounts[i];
+  a.linked = !a.linked;
+  a.lastSync = a.linked ? 'الآن' : '—';
+  persistState();
+  renderLinkAccounts();
+}
+function toggleOtherBank(i){
+  const a = otherBanks[i];
   a.linked = !a.linked;
   a.lastSync = a.linked ? 'الآن' : '—';
   persistState();
