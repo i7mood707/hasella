@@ -159,7 +159,7 @@ function renderLinkAccounts(){
           ${openAccMenu === i ? `
           <div class="acc-menu">
             <button onclick="startRenameAccount(${i})">تسمية الحساب</button>
-            <button onclick="setPrimaryAccount(${i})">تعيين حساب رئيسي</button>
+            ${!a.primary ? `<button onclick="setPrimaryAccount(${i})">تعيين حساب رئيسي</button>` : ''}
             <button class="danger" onclick="askDeleteAccount(${i})">حذف الحساب</button>
           </div>` : ''}
         </div>
@@ -176,13 +176,27 @@ function renderLinkAccounts(){
           <div class="acc-type">دفع آجل — أقساط</div>
         </div>
       </div>
+      ${deletingBnplIndex === i ? `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12px; color:var(--brick); font-weight:600;">حذف الحساب نهائيًا؟</span>
+        <button class="btn btn-outline btn-sm" onclick="cancelDeleteBnpl()">إلغاء</button>
+        <button class="btn btn-sm" style="background:var(--brick); color:#fff; border-color:var(--brick);" onclick="deleteBnplConfirmed(${i})">تأكيد الحذف</button>
+      </div>
+      ` : `
       <div style="display:flex; align-items:center; gap:14px;">
         <div style="text-align:left;">
           <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
           <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
         </div>
-        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleBnplLink(${i})" aria-label="ربط ${a.bank}"></button>
+        <div class="acc-menu-wrap">
+          <button class="acc-menu-btn" onclick="toggleBnplMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
+          ${openBnplMenu === i ? `
+          <div class="acc-menu">
+            <button class="danger" onclick="askDeleteBnpl(${i})">حذف الحساب</button>
+          </div>` : ''}
+        </div>
       </div>
+      `}
     </div>`).join('');
 
   document.getElementById('link-investments-list').innerHTML = investmentPlatforms.map((a,i)=>`
@@ -194,22 +208,47 @@ function renderLinkAccounts(){
           <div class="acc-type">منصة استثمار — أسهم</div>
         </div>
       </div>
+      ${deletingInvIndex === i ? `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12px; color:var(--brick); font-weight:600;">حذف الحساب نهائيًا؟</span>
+        <button class="btn btn-outline btn-sm" onclick="cancelDeleteInv()">إلغاء</button>
+        <button class="btn btn-sm" style="background:var(--brick); color:#fff; border-color:var(--brick);" onclick="deleteInvConfirmed(${i})">تأكيد الحذف</button>
+      </div>
+      ` : `
       <div style="display:flex; align-items:center; gap:14px;">
         <div style="text-align:left;">
           <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
           <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
         </div>
-        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleInvestmentLink(${i})" aria-label="ربط ${a.bank}"></button>
+        <div class="acc-menu-wrap">
+          <button class="acc-menu-btn" onclick="toggleInvMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
+          ${openInvMenu === i ? `
+          <div class="acc-menu">
+            <button class="danger" onclick="askDeleteInv(${i})">حذف الحساب</button>
+          </div>` : ''}
+        </div>
       </div>
+      `}
     </div>`).join('');
 }
 let openAccMenu = null;
 let renamingAccIndex = null;
 let deletingAccIndex = null;
+let openBnplMenu = null;
+let deletingBnplIndex = null;
+let openInvMenu = null;
+let deletingInvIndex = null;
 
+function closeAllMenus(){
+  openAccMenu = null;
+  openBnplMenu = null;
+  openInvMenu = null;
+}
 function toggleAccMenu(e, i){
   e.stopPropagation();
-  openAccMenu = (openAccMenu === i) ? null : i;
+  const next = (openAccMenu === i) ? null : i;
+  closeAllMenus();
+  openAccMenu = next;
   deletingAccIndex = null;
   renderLinkAccounts();
 }
@@ -262,10 +301,64 @@ function deleteAccountConfirmed(i){
   renderLinkAccounts();
   showToast(`تم حذف ${removed.bank}.`);
 }
+function toggleBnplMenu(e, i){
+  e.stopPropagation();
+  const next = (openBnplMenu === i) ? null : i;
+  closeAllMenus();
+  openBnplMenu = next;
+  deletingBnplIndex = null;
+  renderLinkAccounts();
+}
+function askDeleteBnpl(i){
+  openBnplMenu = null;
+  deletingBnplIndex = i;
+  renderLinkAccounts();
+}
+function cancelDeleteBnpl(){
+  deletingBnplIndex = null;
+  renderLinkAccounts();
+}
+function deleteBnplConfirmed(i){
+  const removed = bnplProviders[i];
+  bnplProviders.splice(i, 1);
+  deletingBnplIndex = null;
+  persistState();
+  renderLinkAccounts();
+  showToast(`تم حذف ${removed.bank}.`);
+}
+function toggleInvMenu(e, i){
+  e.stopPropagation();
+  const next = (openInvMenu === i) ? null : i;
+  closeAllMenus();
+  openInvMenu = next;
+  deletingInvIndex = null;
+  renderLinkAccounts();
+}
+function askDeleteInv(i){
+  openInvMenu = null;
+  deletingInvIndex = i;
+  renderLinkAccounts();
+}
+function cancelDeleteInv(){
+  deletingInvIndex = null;
+  renderLinkAccounts();
+}
+function deleteInvConfirmed(i){
+  const removed = investmentPlatforms[i];
+  investmentPlatforms.splice(i, 1);
+  deletingInvIndex = null;
+  persistState();
+  renderLinkAccounts();
+  showToast(`تم حذف ${removed.bank}.`);
+}
 document.addEventListener('click', function(e){
-  if(openAccMenu !== null && !e.target.closest('.acc-menu-wrap')){
-    openAccMenu = null;
-    renderLinkAccounts();
+  if(!e.target.closest('.acc-menu-wrap')){
+    if(openAccMenu !== null || openBnplMenu !== null || openInvMenu !== null){
+      openAccMenu = null;
+      openBnplMenu = null;
+      openInvMenu = null;
+      renderLinkAccounts();
+    }
   }
 });
 function showToast(msg){
@@ -339,20 +432,6 @@ function openAddBankModal(){
 }
 function closeAddBankModal(){
   document.getElementById('add-bank-modal').style.display = 'none';
-}
-function toggleBnplLink(i){
-  const a = bnplProviders[i];
-  a.linked = !a.linked;
-  a.lastSync = a.linked ? 'الآن' : '—';
-  persistState();
-  renderLinkAccounts();
-}
-function toggleInvestmentLink(i){
-  const a = investmentPlatforms[i];
-  a.linked = !a.linked;
-  a.lastSync = a.linked ? 'الآن' : '—';
-  persistState();
-  renderLinkAccounts();
 }
 
 renderLinkAccounts();
