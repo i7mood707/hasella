@@ -335,6 +335,13 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 }
 .token-receipt .tline{border-bottom:1px dashed rgba(36,48,61,0.18); padding:8px 0; display:flex; justify-content:space-between; font-size:12.5px;}
 .token-receipt .code{font-size:19px; letter-spacing:2px; color:var(--ink); text-align:center; padding:14px 0; font-weight:600;}
+.copy-code-btn{
+  width:32px; height:32px; border-radius:9px; border:1.5px solid #DAD4C2; background:#fff;
+  color:var(--text-dark); font-size:14px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:background .2s ease, border-color .2s ease, color .2s ease;
+  font-family:var(--font-body);
+}
+.copy-code-btn:hover{background:var(--paper-dim); border-color:var(--emerald); color:var(--emerald-deep);}
 .perforation{height:1px; background:repeating-linear-gradient(90deg, #DAD4C2 0 6px, transparent 6px 12px); margin:14px 0;}
 
 select.sel{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; background:#fff;}

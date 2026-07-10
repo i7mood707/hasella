@@ -82,9 +82,28 @@
   </main>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script src="assets/data.js"></script>
 <script>
 requireAuth();
+
+let currentTokenCode = '';
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+function copyTokenCode(){
+  if(!currentTokenCode) return;
+  navigator.clipboard.writeText(currentTokenCode).then(()=>{
+    showToast('تم نسخ رمز مدّ.');
+  }).catch(()=>{
+    showToast('تعذر نسخ الرمز.');
+  });
+}
 
 function renderTokenAccounts(){
   document.getElementById('token-accounts').innerHTML = accounts.map((a,i)=>`
@@ -122,13 +141,17 @@ function generateToken(){
   const total = chosen.reduce((s,c)=>s+c.amt,0);
   const duration = document.getElementById('token-duration').value;
   const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  currentTokenCode = code;
 
   document.getElementById('token-placeholder').style.display='none';
   const wrap = document.getElementById('token-receipt-wrap');
   wrap.style.display='block';
   document.getElementById('token-receipt').innerHTML = `
     <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:8px;">إيصال مدّ الدفع</div>
-    <div class="code">${code}</div>
+    <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+      <div class="code">${code}</div>
+      <button class="copy-code-btn" onclick="copyTokenCode()" aria-label="نسخ الرمز" title="نسخ الرمز">⧉</button>
+    </div>
     <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(36,48,61,0.2) 0 6px, transparent 6px 12px);"></div>
     ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${fmt(c.amt)} ${SAR}</span></div>`).join('')}
     <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:var(--gold);">${fmt(total)} ${SAR}</span></div>
