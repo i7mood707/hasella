@@ -61,7 +61,7 @@
         <h3>البنوك <span class="sub" id="banks-count-sub">5 جهات</span></h3>
         <div id="link-accounts-list"></div>
         <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
-          🔒 بياناتك مشفّرة من طرفك إلى طرفك، ولا نطّلع أو نخزّن كلمات مرور حساباتك البنكية. تقدر تفصل أي حساب في أي وقت.
+          🔒 بياناتك مشفّرة من طرفك إلى طرفك، ولا نطّلع أو نخزّن كلمات مرور حساباتك البنكية. من قائمة النقاط بجانب كل حساب تقدر تعيد تسميته، تجعله الحساب الرئيسي، أو تحذفه.
         </p>
       </div>
 
@@ -90,6 +90,15 @@
 .add-bank-scroll::-webkit-scrollbar-thumb{background:#DAD4C2; border-radius:99px;}
 .add-bank-scroll::-webkit-scrollbar-thumb:hover{background:#C7BFA4;}
 .add-bank-scroll{scrollbar-width:thin; scrollbar-color:#DAD4C2 transparent;}
+.acc-menu-wrap{position:relative;}
+.acc-menu-btn{width:32px; height:32px; border-radius:9px; border:1.5px solid #DAD4C2; background:#fff; color:var(--text-dark); font-size:16px; line-height:1; cursor:pointer; transition:background .2s ease, border-color .2s ease;}
+.acc-menu-btn:hover{background:var(--paper-dim); border-color:var(--emerald);}
+.acc-menu{position:absolute; top:calc(100% + 6px); left:0; min-width:190px; background:#fff; border-radius:12px; border:1px solid #E7E1D1; box-shadow:0 12px 32px rgba(36,48,61,0.18); padding:6px; z-index:20; display:flex; flex-direction:column; gap:2px;}
+.acc-menu button{display:block; width:100%; text-align:right; padding:9px 12px; border-radius:8px; border:none; background:none; font-family:inherit; font-size:12.5px; color:var(--text-dark); cursor:pointer; transition:background .15s ease;}
+.acc-menu button:hover{background:var(--paper-dim);}
+.acc-menu button.danger{color:var(--brick);}
+.acc-menu button.danger:hover{background:rgba(178,58,46,0.08);}
+.acc-rename-input{font-size:13.5px; font-weight:600; padding:4px 8px; border-radius:7px; border:1.5px solid var(--emerald); font-family:inherit; width:100%; max-width:220px;}
 </style>
 <div class="modal-overlay" id="add-bank-modal" style="display:none;">
   <div class="modal-box" style="max-width:640px;">
@@ -123,17 +132,39 @@ function renderLinkAccounts(){
       <div class="acc-left">
         <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
         <div>
-          <div class="acc-name">${a.bank}</div>
+          ${renamingAccIndex === i ? `
+            <input type="text" id="rename-input-${i}" class="acc-rename-input" value="${a.bank}"
+              onkeydown="if(event.key==='Enter') commitRename(${i}); if(event.key==='Escape') cancelRename();"
+              onblur="commitRename(${i})">
+          ` : `
+            <div class="acc-name">${a.bank}${a.primary ? ' <span class="demo-pill" style="background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);">رئيسي</span>' : ''}</div>
+          `}
           <div class="acc-type" style="font-family:var(--font-mono); direction:ltr; display:inline-block;">${a.iban}</div>
         </div>
       </div>
+      ${deletingAccIndex === i ? `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12px; color:var(--brick); font-weight:600;">حذف الحساب نهائيًا؟</span>
+        <button class="btn btn-outline btn-sm" onclick="cancelDeleteAccount()">إلغاء</button>
+        <button class="btn btn-sm" style="background:var(--brick); color:#fff; border-color:var(--brick);" onclick="deleteAccountConfirmed(${i})">تأكيد الحذف</button>
+      </div>
+      ` : `
       <div style="display:flex; align-items:center; gap:14px;">
         <div style="text-align:left;">
           <span class="demo-pill" style="${a.linked ? 'background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);' : ''}">${a.linked ? 'متصل' : 'غير متصل'}</span>
           <div style="font-size:10.5px; color:var(--text-muted); margin-top:4px;">${a.linked ? 'آخر مزامنة: ' + a.lastSync : 'لم تتم المزامنة بعد'}</div>
         </div>
-        <button class="toggle ${a.linked ? 'on' : ''}" onclick="toggleLink(${i})" aria-label="ربط ${a.bank}"></button>
+        <div class="acc-menu-wrap">
+          <button class="acc-menu-btn" onclick="toggleAccMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
+          ${openAccMenu === i ? `
+          <div class="acc-menu">
+            <button onclick="startRenameAccount(${i})">تسمية الحساب</button>
+            <button onclick="setPrimaryAccount(${i})">تعيين حساب رئيسي</button>
+            <button class="danger" onclick="askDeleteAccount(${i})">حذف الحساب</button>
+          </div>` : ''}
+        </div>
       </div>
+      `}
     </div>`).join('');
 
   document.getElementById('link-bnpl-list').innerHTML = bnplProviders.map((a,i)=>`
@@ -172,13 +203,71 @@ function renderLinkAccounts(){
       </div>
     </div>`).join('');
 }
-function toggleLink(i){
-  const a = accounts[i];
-  a.linked = !a.linked;
-  a.lastSync = a.linked ? 'الآن' : '—';
-  persistState();
+let openAccMenu = null;
+let renamingAccIndex = null;
+let deletingAccIndex = null;
+
+function toggleAccMenu(e, i){
+  e.stopPropagation();
+  openAccMenu = (openAccMenu === i) ? null : i;
+  deletingAccIndex = null;
   renderLinkAccounts();
 }
+function startRenameAccount(i){
+  openAccMenu = null;
+  renamingAccIndex = i;
+  renderLinkAccounts();
+  const input = document.getElementById('rename-input-'+i);
+  if(input){ input.focus(); input.select(); }
+}
+function commitRename(i){
+  const input = document.getElementById('rename-input-'+i);
+  if(!input){ renamingAccIndex = null; return; }
+  const val = input.value.trim();
+  if(val && val !== accounts[i].bank){
+    accounts[i].bank = val;
+    persistState();
+    showToast('تم تحديث اسم الحساب.');
+  }
+  renamingAccIndex = null;
+  renderLinkAccounts();
+}
+function cancelRename(){
+  renamingAccIndex = null;
+  renderLinkAccounts();
+}
+function setPrimaryAccount(i){
+  accounts.forEach((a,idx)=>{ a.primary = (idx === i); });
+  openAccMenu = null;
+  persistState();
+  renderLinkAccounts();
+  showToast(`${accounts[i].bank} صار الحساب الرئيسي.`);
+}
+function askDeleteAccount(i){
+  openAccMenu = null;
+  deletingAccIndex = i;
+  renderLinkAccounts();
+}
+function cancelDeleteAccount(){
+  deletingAccIndex = null;
+  renderLinkAccounts();
+}
+function deleteAccountConfirmed(i){
+  const removed = accounts[i];
+  const wasPrimary = removed.primary;
+  accounts.splice(i, 1);
+  if(wasPrimary && accounts.length > 0){ accounts[0].primary = true; }
+  deletingAccIndex = null;
+  persistState();
+  renderLinkAccounts();
+  showToast(`تم حذف ${removed.bank}.`);
+}
+document.addEventListener('click', function(e){
+  if(openAccMenu !== null && !e.target.closest('.acc-menu-wrap')){
+    openAccMenu = null;
+    renderLinkAccounts();
+  }
+});
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
