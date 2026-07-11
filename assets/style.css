@@ -325,6 +325,15 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .transfer-choice-btn .desc{font-size:11px; color:var(--text-muted); line-height:1.5;}
 .modal-back-btn{background:none; border:none; color:var(--text-muted); font-size:12.5px; cursor:pointer; margin-bottom:12px; padding:0; display:flex; align-items:center; gap:4px;}
 .modal-back-btn:hover{color:var(--emerald-deep);}
+.acc-menu-wrap{position:relative;}
+.acc-menu-btn{width:32px; height:32px; border-radius:9px; border:1.5px solid #DAD4C2; background:#fff; color:var(--text-dark); font-size:16px; line-height:1; cursor:pointer; transition:background .2s ease, border-color .2s ease;}
+.acc-menu-btn:hover{background:var(--paper-dim); border-color:var(--emerald);}
+.acc-menu{position:absolute; top:calc(100% + 6px); left:0; min-width:190px; background:#fff; border-radius:12px; border:1px solid #E7E1D1; box-shadow:0 12px 32px rgba(36,48,61,0.18); padding:6px; z-index:20; display:flex; flex-direction:column; gap:2px;}
+.acc-menu button{display:block; width:100%; text-align:right; padding:9px 12px; border-radius:8px; border:none; background:none; font-family:inherit; font-size:12.5px; color:var(--text-dark); cursor:pointer; transition:background .15s ease;}
+.acc-menu button:hover{background:var(--paper-dim);}
+.acc-menu button.danger{color:var(--brick);}
+.acc-menu button.danger:hover{background:rgba(178,58,46,0.08);}
+.acc-rename-input{font-size:13.5px; font-weight:600; padding:4px 8px; border-radius:7px; border:1.5px solid var(--emerald); font-family:inherit; width:100%; max-width:220px;}
 
 .toast{
   position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
