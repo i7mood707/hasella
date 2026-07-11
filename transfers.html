@@ -153,6 +153,11 @@
         </select>
       </div>
 
+      <div class="field-block" id="transfer-day-row" style="display:none;">
+        <label class="flabel" id="transfer-day-label">اليوم</label>
+        <select class="sel" id="transfer-day"></select>
+      </div>
+
       <div class="field-block" id="transfer-amount-row">
         <label class="flabel">المبلغ</label>
         <input type="number" id="transfer-amount" min="1" placeholder="0.00" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono);">
@@ -330,7 +335,37 @@ function chooseTransferKind(kind){
     document.getElementById('transfer-ref').placeholder = 'SA•• •••• •••• •••• ••••';
   }
 
+  if(kind==='auto') onTransferFreqChange();
+
   goToTransferStep('form');
+}
+
+const WEEKDAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+
+function onTransferFreqChange(){
+  const freq = document.getElementById('transfer-freq').value;
+  const dayRow = document.getElementById('transfer-day-row');
+  const daySel = document.getElementById('transfer-day');
+  if(freq === 'أسبوعيًا'){
+    dayRow.style.display = 'block';
+    document.getElementById('transfer-day-label').textContent = 'يوم الأسبوع';
+    daySel.innerHTML = WEEKDAYS.map(d=>`<option value="${d}">${d}</option>`).join('');
+  } else if(freq === 'شهريًا'){
+    dayRow.style.display = 'block';
+    document.getElementById('transfer-day-label').textContent = 'يوم الشهر';
+    daySel.innerHTML = Array.from({length:28}, (_,i)=>i+1).map(d=>`<option value="${d}">يوم ${d}</option>`).join('');
+  } else {
+    dayRow.style.display = 'none';
+  }
+}
+document.getElementById('transfer-freq').addEventListener('change', onTransferFreqChange);
+
+function getTransferFreqText(){
+  const freq = document.getElementById('transfer-freq').value;
+  const day = document.getElementById('transfer-day').value;
+  if(freq === 'أسبوعيًا') return `كل يوم ${day}`;
+  if(freq === 'شهريًا') return `كل يوم ${day} من الشهر`;
+  return 'يوميًا';
 }
 
 function onTransferAccountChange(){
@@ -419,12 +454,12 @@ function confirmTransfer(){
       closeTransferModal();
       showToast(`تم تنفيذ الحوالة بمبلغ ${fmt(amount)} ر.س من ${acc.bank}.`);
     } else {
-      const freq = document.getElementById('transfer-freq').value;
-      automations.push({name:`${typeLabel} — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freq} من ${acc.bank}`, on:true});
+      const freqText = getTransferFreqText();
+      automations.push({name:`${typeLabel} — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freqText} من ${acc.bank}`, on:true});
       persistState();
       renderTransfers();
       closeTransferModal();
-      showToast(`تم تفعيل تحويل تلقائي (${freq}) بمبلغ ${fmt(amount)} ر.س.`);
+      showToast(`تم تفعيل تحويل تلقائي (${freqText}) بمبلغ ${fmt(amount)} ر.س.`);
     }
     return;
   }
@@ -450,12 +485,12 @@ function confirmTransfer(){
     closeTransferModal();
     showToast(`تم تنفيذ حوالة مدّ بمبلغ ${fmt(total)} ر.س من ${chosen.length} حسابات.`);
   } else {
-    const freq = document.getElementById('transfer-freq').value;
-    automations.push({name:`حوالة مدّ — إلى ${recipient}`, detail:`${fmt(total)} ${SAR} ${freq} من ${chosen.length} حسابات`, on:true});
+    const freqText = getTransferFreqText();
+    automations.push({name:`حوالة مدّ — إلى ${recipient}`, detail:`${fmt(total)} ${SAR} ${freqText} من ${chosen.length} حسابات`, on:true});
     persistState();
     renderTransfers();
     closeTransferModal();
-    showToast(`تم تفعيل حوالة مدّ تلقائية (${freq}) بمبلغ ${fmt(total)} ر.س.`);
+    showToast(`تم تفعيل حوالة مدّ تلقائية (${freqText}) بمبلغ ${fmt(total)} ر.س.`);
   }
 }
 
