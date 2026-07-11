@@ -44,6 +44,10 @@
 
   <main class="main">
     <section class="page" id="page-transfers">
+      <div style="display:flex; justify-content:flex-start; margin-bottom:14px;">
+        <button class="btn btn-emerald btn-sm" onclick="openTransferModal()">+ حوالة جديدة</button>
+      </div>
+
       <div class="page-head">
         <div>
           <h1>الحوالات</h1>
@@ -51,11 +55,10 @@
         </div>
       </div>
 
-      <div class="grid grid-2">
+      <div class="grid">
         <div class="card">
           <h3>سجل الحوالات</h3>
           <div class="tx-list" id="transfers-list"></div>
-          <button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="openTransferModal()">+ حوالة جديدة</button>
         </div>
         <div class="card">
           <h3>الحوالات التلقائية</h3>
@@ -68,52 +71,101 @@
 </div>
 
 <div class="modal-overlay" id="transfer-modal" style="display:none;">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:460px;">
     <h3>حوالة جديدة</h3>
-    <div style="display:flex; gap:8px; margin-bottom:16px;">
-      <button type="button" class="btn btn-sm" id="kind-new" style="flex:1;" onclick="setTransferKind('new')">حوالة جديدة</button>
-      <button type="button" class="btn btn-sm" id="kind-auto" style="flex:1;" onclick="setTransferKind('auto')">حوالة تلقائية</button>
+
+    <div id="transfer-step-type">
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px;">اختر نوع الحوالة</p>
+      <div style="display:flex; gap:12px;">
+        <button type="button" class="transfer-choice-btn" onclick="chooseTransferMode('madd')">
+          <span class="ic">◎</span>
+          <span class="title">حوالة مدّ</span>
+          <span class="desc">حوّل من أكثر من حساب لحساب واحد</span>
+        </button>
+        <button type="button" class="transfer-choice-btn" onclick="chooseTransferMode('normal')">
+          <span class="ic">⇄</span>
+          <span class="title">حوالة عادية</span>
+          <span class="desc">حوالة من حساب واحد</span>
+        </button>
+      </div>
+      <div style="display:flex; margin-top:18px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="closeTransferModal()">إلغاء</button>
+      </div>
     </div>
 
-    <div class="field-block">
-      <label class="flabel">من حساب</label>
-      <select class="sel" id="transfer-account" onchange="onTransferAccountChange()"></select>
+    <div id="transfer-step-kind" style="display:none;">
+      <button type="button" class="modal-back-btn" onclick="goToTransferStep('type')">→ رجوع</button>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px;">حوالة جديدة أو تلقائية؟</p>
+      <div style="display:flex; gap:12px;">
+        <button type="button" class="transfer-choice-btn" onclick="chooseTransferKind('new')">
+          <span class="ic">⚡</span>
+          <span class="title">حوالة جديدة</span>
+          <span class="desc">تنفيذ مرة واحدة الآن</span>
+        </button>
+        <button type="button" class="transfer-choice-btn" onclick="chooseTransferKind('auto')">
+          <span class="ic">🔁</span>
+          <span class="title">حوالة تلقائية</span>
+          <span class="desc">تتكرر حسب المدة اللي تحددها</span>
+        </button>
+      </div>
+      <div style="display:flex; margin-top:18px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="closeTransferModal()">إلغاء</button>
+      </div>
     </div>
 
-    <div class="field-block">
-      <label class="flabel">نوع الحوالة</label>
-      <select class="sel" id="transfer-type"></select>
-    </div>
+    <div id="transfer-step-form" style="display:none;">
+      <button type="button" class="modal-back-btn" onclick="goToTransferStep('kind')">→ رجوع</button>
 
-    <div class="field-block">
-      <label class="flabel">اسم المستلم / الجهة</label>
-      <input type="text" id="transfer-recipient" placeholder="مثال: عبدالله العتيبي" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2;">
-    </div>
+      <div id="transfer-normal-fields">
+        <div class="field-block">
+          <label class="flabel">من حساب</label>
+          <select class="sel" id="transfer-account" onchange="onTransferAccountChange()"></select>
+        </div>
+        <div class="field-block">
+          <label class="flabel">نوع الحوالة</label>
+          <select class="sel" id="transfer-type"></select>
+        </div>
+      </div>
 
-    <div class="field-block">
-      <label class="flabel" id="transfer-ref-label">رقم الحساب / الآيبان</label>
-      <input type="text" id="transfer-ref" placeholder="SA•• •••• •••• •••• ••••" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); direction:ltr; text-align:right;">
-    </div>
+      <div id="transfer-madd-fields" style="display:none;">
+        <label class="flabel">اختر الحسابات والمبلغ من كل حساب</label>
+        <div id="transfer-madd-accounts" style="margin-bottom:10px;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--paper-dim); border-radius:9px; margin-bottom:16px;">
+          <span style="font-size:12.5px; color:var(--text-muted);">إجمالي الحوالة</span>
+          <span id="transfer-madd-total-amt" style="font-family:var(--font-mono); font-weight:700; font-size:15px;">0.00</span>
+        </div>
+      </div>
 
-    <div class="field-block" id="transfer-freq-row" style="display:none;">
-      <label class="flabel">التكرار</label>
-      <select class="sel" id="transfer-freq">
-        <option value="شهريًا">شهريًا</option>
-        <option value="أسبوعيًا">أسبوعيًا</option>
-        <option value="يوميًا">يوميًا</option>
-      </select>
-    </div>
+      <div class="field-block">
+        <label class="flabel">اسم المستلم / الجهة</label>
+        <input type="text" id="transfer-recipient" placeholder="مثال: عبدالله العتيبي" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2;">
+      </div>
 
-    <div class="field-block">
-      <label class="flabel">المبلغ</label>
-      <input type="number" id="transfer-amount" min="1" placeholder="0.00" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono);">
-    </div>
+      <div class="field-block">
+        <label class="flabel" id="transfer-ref-label">رقم الحساب / الآيبان</label>
+        <input type="text" id="transfer-ref" placeholder="SA•• •••• •••• •••• ••••" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); direction:ltr; text-align:right;">
+      </div>
 
-    <p id="transfer-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+      <div class="field-block" id="transfer-freq-row" style="display:none;">
+        <label class="flabel">التكرار</label>
+        <select class="sel" id="transfer-freq">
+          <option value="شهريًا">شهريًا</option>
+          <option value="أسبوعيًا">أسبوعيًا</option>
+          <option value="يوميًا">يوميًا</option>
+        </select>
+      </div>
 
-    <div style="display:flex; gap:10px;">
-      <button class="btn btn-outline" style="flex:1;" onclick="closeTransferModal()">إلغاء</button>
-      <button class="btn btn-emerald" style="flex:1;" id="transfer-submit" onclick="confirmTransfer()">تنفيذ الحوالة</button>
+      <div class="field-block" id="transfer-amount-row">
+        <label class="flabel">المبلغ</label>
+        <input type="number" id="transfer-amount" min="1" placeholder="0.00" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono);">
+      </div>
+
+      <p id="transfer-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="closeTransferModal()">إلغاء</button>
+        <button class="btn btn-emerald" style="flex:1;" id="transfer-submit" onclick="confirmTransfer()">تنفيذ الحوالة</button>
+      </div>
     </div>
   </div>
 </div>
@@ -146,6 +198,7 @@ function toggleAuto(i){
 }
 
 /* ---------------- New Transfer Modal ---------------- */
+let transferMode = null; // 'madd' | 'normal'
 let transferKind = 'new';
 
 function showToast(msg){
@@ -162,12 +215,41 @@ function transferErr(msg){
   el.style.display = 'block';
 }
 
-function setTransferKind(kind){
+function goToTransferStep(step){
+  document.getElementById('transfer-step-type').style.display = step==='type' ? 'block' : 'none';
+  document.getElementById('transfer-step-kind').style.display = step==='kind' ? 'block' : 'none';
+  document.getElementById('transfer-step-form').style.display = step==='form' ? 'block' : 'none';
+  document.getElementById('transfer-error').style.display = 'none';
+}
+
+function chooseTransferMode(mode){
+  transferMode = mode;
+  goToTransferStep('kind');
+}
+
+function chooseTransferKind(kind){
   transferKind = kind;
-  document.getElementById('kind-new').className = 'btn btn-sm ' + (kind==='new' ? 'btn-emerald' : 'btn-outline');
-  document.getElementById('kind-auto').className = 'btn btn-sm ' + (kind==='auto' ? 'btn-emerald' : 'btn-outline');
   document.getElementById('transfer-freq-row').style.display = kind==='auto' ? 'block' : 'none';
   document.getElementById('transfer-submit').textContent = kind==='auto' ? 'تفعيل التحويل التلقائي' : 'تنفيذ الحوالة';
+
+  document.getElementById('transfer-normal-fields').style.display = transferMode==='normal' ? 'block' : 'none';
+  document.getElementById('transfer-madd-fields').style.display = transferMode==='madd' ? 'block' : 'none';
+  document.getElementById('transfer-amount-row').style.display = transferMode==='normal' ? 'block' : 'none';
+
+  document.getElementById('transfer-recipient').value = '';
+  document.getElementById('transfer-ref').value = '';
+  document.getElementById('transfer-amount').value = '';
+
+  if(transferMode==='normal'){
+    document.getElementById('transfer-account').innerHTML = accounts.map((a,i)=>`<option value="${i}">${a.bank} — رصيد ${fmt(a.balance)} ${SAR}</option>`).join('');
+    onTransferAccountChange();
+  } else {
+    renderMaddTransferAccounts();
+    document.getElementById('transfer-ref-label').textContent = 'رقم الحساب / الآيبان للمستلم';
+    document.getElementById('transfer-ref').placeholder = 'SA•• •••• •••• •••• ••••';
+  }
+
+  goToTransferStep('form');
 }
 
 function onTransferAccountChange(){
@@ -191,14 +273,40 @@ function onTransferTypeChange(){
 }
 document.getElementById('transfer-type').addEventListener('change', onTransferTypeChange);
 
+function renderMaddTransferAccounts(){
+  document.getElementById('transfer-madd-accounts').innerHTML = accounts.map((a,i)=>`
+    <div class="token-account">
+      <input type="checkbox" id="mt-chk-${i}" onchange="updateMaddTransferTotal()">
+      <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+      <div style="flex:1;">
+        <div class="acc-name">${a.bank}</div>
+        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ${SAR}</div>
+      </div>
+      <input type="number" class="amt-input" id="mt-amt-${i}" placeholder="0.00" oninput="onMaddTransferAmountInput(${i})">
+    </div>`).join('');
+  updateMaddTransferTotal();
+}
+function onMaddTransferAmountInput(i){
+  const amt = parseFloat(document.getElementById('mt-amt-'+i).value);
+  document.getElementById('mt-chk-'+i).checked = !!(amt && amt>0);
+  updateMaddTransferTotal();
+}
+function updateMaddTransferTotal(){
+  let total = 0;
+  accounts.forEach((a,i)=>{
+    const chk = document.getElementById('mt-chk-'+i);
+    if(chk && chk.checked){ total += parseFloat(document.getElementById('mt-amt-'+i).value)||0; }
+  });
+  document.getElementById('transfer-madd-total-amt').innerHTML = fmt(total) + ' ' + SAR;
+}
+
 function openTransferModal(){
-  document.getElementById('transfer-account').innerHTML = accounts.map((a,i)=>`<option value="${i}">${a.bank} — رصيد ${fmt(a.balance)} ر.س</option>`).join('');
+  transferMode = null;
+  transferKind = 'new';
   document.getElementById('transfer-recipient').value = '';
   document.getElementById('transfer-ref').value = '';
   document.getElementById('transfer-amount').value = '';
-  document.getElementById('transfer-error').style.display = 'none';
-  onTransferAccountChange();
-  setTransferKind('new');
+  goToTransferStep('type');
   document.getElementById('transfer-modal').style.display = 'flex';
 }
 function closeTransferModal(){
@@ -206,35 +314,67 @@ function closeTransferModal(){
 }
 
 function confirmTransfer(){
-  const accIdx = parseInt(document.getElementById('transfer-account').value);
-  const acc = accounts[accIdx];
-  const type = document.getElementById('transfer-type').value;
-  const typeLabel = document.getElementById('transfer-type').selectedOptions[0].textContent;
   const recipient = document.getElementById('transfer-recipient').value.trim();
   const ref = document.getElementById('transfer-ref').value.trim();
-  const amount = parseFloat(document.getElementById('transfer-amount').value);
-
   if(!recipient){ transferErr('اكتب اسم المستلم أو الجهة'); return; }
   if(!ref){ transferErr('اكتب رقم الحساب أو الآيبان'); return; }
-  if(!amount || amount<=0){ transferErr('أدخل مبلغًا صحيحًا'); return; }
 
-  const icByType = {internal:'🔁', local:'🏦', international:'🌍'};
+  if(transferMode==='normal'){
+    const accIdx = parseInt(document.getElementById('transfer-account').value);
+    const acc = accounts[accIdx];
+    const type = document.getElementById('transfer-type').value;
+    const typeLabel = document.getElementById('transfer-type').selectedOptions[0].textContent;
+    const amount = parseFloat(document.getElementById('transfer-amount').value);
+    if(!amount || amount<=0){ transferErr('أدخل مبلغًا صحيحًا'); return; }
+
+    const icByType = {internal:'🔁', local:'🏦', international:'🌍'};
+
+    if(transferKind==='new'){
+      if(acc.balance < amount){ transferErr(`رصيد ${acc.bank} غير كافٍ لإتمام الحوالة.`); return; }
+      acc.balance -= amount;
+      transfersData.unshift({name:`${typeLabel} — إلى ${recipient}`, date:'الآن', amount:-amount, ic:icByType[type]});
+      persistState();
+      renderTransfers();
+      closeTransferModal();
+      showToast(`تم تنفيذ الحوالة بمبلغ ${fmt(amount)} ر.س من ${acc.bank}.`);
+    } else {
+      const freq = document.getElementById('transfer-freq').value;
+      automations.push({name:`${typeLabel} — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freq} من ${acc.bank}`, on:true});
+      persistState();
+      renderTransfers();
+      closeTransferModal();
+      showToast(`تم تفعيل تحويل تلقائي (${freq}) بمبلغ ${fmt(amount)} ر.س.`);
+    }
+    return;
+  }
+
+  // madd mode — from multiple accounts to one recipient
+  const chosen = [];
+  accounts.forEach((a,i)=>{
+    const chk = document.getElementById('mt-chk-'+i);
+    const amt = parseFloat(document.getElementById('mt-amt-'+i).value)||0;
+    if(chk && chk.checked && amt>0) chosen.push({acc:a, amt});
+  });
+  if(chosen.length===0){ transferErr('اختر حسابًا واحدًا على الأقل وحدد مبلغًا.'); return; }
+  for(const c of chosen){
+    if(c.acc.balance < c.amt){ transferErr(`رصيد ${c.acc.bank} غير كافٍ.`); return; }
+  }
+  const total = chosen.reduce((s,c)=>s+c.amt,0);
 
   if(transferKind==='new'){
-    if(acc.balance < amount){ transferErr(`رصيد ${acc.bank} غير كافٍ لإتمام الحوالة.`); return; }
-    acc.balance -= amount;
-    transfersData.unshift({name:`${typeLabel} — إلى ${recipient}`, date:'الآن', amount:-amount, ic:icByType[type]});
+    chosen.forEach(c=>{ c.acc.balance -= c.amt; });
+    transfersData.unshift({name:`حوالة مدّ (${chosen.length} حسابات) — إلى ${recipient}`, date:'الآن', amount:-total, ic:'◎'});
     persistState();
     renderTransfers();
     closeTransferModal();
-    showToast(`تم تنفيذ الحوالة بمبلغ ${fmt(amount)} ر.س من ${acc.bank}.`);
+    showToast(`تم تنفيذ حوالة مدّ بمبلغ ${fmt(total)} ر.س من ${chosen.length} حسابات.`);
   } else {
     const freq = document.getElementById('transfer-freq').value;
-    automations.push({name:`${typeLabel} — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freq} من ${acc.bank}`, on:true});
+    automations.push({name:`حوالة مدّ — إلى ${recipient}`, detail:`${fmt(total)} ${SAR} ${freq} من ${chosen.length} حسابات`, on:true});
     persistState();
     renderTransfers();
     closeTransferModal();
-    showToast(`تم تفعيل تحويل تلقائي (${freq}) بمبلغ ${fmt(amount)} ر.س.`);
+    showToast(`تم تفعيل حوالة مدّ تلقائية (${freq}) بمبلغ ${fmt(total)} ر.س.`);
   }
 }
 

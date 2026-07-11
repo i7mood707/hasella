@@ -314,6 +314,17 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .modal-total-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px dashed #DDD6C2; margin-bottom:16px;}
 .modal-total-row span:first-child{font-size:13px; color:var(--text-muted);}
 .modal-total-row span:last-child{font-family:var(--font-mono); font-weight:700; font-size:15px;}
+.transfer-choice-btn{
+  flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
+  padding:22px 14px; border-radius:14px; border:1.5px solid #DAD4C2; background:#fff; cursor:pointer;
+  transition:border-color .2s ease, background .2s ease, transform .15s ease;
+}
+.transfer-choice-btn:hover{border-color:var(--emerald); background:var(--paper-dim); transform:translateY(-2px);}
+.transfer-choice-btn .ic{font-size:24px; color:var(--emerald-deep);}
+.transfer-choice-btn .title{font-weight:700; font-size:13.5px; color:var(--text-dark);}
+.transfer-choice-btn .desc{font-size:11px; color:var(--text-muted); line-height:1.5;}
+.modal-back-btn{background:none; border:none; color:var(--text-muted); font-size:12.5px; cursor:pointer; margin-bottom:12px; padding:0; display:flex; align-items:center; gap:4px;}
+.modal-back-btn:hover{color:var(--emerald-deep);}
 
 .toast{
   position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
