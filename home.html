@@ -91,12 +91,8 @@
           <div class="card">
             <h3>مستشار مالي سريع</h3>
             <div class="advisor-mini">
-              <div class="bubble">أهلًا فيصل، رصيدك الإجمالي اليوم يكفي لتغطية التزاماتك لهذا الشهر بعد خصم الأقساط. هل تحتاج نصيحة سريعة؟</div>
-              <div class="mini-input-row">
-                <input id="mini-advisor-input" type="text" placeholder="اسأل عن وضعك المالي...">
-                <button onclick="miniAdvisorAsk()">اسأل</button>
-              </div>
-              <a class="btn btn-outline btn-sm" style="align-self:flex-start;" href="advisor.html">فتح المحادثة الكاملة ←</a>
+              <div class="bubble">أهلًا فيصل، مستشارك المالي الذكي يحلل حساباتك والتزاماتك الحالية ويعطيك نصائح مبنية على بياناتك.</div>
+              <a class="btn btn-outline btn-sm" style="align-self:flex-start;" href="advisor.html">عرض التحليل الكامل ←</a>
             </div>
           </div>
         </div>
@@ -140,16 +136,6 @@ function renderHome(){
       <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ${SAR}</div>
     </div>`).join('');
 }
-
-function miniAdvisorAsk(){
-  const input = document.getElementById('mini-advisor-input');
-  const q = input.value.trim();
-  if(!q) return;
-  sessionStorage.setItem('hasila_pending_question', q);
-  location.href = 'advisor.html';
-}
-
-document.getElementById('mini-advisor-input').addEventListener('keydown', e=>{ if(e.key==='Enter') miniAdvisorAsk(); });
 
 renderHome();
 </script>

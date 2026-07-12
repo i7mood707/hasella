@@ -50,19 +50,25 @@
           <p>يرى حساباتك وديونك، ويتوقع احتياجك القادم</p>
         </div>
       </div>
+      <div class="card ai-advisor-card" id="ai-advisor-card">
+        <h3>المستشار المالي الذكي <span class="sub">تحليل مباشر بالذكاء الاصطناعي</span></h3>
+        <div id="ai-advisor-body"></div>
+      </div>
+
       <div class="chat-wrap">
         <div class="chat-head">
           <div class="seal" style="background:var(--emerald);">🤖</div>
           <div>
-            <div style="font-weight:700; font-size:14px;">المستشار المالي</div>
-            <div style="font-size:11.5px; color:var(--text-muted);">متصل بحساباتك وديونك الحالية</div>
+            <div style="font-weight:700; font-size:14px;">اسأل المستشار الذكي</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">الإجابات مبنية على تحليل الذكاء الاصطناعي الفعلي لبياناتك أعلاه</div>
           </div>
         </div>
         <div class="chat-body" id="chat-body"></div>
         <div class="suggest-row">
           <button class="suggest-chip" onclick="askAdvisor('كيف وضعي المالي هذا الشهر؟')">كيف وضعي المالي هذا الشهر؟</button>
-          <button class="suggest-chip" onclick="askAdvisor('هل أقدر أسدد ديوني الحين؟')">هل أقدر أسدد ديوني الحين؟</button>
-          <button class="suggest-chip" onclick="askAdvisor('وش أفضل وقت أبيع فيه أسهمي؟')">أفضل وقت لبيع أسهمي؟</button>
+          <button class="suggest-chip" onclick="askAdvisor('هل أقدر أسدد التزاماتي الحالية؟')">هل أقدر أسدد التزاماتي الحالية؟</button>
+          <button class="suggest-chip" onclick="askAdvisor('وش تقييمي المالي؟')">وش تقييمي المالي؟</button>
+          <button class="suggest-chip" onclick="askAdvisor('أبغى خطة استثمار')">أبغى خطة استثمار</button>
         </div>
         <div class="chat-input-row">
           <input id="chat-input" type="text" placeholder="اكتب سؤالك عن وضعك المالي...">
@@ -77,28 +83,212 @@
 <script>
 requireAuth();
 
+/* ---------------- AI Financial Advisor (real backend) ---------------- */
+const AI_ADVISOR_URL = 'https://ai-financial-advisor-production-ec94.up.railway.app/ai-advice';
+const AI_CATEGORY_MAP = {
+  '🍽️':'مطاعم', '☕':'مقاهي', '📶':'فواتير واشتراكات', '💡':'فواتير واشتراكات',
+  '🎬':'اشتراكات', '📦':'تسوق أونلاين', '🧺':'بقالة', '⛽':'مواصلات ووقود',
+  '💵':'سحب نقدي', '↗️':'تحويلات صادرة'
+};
+const AI_COMMITMENT_DUES = {'تابي':160, 'تمارا':300};
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function buildAIAdvisorPayload(){
+  const incomeTx = transactions.find(t=>t.name==='راتب شهري');
+  const income = incomeTx ? incomeTx.amount : 11200;
+  const byCategory = {};
+  transactions.forEach(t=>{
+    if(t.amount>=0) return;
+    const cat = AI_CATEGORY_MAP[t.ic];
+    if(!cat) return;
+    byCategory[cat] = (byCategory[cat]||0) + Math.abs(t.amount);
+  });
+  const txPayload = Object.entries(byCategory).map(([category,amount])=>({category, amount: Math.round(amount*100)/100}));
+  const commitments = bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: AI_COMMITMENT_DUES[b.bank] || 0}));
+  return {income, transactions: txPayload, commitments, savings_goal: 2000};
+}
+
+function renderAILoading(){
+  document.getElementById('ai-advisor-body').innerHTML = `
+    <div class="ai-loading">
+      <div class="ai-skel ai-skel-circle"></div>
+      <div class="ai-skel-lines">
+        <div class="ai-skel ai-skel-line" style="width:85%"></div>
+        <div class="ai-skel ai-skel-line" style="width:60%"></div>
+        <div class="ai-skel ai-skel-line" style="width:70%"></div>
+      </div>
+    </div>`;
+}
+
+function renderAIError(message){
+  document.getElementById('ai-advisor-body').innerHTML = `
+    <div class="ai-error">
+      <div>تعذّر الاتصال بخدمة التحليل الذكي حاليًا${message ? ' ('+escapeHtml(message)+')' : ''}.</div>
+      <button class="btn btn-outline btn-sm" onclick="fetchAIAdvice()">إعادة المحاولة</button>
+    </div>`;
+}
+
+function renderAIAdvice(advice){
+  const score = Math.max(0, Math.min(100, Math.round(advice.financial_health_score || 0)));
+  const flags = (advice.flags||[]).map(f=>`<div class="ai-flag">⚠️ ${escapeHtml(f)}</div>`).join('');
+  const recs = (advice.recommendations||[]).map(r=>`
+    <div class="ai-rec">
+      <div class="ai-rec-title">${escapeHtml(r.title||'')}</div>
+      <div class="ai-rec-detail">${escapeHtml(r.detail||'')}</div>
+      ${r.potential_saving ? `<div class="ai-rec-saving">توفير متوقع: ${fmt(r.potential_saving)} ${SAR}</div>` : ''}
+    </div>`).join('');
+  document.getElementById('ai-advisor-body').innerHTML = `
+    <div class="ai-advisor-top">
+      <div class="score-ring" style="--score:${score}">
+        <div class="score-ring-inner">
+          <div class="score-num">${score}</div>
+          <div class="score-label">/ 100</div>
+        </div>
+      </div>
+      <div class="ai-summary">${escapeHtml(advice.summary||'')}</div>
+    </div>
+    ${flags ? `<div class="ai-flags">${flags}</div>` : ''}
+    ${recs ? `<div class="ai-recs">${recs}</div>` : ''}
+  `;
+}
+
+let aiAdvice = null;
+let aiAdviceError = null;
+
+async function requestAIAdvice(){
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 35000);
+  try{
+    const res = await fetch(AI_ADVISOR_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(buildAIAdvisorPayload()),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(!data.success || !data.advice) throw new Error('استجابة غير صالحة');
+    return data.advice;
+  }catch(err){
+    clearTimeout(timeout);
+    throw err;
+  }
+}
+
+async function fetchAIAdvice(){
+  renderAILoading();
+  aiAdvice = null;
+  aiAdviceError = null;
+  try{
+    aiAdvice = await requestAIAdvice();
+    renderAIAdvice(aiAdvice);
+  }catch(err){
+    if(err.name === 'AbortError'){
+      try{
+        aiAdvice = await requestAIAdvice();
+        renderAIAdvice(aiAdvice);
+        return;
+      }catch(err2){
+        aiAdviceError = err2.name==='AbortError' ? 'انتهت المهلة' : err2.message;
+        renderAIError(aiAdviceError);
+        return;
+      }
+    }
+    aiAdviceError = err.message;
+    renderAIError(aiAdviceError);
+  }
+}
+
+/* ---------------- Chat: real free-text answers from an LLM backend ---------------- */
 const chatLog = [
-  {who:'bot', text:'أهلًا فيصل 👋 أنا مستشارك المالي، أقدر أطّلع على حساباتك وديونك وأسهمك لأعطيك توقعات ونصائح دقيقة. وش تحب تعرف؟'}
+  {who:'bot', text:'أهلًا فيصل 👋 اسألني أي شي عن وضعك المالي، مصاريفك، ديونك، أو أسهمك — أجاوبك بناءً على بياناتك الفعلية.'}
 ];
+
+function buildChatContext(){
+  const total = accounts.reduce((s,a)=>s+a.balance,0);
+  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  return {
+    accounts: accounts.map(a=>({bank:a.bank, type:a.type, balance:a.balance})),
+    total_balance: total,
+    debts_total: debtsTotal,
+    stocks_held: stocks.filter(s=>s.qty>0).map(s=>({name:s.name, ticker:s.ticker, qty:s.qty, price:s.price, change_pct:s.chg})),
+    stocks_net_worth: stocksNet,
+    monthly_commitments: bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: AI_COMMITMENT_DUES[b.bank] || 0})),
+    ai_health_analysis: aiAdvice
+  };
+}
+
+function fmtPrice(v, currency){
+  if(v == null) return '—';
+  return v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ' + currency;
+}
+
+function fmtChangePct(v){
+  if(v == null) return '';
+  const sign = v >= 0 ? '+' : '';
+  return `${sign}${v.toFixed(2)}%`;
+}
+
+function renderFundHolding(h){
+  if(!h || h.error){
+    return `<div class="fund-holding fund-holding-error">${escapeHtml((h && (h.name||h.symbol)) || '')} — تعذّر جلب السعر الحي</div>`;
+  }
+  const chgClass = h.changePercent == null ? '' : (h.changePercent >= 0 ? 'pos' : 'neg');
+  return `<div class="fund-holding">
+    <div class="fund-holding-name">${escapeHtml(h.name)} <span class="fund-holding-symbol">${escapeHtml(h.symbol)}</span></div>
+    <div class="fund-holding-price">${fmtPrice(h.price, h.currency)}${h.changePercent != null ? ` <span class="fund-chg ${chgClass}">${fmtChangePct(h.changePercent)}</span>` : ''}</div>
+  </div>`;
+}
+
+function renderFundCard(plan){
+  const goldRow = plan.gold && !plan.gold.error
+    ? `<div class="fund-holding"><div class="fund-holding-name">${escapeHtml(plan.gold.name)}</div><div class="fund-holding-price">${fmtPrice(plan.gold.price, plan.gold.currency)}</div></div>`
+    : `<div class="fund-holding fund-holding-error">تعذّر جلب سعر الذهب الحي</div>`;
+  return `
+  <div class="fund-card">
+    <div class="fund-head">
+      <div class="fund-title">صندوق ${escapeHtml(plan.label)}</div>
+      <div class="fund-desc">${escapeHtml(plan.description)}</div>
+    </div>
+    <div class="fund-alloc-bar">
+      <span style="width:${plan.allocation.gold}%; background:var(--gold);"></span>
+      <span style="width:${plan.allocation.saudi}%; background:var(--emerald);"></span>
+      <span style="width:${plan.allocation.us}%; background:var(--brick);"></span>
+    </div>
+    <div class="fund-alloc-legend">
+      <span><i style="background:var(--gold)"></i> ذهب ${plan.allocation.gold}%</span>
+      <span><i style="background:var(--emerald)"></i> أسهم سعودية ${plan.allocation.saudi}%</span>
+      <span><i style="background:var(--brick)"></i> أسهم أمريكية ${plan.allocation.us}%</span>
+    </div>
+    <div class="fund-section">
+      <div class="fund-section-title">الذهب</div>
+      ${goldRow}
+    </div>
+    <div class="fund-section">
+      <div class="fund-section-title">الأسهم السعودية</div>
+      ${plan.saudi_holdings.map(renderFundHolding).join('')}
+    </div>
+    <div class="fund-section">
+      <div class="fund-section-title">الأسهم الأمريكية</div>
+      ${plan.us_holdings.map(renderFundHolding).join('')}
+    </div>
+    <div class="fund-updated">آخر تحديث للأسعار: ${new Date(plan.generated_at).toLocaleString('ar-SA')}</div>
+  </div>`;
+}
+
 function renderChat(){
-  document.getElementById('chat-body').innerHTML = chatLog.map(m=>`<div class="msg ${m.who}">${m.text}</div>`).join('');
+  document.getElementById('chat-body').innerHTML = chatLog.map(m=>{
+    if(m.type === 'fund') return `<div class="msg fund-msg">${renderFundCard(m.plan)}</div>`;
+    return `<div class="msg ${m.who}">${escapeHtml(m.text)}</div>`;
+  }).join('');
   const body = document.getElementById('chat-body');
   body.scrollTop = body.scrollHeight;
 }
-function advisorReply(q){
-  const total = accounts.reduce((s,a)=>s+a.balance,0);
-  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
-  if(q.includes('وضعي') || q.includes('شهر')){
-    return `رصيدك الحالي ${fmt(total)} ${SAR}، والتزاماتك الشهرية (أقساط + تابي/تمارا) تقارب 3,890 ${SAR}. بعد خصمها يبقى لديك هامش جيد للادخار، وأنصحك بتحويل جزء منه تلقائيًا لحساب التوفير.`;
-  }
-  if(q.includes('ديون') || q.includes('اسدد') || q.includes('أسدد')){
-    return `إجمالي ديونك الحالية ${fmt(debtsTotal)} ${SAR}. بناءً على رصيدك، تقدر تسدد دفعة تابي القادمة (160 ${SAR}) وتمارا (300 ${SAR}) بدون أي ضغط. تسديد التمويل الشخصي مبكرًا سيوفر عليك فوائد إضافية إذا رغبت.`;
-  }
-  if(q.includes('أسهم') || q.includes('سهم') || q.includes('بيع')){
-    return `صافي محفظتك من الأسهم حاليًا ${fmt(stocksNet)} ${SAR}. سهم سابك يسجل أعلى نمو هذا الأسبوع (+1.2%)، بينما الراجحي في تراجع طفيف (-0.3%). القرار يعتمد على أفقك الاستثماري، لكن لا يوجد مؤشر ضغط يستدعي بيعًا فوريًا.`;
-  }
-  return `بناءً على بياناتك: رصيدك الإجمالي ${fmt(total)} ${SAR}، وديونك ${fmt(debtsTotal)} ${SAR}، ومحفظة أسهمك ${fmt(stocksNet)} ${SAR}. وضعك المالي مستقر بشكل عام. تحب أفصّل لك أي جزء منها؟`;
-}
+
 function sendChat(){
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
@@ -106,20 +296,56 @@ function sendChat(){
   askAdvisor(text);
   input.value='';
 }
-function askAdvisor(q){
+
+const AUTOMATION_FREQ_MAP = {'شهريا':'شهريًا', 'شهريًا':'شهريًا', 'اسبوعيا':'أسبوعيًا', 'أسبوعيًا':'أسبوعيًا', 'يوميا':'يوميًا', 'يوميًا':'يوميًا'};
+
+function applyAutomationIntent(automation){
+  if(!automation) return null;
+  const recipient = (automation.recipient || '').toString().trim();
+  const amount = Number(automation.amount);
+  if(!recipient || !amount || amount <= 0) return null;
+  const freqText = AUTOMATION_FREQ_MAP[(automation.frequency || '').toString().trim()] || 'شهريًا';
+  const acc = accounts.find(a=>a.primary) || accounts[0];
+  automations.push({name:`تحويل تلقائي — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freqText} من ${acc.bank}`, on:true});
+  persistState();
+  return {recipient, amount, freqText, bank:acc.bank};
+}
+
+async function askAdvisor(q){
   chatLog.push({who:'user', text:q});
-  chatLog.push({who:'bot', text:advisorReply(q)});
+  chatLog.push({who:'bot', text:'يفكّر...'});
+  renderChat();
+  const pendingIndex = chatLog.length - 1;
+  const history = chatLog.slice(0, -2)
+    .filter(m=>m.text !== 'يفكّر...')
+    .slice(-8)
+    .map(m=>({role: m.who==='user' ? 'user' : 'assistant', content: m.text}));
+  try{
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question:q, context: buildChatContext(), history})
+    });
+    const data = await res.json();
+    if(!res.ok || !data.answer) throw new Error(data.error || 'HTTP '+res.status);
+    chatLog[pendingIndex] = {who:'bot', text: data.answer};
+    const applied = applyAutomationIntent(data.automation);
+    if(applied){
+      chatLog.push({who:'system', text:`✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}. تقدر تديره من صفحة الحوالات.`});
+    }
+    if(data.investmentPlan){
+      chatLog.push({who:'system', type:'fund', plan: data.investmentPlan});
+    }
+  }catch(err){
+    chatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};
+  }
   renderChat();
 }
 
 document.getElementById('chat-input').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
 
 renderChat();
-const pending = sessionStorage.getItem('hasila_pending_question');
-if(pending){
-  sessionStorage.removeItem('hasila_pending_question');
-  askAdvisor(pending);
-}
+fetchAIAdvice();
 </script>
 </body>
 </html>
