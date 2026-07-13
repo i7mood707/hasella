@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدفع — حصيلة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#24303D;--ink-soft:#34424F;--ink-line:#E3E0D6;--paper:#F6F4EE;--paper-dim:#ECE8DD;
+  --emerald:#3E7C6F;--emerald-deep:#2C5D52;--gold:#B98F4A;--brick:#C06B4F;
+  --text-dark:#24303D;--text-muted:#7C8288;--radius:14px;
+  --font-display:'Almarai',sans-serif;--font-body:'IBM Plex Sans Arabic',sans-serif;--font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font-body); background:var(--paper); color:var(--text-dark); min-height:100vh; -webkit-font-smoothing:antialiased;}
+button{font-family:inherit; cursor:pointer;}
+input,select{font-family:inherit;}
+::selection{background:var(--emerald); color:#fff;}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:6px;}
+
+/* ---------- Top bar ---------- */
+.topbar{background:#fff; border-bottom:1px solid var(--ink-line); padding:16px 24px; display:flex; align-items:center; justify-content:center; position:sticky; top:0; z-index:10;}
+.topbar h1{font-family:var(--font-display); font-size:20px; font-weight:800; color:var(--ink);}
+
+/* ---------- Container ---------- */
+.container{max-width:520px; margin:0 auto; padding:28px 20px 60px; animation:pagein .45s cubic-bezier(.22,.8,.32,1);}
+@keyframes pagein{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+.card{background:#fff; border-radius:var(--radius); padding:22px; border:1px solid #E7E1D1; box-shadow:0 1px 3px rgba(36,48,61,0.04); margin-bottom:18px; transition:box-shadow .3s ease, transform .3s ease;}
+.card:hover{box-shadow:0 14px 32px rgba(36,48,61,0.10); transform:translateY(-2px);}
+.card h3{font-family:var(--font-display); font-size:15.5px; font-weight:700; margin-bottom:14px;}
+
+/* ---------- Payment methods ---------- */
+.pay-methods{display:flex; flex-direction:column; gap:10px;}
+.pay-method{display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:14px; border:1.5px solid #E7E1D1; background:#fff; cursor:pointer; transition:all .25s ease; position:relative; text-align:right;}
+.pay-method:hover{border-color:var(--emerald); background:var(--paper-dim); transform:translateY(-2px); box-shadow:0 8px 20px rgba(36,48,61,0.08);}
+.pay-method.active{border-color:var(--emerald); background:rgba(62,124,111,0.06); box-shadow:0 0 0 2px rgba(62,124,111,0.18);}
+.pay-method-icon{width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .25s ease;}
+.pay-method:hover .pay-method-icon{transform:scale(1.08);}
+.applepay-icon{background:var(--ink); color:#fff;}
+.card-icon{background:linear-gradient(135deg, var(--emerald), var(--emerald-deep)); color:#fff;}
+.madd-icon{background:linear-gradient(135deg, var(--emerald), var(--emerald-deep)); color:#fff;}
+.pay-method-info{flex:1;}
+.pay-method-name{font-family:var(--font-display); font-size:14.5px; font-weight:700; color:var(--text-dark);}
+.pay-method-desc{font-size:11.5px; color:var(--text-muted); margin-top:2px;}
+.pay-method-check{width:24px; height:24px; border-radius:50%; border:2px solid #DAD4C2; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:transparent; transition:all .25s ease; flex-shrink:0;}
+.pay-method.active .pay-method-check{background:var(--emerald); border-color:var(--emerald); color:#fff;}
+
+/* ---------- Forms ---------- */
+.field-block{margin-bottom:16px;}
+.flabel{display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:6px; font-weight:500;}
+.pay-card-input{width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid #DAD4C2; background:#fff; font-size:14.5px; color:var(--text-dark); transition:border-color .15s; font-family:var(--font-mono); direction:ltr; text-align:right;}
+.pay-card-input:focus{outline:none; border-color:var(--emerald);}
+.pay-card-input::placeholder{color:#B0AFA8; font-family:var(--font-body); direction:rtl; text-align:right;}
+.pay-card-input-wrap{position:relative;}
+.pay-card-brands{position:absolute; left:12px; top:50%; transform:translateY(-50%); display:flex; align-items:center; gap:6px;}
+select.sel{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; background:#fff;}
+
+/* ---------- Summary ---------- */
+.pay-summary{background:var(--paper-dim); border-radius:12px; padding:16px; margin-bottom:14px; border:1px solid #E7E1D1;}
+.pay-summary-row{display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:13px; color:var(--text-muted);}
+.pay-summary-row + .pay-summary-row{border-top:1px dashed #DDD6C2;}
+.pay-summary-row.total{border-top:1.5px solid #DAD4C2; margin-top:6px; padding-top:12px; font-size:15px; font-weight:700; color:var(--text-dark);}
+.pay-summary-row.total span:last-child{font-family:var(--font-mono); color:var(--emerald-deep);}
+
+/* ---------- Buttons ---------- */
+.btn{padding:9px 16px; border-radius:9px; border:1.5px solid var(--ink-line); background:#fff; font-size:12.5px; font-weight:600; color:var(--text-dark); transition:transform .15s ease, box-shadow .2s ease; text-decoration:none; display:inline-block;}
+.btn:active{transform:translateY(0) scale(.97);}
+.btn-emerald{background:var(--emerald); color:#fff; border-color:var(--emerald); width:100%; padding:14px; font-size:15px; font-family:var(--font-display);}
+.btn-emerald:hover{background:var(--emerald-deep);}
+.btn-outline{background:#fff; border-color:#DAD4C2; color:var(--text-dark);}
+
+/* ---------- Features ---------- */
+.pay-feature{background:rgba(62,124,111,0.08); color:var(--emerald-deep); border:1px solid rgba(62,124,111,0.25); border-radius:10px; padding:10px 14px; font-size:12.5px; font-weight:500;}
+.madd-token-info{display:flex; flex-direction:column; gap:8px;}
+
+/* ---------- Modal ---------- */
+.modal-overlay{position:fixed; inset:0; background:rgba(36,48,61,0.45); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px;}
+.modal-box{background:#fff; border-radius:16px; padding:26px; width:100%; max-width:420px; max-height:90vh; overflow-y:auto; box-shadow:0 30px 80px rgba(36,48,61,0.3); animation:sheetup .3s cubic-bezier(.22,.8,.32,1);}
+.modal-box h3{font-family:var(--font-display); font-size:17px; font-weight:700; margin-bottom:16px;}
+
+/* ---------- Overlays (Apple Pay / Madd) ---------- */
+.overlay-sheet{position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:300; padding:20px; animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0;} to{opacity:1;}}
+.sheet-box{background:#fff; border-radius:20px; padding:32px 28px; width:100%; max-width:360px; box-shadow:0 30px 80px rgba(0,0,0,0.3); animation:sheetup .4s cubic-bezier(.22,.8,.32,1);}
+@keyframes sheetup{from{opacity:0; transform:translateY(30px) scale(.95);} to{opacity:1; transform:translateY(0) scale(1);}}
+.sheet-logo-row{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:18px;}
+.sheet-amount{font-family:var(--font-mono); font-size:32px; font-weight:700; text-align:center; color:#000; margin-bottom:6px;}
+.sheet-merchant{font-size:13px; color:#666; text-align:center; margin-bottom:16px;}
+.sheet-divider{height:1px; background:#E5E5E5; margin-bottom:12px;}
+.sheet-status{text-align:center; padding:10px 0; font-size:13px; color:#666;}
+.sheet-spinner{width:36px; height:36px; border:3px solid #E5E5E5; border-top-color:#000; border-radius:50%; margin:16px auto; animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sheet-cancel{width:100%; padding:12px; border:none; background:none; color:#007AFF; font-size:15px; font-weight:600; cursor:pointer; margin-top:10px; border-radius:10px; transition:background .15s;}
+.sheet-cancel:hover{background:rgba(0,122,255,0.08);}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:13px 22px; border-radius:12px; font-size:13px; box-shadow:0 14px 32px rgba(36,48,61,0.3); opacity:0; pointer-events:none; z-index:200; transition:opacity .25s ease, transform .25s ease; max-width:90vw; text-align:center;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* ---------- Success state ---------- */
+.success-check{width:72px; height:72px; border-radius:50%; background:var(--emerald); color:#fff; display:flex; align-items:center; justify-content:center; font-size:36px; margin:0 auto 16px; animation:popin .4s cubic-bezier(.22,.8,.32,1);}
+@keyframes popin{from{transform:scale(0);} to{transform:scale(1);}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>حصيلة — الدفع</h1>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h3>اختر طريقة الدفع</h3>
+    <div class="pay-methods">
+      <button class="pay-method active" data-method="applepay" onclick="selectPayMethod('applepay')">
+        <div class="pay-method-icon applepay-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        </div>
+        <div class="pay-method-info">
+          <div class="pay-method-name">Apple Pay</div>
+          <div class="pay-method-desc">ادفع بسرعة بأجهزة Apple</div>
+        </div>
+        <div class="pay-method-check">✓</div>
+      </button>
+
+      <button class="pay-method" data-method="card" onclick="selectPayMethod('card')">
+        <div class="pay-method-icon card-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="pay-method-info">
+          <div class="pay-method-name">بطاقة ائتمان</div>
+          <div class="pay-method-desc">فيزا أو ماستركارد</div>
+        </div>
+        <div class="pay-method-check">✓</div>
+      </button>
+
+      <button class="pay-method" data-method="madd" onclick="selectPayMethod('madd')">
+        <div class="pay-method-icon madd-icon">
+          <span style="font-size:22px; font-weight:800; font-family:var(--font-display);">◎</span>
+        </div>
+        <div class="pay-method-info">
+          <div class="pay-method-name">مدّ</div>
+          <div class="pay-method-desc">ادفع بأمان باستخدام رمز مدّ</div>
+        </div>
+        <div class="pay-method-check">✓</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Credit Card Form -->
+  <div class="card" id="card-form-card" style="display:none;">
+    <h3>بيانات البطاقة</h3>
+    <div class="field-block">
+      <label class="flabel">رقم البطاقة</label>
+      <div class="pay-card-input-wrap">
+        <input type="text" id="card-number" class="pay-card-input" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="formatCardNumber(this)">
+        <div class="pay-card-brands" id="card-brands"></div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div class="field-block">
+        <label class="flabel">تاريخ الانتهاء</label>
+        <input type="text" id="card-expiry" class="pay-card-input" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+      </div>
+      <div class="field-block">
+        <label class="flabel">CVV</label>
+        <input type="password" id="card-cvv" class="pay-card-input" placeholder="•••" maxlength="4">
+      </div>
+    </div>
+    <div class="field-block">
+      <label class="flabel">اسم حامل البطاقة</label>
+      <input type="text" id="card-name" class="pay-card-input" placeholder="الاسم كما يظهر على البطاقة">
+    </div>
+  </div>
+
+  <!-- Madd Token Form -->
+  <div class="card" id="madd-form-card" style="display:none;">
+    <h3>دفع بالمدّ</h3>
+    <p style="font-size:12.5px; color:var(--text-muted); line-height:1.8; margin-bottom:14px;">
+      أدخل رمز مدّ الدفع الخاص بك للإتمام.
+    </p>
+    <div class="field-block">
+      <label class="flabel">رمز مدّ</label>
+      <input type="text" id="madd-token" class="pay-card-input" placeholder="TKN-XXXX-XXXX" style="font-family:var(--font-mono); letter-spacing:1.5px; text-align:center; font-size:16px;" maxlength="15">
+    </div>
+    <div class="madd-token-info">
+      <div class="pay-feature">✓ دفع فوري وآمن</div>
+      <div class="pay-feature">✓ لا تحتاج لبيانات بطاقة</div>
+      <div class="pay-feature">✓ صالح لمدة محددة</div>
+    </div>
+  </div>
+
+  <!-- Payment Summary -->
+  <div class="card">
+    <h3>ملخص الدفع</h3>
+    <div class="field-block">
+      <label class="flabel">المبلغ (ر.س)</label>
+      <input type="number" id="pay-amount" class="pay-card-input" placeholder="0.00" min="1" oninput="updatePaySummary()">
+    </div>
+    <div class="field-block">
+      <label class="flabel">الوصف (اختياري)</label>
+      <input type="text" id="pay-desc" class="pay-card-input" placeholder="مثال: فاتورة كهرباء">
+    </div>
+    <div class="pay-summary" id="pay-summary" style="display:none;">
+      <div class="pay-summary-row">
+        <span>المبلغ</span>
+        <span id="sum-amount">0.00 ر.س</span>
+      </div>
+      <div class="pay-summary-row">
+        <span>رسوم المعالجة</span>
+        <span style="color:var(--emerald-deep);">مجاني</span>
+      </div>
+      <div class="pay-summary-row total">
+        <span>الإجمالي</span>
+        <span id="sum-total">0.00 ر.س</span>
+      </div>
+    </div>
+    <p id="pay-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+    <button class="btn btn-emerald" id="pay-submit-btn" onclick="processPayment()">إتمام الدفع</button>
+    <div style="text-align:center; margin-top:12px;">
+      <span style="font-size:11px; color:var(--text-muted);">🔒 جميع المعاملات مشفرة وآمنة</span>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="card" id="result-card" style="display:none;">
+    <div class="success-check">✓</div>
+    <h3 style="text-align:center; justify-content:center;">تم الدفع بنجاح</h3>
+    <div style="background:var(--paper-dim); border-radius:12px; padding:18px; margin-top:14px;">
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-muted); margin-bottom:8px;">
+        <span>المبلغ</span>
+        <span id="result-amount" style="font-family:var(--font-mono); font-weight:700; color:var(--emerald-deep); font-size:15px;"></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-muted); margin-bottom:8px;">
+        <span>الطريقة</span>
+        <span id="result-method" style="color:var(--text-dark); font-weight:600;"></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-muted);">
+        <span>الرقم المرجعي</span>
+        <span id="result-ref" style="font-family:var(--font-mono); color:var(--text-dark); font-weight:600; font-size:12px;"></span>
+      </div>
+    </div>
+    <button class="btn btn-emerald" style="width:100%; margin-top:18px;" onclick="resetForm()">دفع جديد</button>
+  </div>
+</div>
+
+<!-- Card confirm modal -->
+<div class="modal-overlay" id="card-confirm-modal" style="display:none;">
+  <div class="modal-box">
+    <h3>تأكيد الدفع</h3>
+    <div id="card-confirm-body" style="margin-bottom:18px;"></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeCardConfirm()">إلغاء</button>
+      <button class="btn btn-emerald" style="flex:1; width:auto;" onclick="confirmCardPayment()">تأكيد الدفع</button>
+    </div>
+  </div>
+</div>
+
+<!-- Apple Pay overlay -->
+<div id="applepay-overlay" class="overlay-sheet" style="display:none;">
+  <div class="sheet-box">
+    <div class="sheet-logo-row">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+      <span style="font-family:var(--font-display); font-size:18px; font-weight:800; color:#000;">Apple Pay</span>
+    </div>
+    <div class="sheet-amount" id="ap-amount"></div>
+    <div class="sheet-merchant">الدفع إلى حصيلة</div>
+    <div class="sheet-divider"></div>
+    <div id="ap-status" class="sheet-status">جاري التحقق...</div>
+    <div class="sheet-spinner" id="ap-spinner"></div>
+    <div id="ap-faceid" style="display:none; text-align:center; padding:20px 0;">
+      <div style="font-size:48px; margin-bottom:10px;">🔒</div>
+      <div style="font-size:13px; color:#333; font-weight:600;">تأكيد بالبصمة أو Face ID</div>
+      <div style="font-size:11px; color:#999; margin-top:4px;">ضع إصبعك على المستشعر أو انظر إلى الكاميرا</div>
+    </div>
+    <button class="sheet-cancel" onclick="cancelOverlay('applepay')">إلغاء</button>
+  </div>
+</div>
+
+<!-- Madd overlay -->
+<div id="madd-overlay" class="overlay-sheet" style="display:none;">
+  <div class="sheet-box">
+    <div class="sheet-logo-row">
+      <span style="font-size:32px; font-weight:800; color:var(--emerald);">◎</span>
+      <span style="font-family:var(--font-display); font-size:18px; font-weight:800; color:#000;">مدّ</span>
+    </div>
+    <div class="sheet-amount" id="md-amount"></div>
+    <div class="sheet-merchant">الدفع عبر مدّ</div>
+    <div class="sheet-divider"></div>
+    <div id="md-status" class="sheet-status">جاري التحقق من الرمز...</div>
+    <div class="sheet-spinner" id="md-spinner"></div>
+    <button class="sheet-cancel" onclick="cancelOverlay('madd')">إلغاء</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+let selectedMethod = 'applepay';
+let pendingPayment = null;
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function selectPayMethod(method){
+  selectedMethod = method;
+  document.querySelectorAll('.pay-method').forEach(el=>el.classList.toggle('active', el.dataset.method === method));
+  document.getElementById('card-form-card').style.display = method === 'card' ? 'block' : 'none';
+  document.getElementById('madd-form-card').style.display = method === 'madd' ? 'block' : 'none';
+  updatePaySummary();
+}
+
+function formatCardNumber(input){
+  let val = input.value.replace(/\D/g, '');
+  input.value = val.replace(/(.{4})/g, '$1 ').trim();
+  const brands = document.getElementById('card-brands');
+  brands.innerHTML = '';
+  if(val.startsWith('4')) brands.innerHTML = '<span style="color:#1A1F71; font-weight:700; font-size:13px; font-style:italic;">VISA</span>';
+  else if(val.startsWith('5') || val.startsWith('2')) brands.innerHTML = '<span style="color:#EB001B; font-weight:700; font-size:12px;">MC</span>';
+}
+
+function formatExpiry(input){
+  let val = input.value.replace(/\D/g, '');
+  if(val.length >= 2) val = val.substring(0,2) + '/' + val.substring(2);
+  input.value = val;
+}
+
+function updatePaySummary(){
+  const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+  const summary = document.getElementById('pay-summary');
+  if(amount > 0){
+    summary.style.display = 'block';
+    document.getElementById('sum-amount').textContent = fmt(amount) + ' ر.س';
+    document.getElementById('sum-total').textContent = fmt(amount) + ' ر.س';
+  } else {
+    summary.style.display = 'none';
+  }
+}
+
+function payErr(msg){
+  const el = document.getElementById('pay-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function genRef(){
+  return 'TXN-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+}
+
+function processPayment(){
+  const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+  document.getElementById('pay-error').style.display = 'none';
+  if(!amount || amount <= 0){ payErr('أدخل مبلغًا صحيحًا'); return; }
+
+  const desc = document.getElementById('pay-desc').value.trim() || 'عملية دفع';
+
+  if(selectedMethod === 'card'){
+    const num = document.getElementById('card-number').value.replace(/\s/g,'');
+    const exp = document.getElementById('card-expiry').value;
+    const cvv = document.getElementById('card-cvv').value;
+    const name = document.getElementById('card-name').value.trim();
+    if(num.length < 13){ payErr('أدخل رقم بطاقة صحيح'); return; }
+    if(!exp || exp.length < 5){ payErr('أدخل تاريخ انتهاء صحيح'); return; }
+    if(!cvv || cvv.length < 3){ payErr('أدخل CVV صحيح'); return; }
+    if(!name){ payErr('أدخل اسم حامل البطاقة'); return; }
+    pendingPayment = {amount, desc, methodLabel:'بطاقة ائتمان', methodIcon:'💳', ref:genRef()};
+    showCardConfirm();
+    return;
+  }
+
+  if(selectedMethod === 'applepay'){
+    pendingPayment = {amount, desc, methodLabel:'Apple Pay', methodIcon:'🍎', ref:genRef()};
+    showApplePayFlow();
+    return;
+  }
+
+  if(selectedMethod === 'madd'){
+    const token = document.getElementById('madd-token').value.trim();
+    if(!token){ payErr('أدخل رمز مدّ'); return; }
+    if(!token.startsWith('TKN-')){ payErr('صيغة الرمز غير صحيحة. يجب أن يبدأ بـ TKN-'); return; }
+    pendingPayment = {amount, desc, methodLabel:'مدّ', methodIcon:'◎', ref:genRef()};
+    showMaddFlow();
+    return;
+  }
+}
+
+/* ---- Card confirm ---- */
+function showCardConfirm(){
+  const {amount, desc, ref} = pendingPayment;
+  const num = document.getElementById('card-number').value.replace(/\s/g,'');
+  document.getElementById('card-confirm-body').innerHTML = `
+    <div style="background:var(--paper-dim); border-radius:12px; padding:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span style="font-size:12.5px; color:var(--text-muted);">المبلغ</span>
+        <span style="font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--emerald-deep);">${fmt(amount)} ر.س</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-muted); margin-bottom:6px;">
+        <span>البطاقة</span>
+        <span style="font-family:var(--font-mono); font-weight:600;">•••• ${num.slice(-4)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-muted); margin-bottom:6px;">
+        <span>الاسم</span>
+        <span style="font-weight:600;">${document.getElementById('card-name').value.trim()}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-muted);">
+        <span>الرقم المرجعي</span>
+        <span style="font-family:var(--font-mono); font-weight:600; font-size:11px;">${ref}</span>
+      </div>
+    </div>`;
+  document.getElementById('card-confirm-modal').style.display = 'flex';
+}
+function closeCardConfirm(){ document.getElementById('card-confirm-modal').style.display = 'none'; }
+
+function confirmCardPayment(){
+  closeCardConfirm();
+  showSuccess();
+  clearCardForm();
+}
+
+/* ---- Apple Pay ---- */
+function showApplePayFlow(){
+  document.getElementById('ap-amount').textContent = fmt(pendingPayment.amount) + ' ر.س';
+  document.getElementById('ap-status').textContent = 'جاري التحقق...';
+  document.getElementById('ap-status').style.color = '#666';
+  document.getElementById('ap-status').style.fontWeight = 'normal';
+  document.getElementById('ap-spinner').style.display = 'block';
+  document.getElementById('ap-faceid').style.display = 'none';
+  document.getElementById('applepay-overlay').style.display = 'flex';
+
+  setTimeout(()=>{
+    document.getElementById('ap-spinner').style.display = 'none';
+    document.getElementById('ap-status').textContent = 'يرجى تأكيد الهوية';
+    document.getElementById('ap-faceid').style.display = 'block';
+  }, 1500);
+
+  setTimeout(()=>{
+    document.getElementById('ap-faceid').style.display = 'none';
+    document.getElementById('ap-status').textContent = 'تم التأكيد بنجاح ✓';
+    document.getElementById('ap-status').style.color = 'var(--emerald-deep)';
+    document.getElementById('ap-status').style.fontWeight = '700';
+  }, 3500);
+
+  setTimeout(()=>{
+    cancelOverlay('applepay');
+    showSuccess();
+  }, 4500);
+}
+
+/* ---- Madd ---- */
+function showMaddFlow(){
+  document.getElementById('md-amount').textContent = fmt(pendingPayment.amount) + ' ر.س';
+  document.getElementById('md-status').textContent = 'جاري التحقق من الرمز...';
+  document.getElementById('md-status').style.color = '#666';
+  document.getElementById('md-status').style.fontWeight = 'normal';
+  document.getElementById('md-spinner').style.display = 'block';
+  document.getElementById('madd-overlay').style.display = 'flex';
+
+  setTimeout(()=>{
+    document.getElementById('md-spinner').style.display = 'none';
+    document.getElementById('md-status').textContent = 'الرمز صالح ✓';
+    document.getElementById('md-status').style.color = 'var(--emerald-deep)';
+    document.getElementById('md-status').style.fontWeight = '700';
+  }, 2000);
+
+  setTimeout(()=>{
+    cancelOverlay('madd');
+    showSuccess();
+  }, 3000);
+}
+
+function cancelOverlay(which){
+  document.getElementById(which === 'applepay' ? 'applepay-overlay' : 'madd-overlay').style.display = 'none';
+}
+
+/* ---- Success ---- */
+function showSuccess(){
+  const {amount, methodLabel, ref} = pendingPayment;
+  document.getElementById('result-amount').textContent = fmt(amount) + ' ر.س';
+  document.getElementById('result-method').textContent = methodLabel;
+  document.getElementById('result-ref').textContent = ref;
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function clearCardForm(){
+  document.getElementById('card-number').value = '';
+  document.getElementById('card-expiry').value = '';
+  document.getElementById('card-cvv').value = '';
+  document.getElementById('card-name').value = '';
+  document.getElementById('card-brands').innerHTML = '';
+}
+
+function resetForm(){
+  document.getElementById('pay-amount').value = '';
+  document.getElementById('pay-desc').value = '';
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('pay-summary').style.display = 'none';
+  if(selectedMethod === 'card') clearCardForm();
+  if(selectedMethod === 'madd') document.getElementById('madd-token').value = '';
+  pendingPayment = null;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+updatePaySummary();
+</script>
+</body>
+</html>
