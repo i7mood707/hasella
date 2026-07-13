@@ -93,7 +93,11 @@
           <div class="card">
             <h3>مستشار مالي سريع</h3>
             <div class="advisor-mini">
-              <div class="bubble">أهلًا فيصل، مستشارك المالي الذكي يحلل حساباتك والتزاماتك الحالية ويعطيك نصائح مبنية على بياناتك.</div>
+              <div class="mini-chat-body" id="mini-chat-body"></div>
+              <div class="mini-input-row">
+                <input id="mini-chat-input" type="text" placeholder="اسأل عن رصيدك، ديونك، أو مصاريفك...">
+                <button onclick="sendMiniChat()">إرسال</button>
+              </div>
               <a class="btn btn-outline btn-sm" style="align-self:flex-start;" href="advisor.html">عرض التحليل الكامل ←</a>
             </div>
           </div>
@@ -140,6 +144,95 @@ function renderHome(){
 }
 
 renderHome();
+
+/* ---------------- مستشار مالي سريع (mini chat) ---------------- */
+const MINI_AI_COMMITMENT_DUES = {'تابي':160, 'تمارا':300};
+const MINI_AUTOMATION_FREQ_MAP = {'شهريا':'شهريًا', 'شهريًا':'شهريًا', 'اسبوعيا':'أسبوعيًا', 'أسبوعيًا':'أسبوعيًا', 'يوميا':'يوميًا', 'يوميًا':'يوميًا'};
+
+function miniEscapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+const miniChatLog = [
+  {who:'bot', text:'أهلًا فيصل، مستشارك المالي الذكي يحلل حساباتك والتزاماتك الحالية ويعطيك نصائح مبنية على بياناتك.'}
+];
+
+function buildMiniChatContext(){
+  const total = accounts.reduce((s,a)=>s+a.balance,0);
+  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  return {
+    accounts: accounts.map(a=>({bank:a.bank, type:a.type, balance:a.balance})),
+    total_balance: total,
+    debts_total: debtsTotal,
+    stocks_held: stocks.filter(s=>s.qty>0).map(s=>({name:s.name, ticker:s.ticker, qty:s.qty, price:s.price, change_pct:s.chg})),
+    stocks_net_worth: stocksNet,
+    monthly_commitments: bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: MINI_AI_COMMITMENT_DUES[b.bank] || 0}))
+  };
+}
+
+function renderMiniChat(){
+  const body = document.getElementById('mini-chat-body');
+  body.innerHTML = miniChatLog.map(m=>`<div class="msg ${m.who}">${miniEscapeHtml(m.text)}</div>`).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function applyMiniAutomationIntent(automation){
+  if(!automation) return null;
+  const recipient = (automation.recipient || '').toString().trim();
+  const amount = Number(automation.amount);
+  if(!recipient || !amount || amount <= 0) return null;
+  const freqText = MINI_AUTOMATION_FREQ_MAP[(automation.frequency || '').toString().trim()] || 'شهريًا';
+  const acc = accounts.find(a=>a.primary) || accounts[0];
+  const isMusaned = automation.source === 'musaned';
+  const name = isMusaned ? `راتب ${recipient} (مساند)` : `تحويل تلقائي — إلى ${recipient}`;
+  if(isMusaned && automations.some(a=>a.name===name)) return {alreadyExisted:true};
+  automations.push({name, detail:`${money(amount)} ${freqText} من ${acc.bank}`, on:true, accountId: acc.id});
+  persistState();
+  return {recipient, amount, freqText, bank:acc.bank};
+}
+
+function sendMiniChat(){
+  const input = document.getElementById('mini-chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  askMiniAdvisor(text);
+  input.value = '';
+}
+
+async function askMiniAdvisor(q){
+  miniChatLog.push({who:'user', text:q});
+  miniChatLog.push({who:'bot', text:'يفكّر...'});
+  renderMiniChat();
+  const pendingIndex = miniChatLog.length - 1;
+  const history = miniChatLog.slice(0, -2)
+    .filter(m=>m.text !== 'يفكّر...')
+    .slice(-8)
+    .map(m=>({role: m.who==='user' ? 'user' : 'assistant', content: m.text}));
+  try{
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question:q, context: buildMiniChatContext(), history})
+    });
+    const data = await res.json();
+    if(!res.ok || !data.answer) throw new Error(data.error || 'HTTP '+res.status);
+    miniChatLog[pendingIndex] = {who:'bot', text: data.answer};
+    const applied = applyMiniAutomationIntent(data.automation);
+    if(applied && !applied.alreadyExisted){
+      miniChatLog.push({who:'system', text:`✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}.`});
+    }
+    if(data.investmentPlan){
+      miniChatLog.push({who:'system', text:`📊 خطة استثمار "${data.investmentPlan.label}" جاهزة — افتح المستشار الكامل لعرض التفاصيل.`});
+    }
+  }catch(err){
+    miniChatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};
+  }
+  renderMiniChat();
+}
+
+document.getElementById('mini-chat-input').addEventListener('keydown', e=>{ if(e.key==='Enter') sendMiniChat(); });
+
+renderMiniChat();
 </script>
 </body>
 </html>
