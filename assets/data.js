@@ -59,9 +59,9 @@ const DEFAULT_TRANSFERS = [
 ];
 
 const DEFAULT_AUTOMATIONS = [
-  {name:'تحويل الإيجار الشهري', detail:`3,000 ${SAR} — كل يوم 1 من الشهر`, on:true},
-  {name:'ادخار تلقائي', detail:`500 ${SAR} أسبوعيًا إلى حساب التوفير`, on:true},
-  {name:'دعم عائلي', detail:`1,000 ${SAR} شهريًا`, on:false},
+  {name:'تحويل الإيجار الشهري', detail:`3,000 ${SAR} — كل يوم 1 من الشهر`, on:true, accountId:'a1'},
+  {name:'ادخار تلقائي', detail:`500 ${SAR} أسبوعيًا إلى حساب التوفير`, on:true, accountId:'a1'},
+  {name:'دعم عائلي', detail:`1,000 ${SAR} شهريًا`, on:false, accountId:'a3'},
 ];
 
 const DEFAULT_BNPL = [
@@ -88,7 +88,7 @@ const DEFAULT_OTHER_BANKS = [
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
-const DATA_VERSION = '6';
+const DATA_VERSION = '7';
 if(localStorage.getItem('hasila_data_version') !== DATA_VERSION){
   ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_transfers','hasila_other_banks'].forEach(k=>localStorage.removeItem(k));
   localStorage.setItem('hasila_data_version', DATA_VERSION);
@@ -111,6 +111,10 @@ const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS)
 const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
 const otherBanks = loadState('hasila_other_banks', DEFAULT_OTHER_BANKS);
 
+const DEFAULT_SETTINGS = {lang:'ar', currency:'SAR', notifications:true, promotions:false, twoFactor:true, darkMode:false};
+const APP_SETTINGS = loadState('hasila_settings', DEFAULT_SETTINGS);
+function persistSettings(){ localStorage.setItem('hasila_settings', JSON.stringify(APP_SETTINGS)); }
+
 function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
   localStorage.setItem('hasila_stocks', JSON.stringify(stocks));
@@ -123,6 +127,136 @@ function persistState(){
 
 /* ---------------- Formatting ---------------- */
 const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+/* ---------------- Currency (all amounts are stored in SAR; this converts + labels for display) ---------------- */
+const CURRENCIES = {
+  SAR: {rate:1,             sym: SAR},
+  USD: {rate:1/3.75,        sym:'<span class="cur-txt">$</span>'},
+  AED: {rate:3.6725/3.75,   sym:'<span class="cur-txt">د.إ</span>'}
+};
+function curCode(){ return CURRENCIES[APP_SETTINGS.currency] ? APP_SETTINGS.currency : 'SAR'; }
+function curSym(){ return CURRENCIES[curCode()].sym; }
+function convToCur(sar){ return sar * CURRENCIES[curCode()].rate; }
+function money(sar){ return fmt(convToCur(sar)) + ' ' + curSym(); }
+
+/* ---------------- Language (interface strings only — data content stays Arabic) ---------------- */
+const I18N_EN = {
+  // nav + shell
+  'الرئيسية':'Home', 'الحوالات':'Transfers', 'مدّ':'Madd', 'الديون':'Debts', 'الأسهم':'Stocks',
+  'التمويل':'Financing', 'المستشار المالي':'Financial Advisor', 'ربط الحسابات':'Link Accounts',
+  'الحساب':'Account', 'الدعم الفني':'Support', 'تسجيل الخروج':'Log out', 'حساب تجريبي':'Demo account',
+  // page-head titles + subtitles
+  'إصدار مدّ الدفع':'Issue Payment Madd',
+  'نظرة عامة على وضعك المالي اليوم':'An overview of your finances today',
+  'حوالاتك المحلية والدولية وإمكانية أتمتتها':'Your local and international transfers, with automation',
+  'حدد الحسابات، المبلغ من كل حساب، ومدة صلاحية مدّ':'Choose accounts, the amount from each, and the Madd validity period',
+  'تابي، تمارا، وأقساط البنوك في جميع حساباتك':'Tabby, Tamara, and bank installments across all your accounts',
+  'محفظتك متزامنة عبر تطبيق عوائد':'Your portfolio is synced via Awaed',
+  'قارن عروض الأقساط أو اطلب تمويلًا لشركتك':'Compare installment offers or request business financing',
+  'يرى حساباتك وديونك، ويتوقع احتياجك القادم':'Sees your accounts and debts, and anticipates your next need',
+  'أدر اتصال حساباتك البنكية وخدمات الدفع الآجل في مكان واحد':'Manage your bank and BNPL connections in one place',
+  'معلومات حسابك وتفضيلاتك الشخصية':'Your account information and personal preferences',
+  'نحن هنا لمساعدتك — تواصل معنا أو ارفع شكوى':'We are here to help — contact us or file a complaint',
+  // card titles
+  'حساباتك والبنوك':'Your accounts & banks', 'أرشيف العمليات':'Transaction history',
+  'إصدار مدّ دفع':'Issue payment Madd', 'مستشار مالي سريع':'Quick financial advisor',
+  'المستشار المالي الذكي':'Smart financial advisor', 'الحوالات التلقائية':'Automatic transfers',
+  'سجل الحوالات':'Transfer log', 'إجمالي الديون':'Total debts', 'جميع الأقساط':'All installments',
+  'البنوك':'Banks', 'خدمات الدفع الآجل':'Buy now, pay later', 'منصات الاستثمار':'Investment platforms',
+  'حساباتك المرتبطة':'Your linked accounts', 'اختر الحسابات':'Choose accounts', 'إيصال مدّ':'Madd receipt',
+  'صافي ثروتك من الأسهم':'Your net stock wealth', 'مقتنياتك':'Your holdings',
+  'مقارنة عروض الأقساط':'Compare installment offers', 'طلب تمويل للشركات':'Business financing request',
+  'المعلومات الشخصية':'Personal information', 'التفضيلات والإعدادات':'Preferences & settings',
+  'رفع شكوى أو طلب دعم':'File a complaint or request support', 'شكاواي السابقة':'Your past complaints',
+  'ربط بنك جديد':'Link a new bank', 'حوالة جديدة':'New transfer',
+  'اسأل المستشار الذكي':'Ask the smart advisor',
+  'الإجابات مبنية على تحليل الذكاء الاصطناعي الفعلي لبياناتك أعلاه':'Answers are based on real AI analysis of your data above',
+  // home hero
+  'إجمالي الرصيد في جميع الحسابات':'Total balance across all accounts', 'عدد الحسابات':'Accounts',
+  'صافي الأسهم':'Net stocks', 'إجمالي الديون':'Total debts', 'عمليات هذا الشهر':'Transactions this month',
+  // sub-labels
+  'تحليل مباشر بالذكاء الاصطناعي':'Live AI analysis', 'بياناتك التعريفية':'Your identity details',
+  'تُحفظ تلقائيًا':'Saved automatically', 'نرد خلال 24 ساعة':'We reply within 24 hours',
+  'جميع الجهات':'All providers', 'حسب سياسة كل بنك':'Per each bank\'s policy', 'اختياري':'Optional',
+  // buttons
+  'إرسال':'Send', '+ حوالة جديدة':'+ New transfer', '+ ربط بنك جديد':'+ Link new bank',
+  'تنفيذ الحوالة':'Execute transfer', 'حفظ المعلومات':'Save information', 'إرسال الشكوى':'Submit complaint',
+  'إرسال الطلب':'Submit request', 'إصدار مدّ':'Issue Madd', 'تأكيد':'Confirm', 'تأكيد الربط':'Confirm link',
+  'إغلاق':'Close', 'إصدار مدّ جديد ←':'Issue new Madd →',
+  // field labels
+  'الاسم الكامل':'Full name', 'البريد الإلكتروني':'Email', 'رقم الجوال':'Mobile number',
+  'رقم الهوية الوطنية':'National ID', 'اللغة':'Language', 'العملة':'Currency', 'نوع الطلب':'Request type',
+  'عنوان الشكوى':'Complaint subject', 'تفاصيل المشكلة':'Problem details', 'من حساب':'From account',
+  'نوع الحوالة':'Transfer type', 'اختر الحسابات والمبلغ من كل حساب':'Choose accounts and the amount from each',
+  'اسم المستلم / الجهة':'Recipient name / entity', 'رقم الحساب / الآيبان':'Account number / IBAN',
+  'التكرار':'Frequency', 'اليوم':'Day', 'المبلغ':'Amount', 'عدد الأسهم':'Number of shares',
+  'يُخصم من حساب':'Charged from account', 'مدة صلاحية مدّ':'Madd validity period', 'اسم الشركة':'Company name',
+  'رقم السجل التجاري':'Commercial registration no.', 'المبلغ المطلوب':'Requested amount',
+  'الغرض من التمويل':'Financing purpose',
+  // settings rows + contact labels
+  'الإشعارات':'Notifications', 'تنبيهات العمليات والحوالات على جهازك':'Transaction and transfer alerts on your device',
+  'رسائل العروض':'Promotional messages', 'استقبال العروض والأخبار التسويقية':'Receive offers and marketing news',
+  'المصادقة الثنائية':'Two-factor authentication', 'طبقة حماية إضافية عند تسجيل الدخول':'An extra layer of protection at login',
+  'الوضع الليلي':'Dark mode', 'مظهر داكن مريح للعين (قريبًا)':'A dark, eye-friendly theme (coming soon)',
+  'الرقم الموحّد':'Unified number', 'جوال الطوارئ المالية':'Financial emergency line', 'ساعات العمل':'Working hours',
+  '✔ حساب موثّق':'✔ Verified account',
+  // placeholders
+  'اكتب سؤالك عن وضعك المالي...':'Type your question about your finances...',
+  'مثال: عبدالله العتيبي':'e.g., Abdullah Alotaibi',
+  'مثال: لم تصل حوالتي إلى المستلم':'e.g., My transfer did not reach the recipient',
+  'اشرح لنا المشكلة بالتفصيل حتى نقدر نساعدك بسرعة...':'Describe the problem in detail so we can help you quickly...'
+};
+
+const _i18nOrigText = new WeakMap();
+const _i18nOrigPh = new WeakMap();
+function _i18nTr(str){
+  const key = (str || '').trim();
+  if(!key) return str;
+  const en = I18N_EN[key];
+  return (APP_SETTINGS.lang === 'en' && en) ? str.replace(key, en) : str;
+}
+function _i18nTranslateEl(el){
+  el.childNodes.forEach(n=>{
+    if(n.nodeType !== 3) return; // text nodes only — leaves nested icons/badges/counters alone
+    if(!_i18nOrigText.has(n)) _i18nOrigText.set(n, n.nodeValue);
+    n.nodeValue = _i18nTr(_i18nOrigText.get(n));
+  });
+}
+function applyLanguage(){
+  const lang = APP_SETTINGS.lang === 'en' ? 'en' : 'ar';
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.setAttribute('dir', lang === 'en' ? 'ltr' : 'rtl');
+  const sels = '.nav-item, .page-head h1, .page-head p, h3, label.flabel, .btn, .logout-btn,'
+    + ' .setting-title, .setting-desc, .contact-label, .sub, .urole, .chat-head div, .demo-pill,'
+    + ' .hero-label, .hero-sub-row .item';
+  document.querySelectorAll(sels).forEach(_i18nTranslateEl);
+  document.querySelectorAll('[placeholder]').forEach(el=>{
+    if(!_i18nOrigPh.has(el)) _i18nOrigPh.set(el, el.getAttribute('placeholder'));
+    const orig = _i18nOrigPh.get(el);
+    if(orig != null) el.setAttribute('placeholder', _i18nTr(orig));
+  });
+}
+
+/* Convert amounts that are baked as static "123 <svg class="sar">" markup in the HTML
+   (e.g. the debts table) when a non-SAR currency is selected. Runs once per page load;
+   the static HTML is reset on every navigation, so no toggle-back handling is needed. */
+function localizeStaticAmounts(){
+  if(curCode() === 'SAR') return;
+  const txt = curCode() === 'USD' ? '$' : (curCode() === 'AED' ? 'د.إ' : 'ر.س');
+  document.querySelectorAll('svg.sar').forEach(svg=>{
+    const prev = svg.previousSibling;
+    if(!prev || prev.nodeType !== 3) return;
+    const m = prev.nodeValue.match(/([\d,]+(?:\.\d+)?)\s*$/);
+    if(!m) return;
+    const sar = parseFloat(m[1].replace(/,/g, ''));
+    if(isNaN(sar)) return;
+    prev.nodeValue = prev.nodeValue.slice(0, m.index) + fmt(convToCur(sar)) + ' ';
+    const span = document.createElement('span');
+    span.className = 'cur-txt';
+    span.textContent = txt;
+    svg.replaceWith(span);
+  });
+}
 
 function animateCount(el, target, suffixHtml, duration){
   duration = duration || 900;
@@ -164,3 +298,5 @@ function initMobileNav(){
   document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click', closeMobileNav));
 }
 initMobileNav();
+applyLanguage();
+localizeStaticAmounts();

@@ -29,6 +29,8 @@
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -138,7 +140,7 @@
 <script src="assets/data.js"></script>
 <script>
 requireAuth();
-document.getElementById('debts-grand-total').innerHTML = fmt(debtsTotal)+' '+SAR;
+document.getElementById('debts-grand-total').innerHTML = money(debtsTotal);
 </script>
 </body>
 </html>

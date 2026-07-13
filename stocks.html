@@ -29,6 +29,8 @@
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -126,7 +128,7 @@ function renderStocks(){
   const held = stocks.map((s,i)=>({...s,i})).filter(s=>s.qty>0);
   document.getElementById('stocks-count-sub').textContent = held.length + ' شركات';
   const net = stocks.reduce((s,st)=>s+st.qty*st.price,0);
-  animateCount(document.getElementById('stocks-networth'), net, ' '+SAR);
+  animateCount(document.getElementById('stocks-networth'), convToCur(net), ' '+curSym());
   document.getElementById('stocks-list').innerHTML = held.length ? held.map(s=>`
     <div class="watch-row">
       <div class="watch-id">
@@ -139,9 +141,9 @@ function renderStocks(){
       ${sparkSvg(s.chg, s.i*7+3)}
       <div class="watch-right">
         <div class="watch-nums">
-          <div class="watch-price">${s.price.toFixed(2)} ${SAR}</div>
+          <div class="watch-price">${money(s.price)}</div>
           <span class="watch-chg ${s.chg>=0?'pos':'neg'}">${s.chg>=0?'+':''}${s.chg}%</span>
-          <div class="watch-qty">تملك ${s.qty} — ${fmt(s.qty*s.price)} ${SAR}</div>
+          <div class="watch-qty">تملك ${s.qty} — ${money(s.qty*s.price)}</div>
         </div>
         <div class="watch-actions">
           <button onclick="tradeStock(${s.i},'buy')" aria-label="شراء ${s.name}" title="شراء">+</button>
@@ -168,7 +170,7 @@ function renderMarket(){
       ${sparkSvg(s.chg, s.i*7+3)}
       <div class="watch-right">
         <div class="watch-nums">
-          <div class="watch-price">${s.price.toFixed(2)} ${SAR}</div>
+          <div class="watch-price">${money(s.price)}</div>
           <span class="watch-chg ${s.chg>=0?'pos':'neg'}">${s.chg>=0?'+':''}${s.chg}%</span>
           ${s.qty>0 ? `<div class="watch-qty">تملك ${s.qty}</div>` : ''}
         </div>
@@ -217,7 +219,7 @@ function updateTradeTotal(){
   if(!currentTrade) return;
   const s = stocks[currentTrade.i];
   const n = parseInt(document.getElementById('trade-qty').value) || 0;
-  document.getElementById('trade-total').innerHTML = fmt(n*s.price) + ' ' + SAR;
+  document.getElementById('trade-total').innerHTML = money(n*s.price);
 }
 document.getElementById('trade-qty').addEventListener('input', updateTradeTotal);
 

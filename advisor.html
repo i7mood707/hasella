@@ -29,6 +29,8 @@
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item active" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -138,7 +140,7 @@ function renderAIAdvice(advice){
     <div class="ai-rec">
       <div class="ai-rec-title">${escapeHtml(r.title||'')}</div>
       <div class="ai-rec-detail">${escapeHtml(r.detail||'')}</div>
-      ${r.potential_saving ? `<div class="ai-rec-saving">توفير متوقع: ${fmt(r.potential_saving)} ${SAR}</div>` : ''}
+      ${r.potential_saving ? `<div class="ai-rec-saving">توفير متوقع: ${money(r.potential_saving)}</div>` : ''}
     </div>`).join('');
   document.getElementById('ai-advisor-body').innerHTML = `
     <div class="ai-advisor-top">
@@ -306,9 +308,12 @@ function applyAutomationIntent(automation){
   if(!recipient || !amount || amount <= 0) return null;
   const freqText = AUTOMATION_FREQ_MAP[(automation.frequency || '').toString().trim()] || 'شهريًا';
   const acc = accounts.find(a=>a.primary) || accounts[0];
-  automations.push({name:`تحويل تلقائي — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freqText} من ${acc.bank}`, on:true});
+  const isMusaned = automation.source === 'musaned';
+  const name = isMusaned ? `راتب ${recipient} (مساند)` : `تحويل تلقائي — إلى ${recipient}`;
+  if(isMusaned && automations.some(a=>a.name===name)) return {recipient, amount, freqText, bank:acc.bank, source: automation.source, alreadyExisted:true};
+  automations.push({name, detail:`${money(amount)} ${freqText} من ${acc.bank}`, on:true, accountId: acc.id});
   persistState();
-  return {recipient, amount, freqText, bank:acc.bank};
+  return {recipient, amount, freqText, bank:acc.bank, source: automation.source};
 }
 
 async function askAdvisor(q){
@@ -330,8 +335,13 @@ async function askAdvisor(q){
     if(!res.ok || !data.answer) throw new Error(data.error || 'HTTP '+res.status);
     chatLog[pendingIndex] = {who:'bot', text: data.answer};
     const applied = applyAutomationIntent(data.automation);
-    if(applied){
-      chatLog.push({who:'system', text:`✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}. تقدر تديره من صفحة الحوالات.`});
+    if(applied && applied.alreadyExisted){
+      chatLog.push({who:'system', text:`ℹ️ عندك تحويل راتب تلقائي مفعّل مسبقًا إلى ${applied.recipient} من مساند، ما احتجت أنشئ واحد جديد. تقدر تديره من صفحة الحوالات.`});
+    } else if(applied){
+      const msg = applied.source === 'musaned'
+        ? `✅ جلبت بيانات العامل من مساند وأنشأت تحويل راتب تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}. تقدر تديره من صفحة الحوالات.`
+        : `✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}. تقدر تديره من صفحة الحوالات.`;
+      chatLog.push({who:'system', text: msg});
     }
     if(data.investmentPlan){
       chatLog.push({who:'system', type:'fund', plan: data.investmentPlan});

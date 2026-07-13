@@ -29,6 +29,8 @@
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -184,7 +186,7 @@ function renderTransfers(){
       <div class="tx-left">
         <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
       </div>
-      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${fmt(Math.abs(t.amount))} ${SAR}</div>
+      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${money(Math.abs(t.amount))}</div>
     </div>`).join('');
 
   document.getElementById('automations-list').innerHTML = automations.map((a,i)=>`
@@ -198,6 +200,9 @@ function renderTransfers(){
           <div class="acc-name">${a.name}</div>
         `}
         <div class="acc-type">${a.detail}</div>
+        <select class="sel auto-acc-sel" onchange="changeAutoAccount(${i}, this.value)">
+          ${accounts.map(acc=>`<option value="${acc.id}" ${(a.accountId || accounts[0].id) === acc.id ? 'selected' : ''}>من ${acc.bank}</option>`).join('')}
+        </select>
       </div>
       ${deletingAutoIndex === i ? `
       <div style="display:flex; align-items:center; gap:8px;">
@@ -224,6 +229,12 @@ function toggleAuto(i){
   automations[i].on = !automations[i].on;
   persistState();
   renderTransfers();
+}
+function changeAutoAccount(i, accountId){
+  automations[i].accountId = accountId;
+  persistState();
+  const acc = accounts.find(a=>a.id===accountId);
+  showToast(`سيتم تنفيذ هذا التحويل من ${acc.bank}.`);
 }
 
 let openAutoMenu = null;
@@ -327,7 +338,7 @@ function chooseTransferKind(kind){
   document.getElementById('transfer-amount').value = '';
 
   if(transferMode==='normal'){
-    document.getElementById('transfer-account').innerHTML = accounts.map((a,i)=>`<option value="${i}">${a.bank} — رصيد ${fmt(a.balance)} ${SAR}</option>`).join('');
+    document.getElementById('transfer-account').innerHTML = accounts.map((a,i)=>`<option value="${i}">${a.bank} — رصيد ${money(a.balance)}</option>`).join('');
     onTransferAccountChange();
   } else {
     renderMaddTransferAccounts();
@@ -396,7 +407,7 @@ function renderMaddTransferAccounts(){
       <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
       <div style="flex:1;">
         <div class="acc-name">${a.bank}</div>
-        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ${SAR}</div>
+        <div class="acc-type">${a.type} — الرصيد: ${money(a.balance)}</div>
       </div>
       <input type="number" class="amt-input" id="mt-amt-${i}" placeholder="0.00" oninput="onMaddTransferAmountInput(${i})">
     </div>`).join('');
@@ -413,7 +424,7 @@ function updateMaddTransferTotal(){
     const chk = document.getElementById('mt-chk-'+i);
     if(chk && chk.checked){ total += parseFloat(document.getElementById('mt-amt-'+i).value)||0; }
   });
-  document.getElementById('transfer-madd-total-amt').innerHTML = fmt(total) + ' ' + SAR;
+  document.getElementById('transfer-madd-total-amt').innerHTML = money(total);
 }
 
 function openTransferModal(){
@@ -455,7 +466,7 @@ function confirmTransfer(){
       showToast(`تم تنفيذ الحوالة بمبلغ ${fmt(amount)} ر.س من ${acc.bank}.`);
     } else {
       const freqText = getTransferFreqText();
-      automations.push({name:`${typeLabel} — إلى ${recipient}`, detail:`${fmt(amount)} ${SAR} ${freqText} من ${acc.bank}`, on:true});
+      automations.push({name:`${typeLabel} — إلى ${recipient}`, detail:`${money(amount)} ${freqText} من ${acc.bank}`, on:true, accountId:acc.id});
       persistState();
       renderTransfers();
       closeTransferModal();
@@ -486,7 +497,7 @@ function confirmTransfer(){
     showToast(`تم تنفيذ حوالة مدّ بمبلغ ${fmt(total)} ر.س من ${chosen.length} حسابات.`);
   } else {
     const freqText = getTransferFreqText();
-    automations.push({name:`حوالة مدّ — إلى ${recipient}`, detail:`${fmt(total)} ${SAR} ${freqText} من ${chosen.length} حسابات`, on:true});
+    automations.push({name:`حوالة مدّ — إلى ${recipient}`, detail:`${money(total)} ${freqText} من ${chosen.length} حسابات`, on:true});
     persistState();
     renderTransfers();
     closeTransferModal();

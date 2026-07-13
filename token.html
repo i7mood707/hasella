@@ -29,6 +29,8 @@
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -112,7 +114,7 @@ function renderTokenAccounts(){
       <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
       <div style="flex:1;">
         <div class="acc-name">${a.bank}</div>
-        <div class="acc-type">${a.type} — الرصيد: ${fmt(a.balance)} ${SAR}</div>
+        <div class="acc-type">${a.type} — الرصيد: ${money(a.balance)}</div>
       </div>
       <input type="number" class="amt-input" id="tok-amt-${i}" placeholder="0.00" oninput="onTokenAmountInput(${i})">
     </div>`).join('');
@@ -153,8 +155,8 @@ function generateToken(){
       <button class="copy-code-btn" onclick="copyTokenCode()" aria-label="نسخ الرمز" title="نسخ الرمز">⧉</button>
     </div>
     <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(36,48,61,0.2) 0 6px, transparent 6px 12px);"></div>
-    ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${fmt(c.amt)} ${SAR}</span></div>`).join('')}
-    <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:var(--gold);">${fmt(total)} ${SAR}</span></div>
+    ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${money(c.amt)}</span></div>`).join('')}
+    <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:var(--gold);">${money(total)}</span></div>
     <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${duration}</span></div>
   `;
 }

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — الحساب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="mobile-topbar">
+  <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="القائمة">☰</button>
+  <span class="mobile-topbar-brand">حصيلة</span>
+</div>
+<div class="sidebar-overlay" onclick="closeMobileNav()"></div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
+      <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item active" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-account">
+      <div class="page-head">
+        <div>
+          <h1>الحساب</h1>
+          <p>معلومات حسابك وتفضيلاتك الشخصية</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div class="avatar-lg">فع</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:var(--font-display); font-size:20px; font-weight:800;">فيصل العتيبي</div>
+          <div style="font-size:12.5px; color:var(--text-muted); margin-top:3px;">عضو منذ يناير 2025 · حساب تجريبي</div>
+        </div>
+        <span class="demo-pill" style="background:rgba(12,102,80,0.12); color:var(--emerald-deep); border-color:rgba(12,102,80,0.3);">✔ حساب موثّق</span>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>المعلومات الشخصية <span class="sub">بياناتك التعريفية</span></h3>
+          <div class="field-block" style="margin-top:14px;">
+            <label class="flabel">الاسم الكامل</label>
+            <input type="text" id="pf-name" class="txt-input">
+          </div>
+          <div class="field-block">
+            <label class="flabel">البريد الإلكتروني</label>
+            <input type="email" id="pf-email" class="txt-input" style="direction:ltr; text-align:right;">
+          </div>
+          <div class="field-block">
+            <label class="flabel">رقم الجوال</label>
+            <input type="tel" id="pf-phone" class="txt-input" style="direction:ltr; text-align:right; font-family:var(--font-mono);">
+          </div>
+          <div class="field-block">
+            <label class="flabel">رقم الهوية الوطنية</label>
+            <input type="text" id="pf-nid" class="txt-input" style="direction:ltr; text-align:right; font-family:var(--font-mono);" readonly>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">رقم الهوية غير قابل للتعديل لأسباب أمنية.</p>
+          </div>
+          <button class="btn btn-emerald" style="width:100%;" onclick="saveProfile()">حفظ المعلومات</button>
+        </div>
+
+        <div class="card">
+          <h3>التفضيلات والإعدادات <span class="sub">تُحفظ تلقائيًا</span></h3>
+
+          <div class="field-block" style="margin-top:14px;">
+            <label class="flabel">اللغة</label>
+            <select class="sel" id="st-lang" onchange="saveSettings('اللغة')">
+              <option value="ar">العربية</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <div class="field-block">
+            <label class="flabel">العملة</label>
+            <select class="sel" id="st-currency" onchange="saveSettings('العملة')">
+              <option value="SAR">ريال سعودي (ر.س)</option>
+              <option value="USD">دولار أمريكي (USD)</option>
+              <option value="AED">درهم إماراتي (AED)</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">الإشعارات</div>
+              <div class="setting-desc">تنبيهات العمليات والحوالات على جهازك</div>
+            </div>
+            <button class="toggle" id="tg-notif" onclick="toggleSetting('notifications', 'tg-notif', 'الإشعارات')"></button>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">رسائل العروض</div>
+              <div class="setting-desc">استقبال العروض والأخبار التسويقية</div>
+            </div>
+            <button class="toggle" id="tg-promo" onclick="toggleSetting('promotions', 'tg-promo', 'رسائل العروض')"></button>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">المصادقة الثنائية</div>
+              <div class="setting-desc">طبقة حماية إضافية عند تسجيل الدخول</div>
+            </div>
+            <button class="toggle" id="tg-2fa" onclick="toggleSetting('twoFactor', 'tg-2fa', 'المصادقة الثنائية')"></button>
+          </div>
+
+          <div class="setting-row" style="border-bottom:none;">
+            <div>
+              <div class="setting-title">الوضع الليلي</div>
+              <div class="setting-desc">مظهر داكن مريح للعين (قريبًا)</div>
+            </div>
+            <button class="toggle" id="tg-dark" onclick="toggleSetting('darkMode', 'tg-dark', 'الوضع الليلي')"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<style>
+.avatar-lg{width:60px; height:60px; border-radius:50%; background:var(--gold); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; flex-shrink:0; font-family:var(--font-display);}
+.txt-input{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; background:#fff; transition:border-color .2s ease;}
+.txt-input:focus{border-color:var(--emerald); outline:none;}
+.txt-input[readonly]{background:var(--paper-dim); color:var(--text-muted); cursor:not-allowed;}
+.setting-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid #F0ECDF;}
+.setting-title{font-size:13.5px; font-weight:600;}
+.setting-desc{font-size:11.5px; color:var(--text-muted); margin-top:2px; line-height:1.6;}
+</style>
+<div id="toast" class="toast"></div>
+
+<script src="assets/data.js"></script>
+<script>
+requireAuth();
+
+const DEFAULT_PROFILE = {
+  name: 'فيصل العتيبي',
+  email: 'faisal.alotaibi@example.com',
+  phone: '+966 55 123 4567',
+  nid: '1•••• ••234'
+};
+
+const profile = loadState('hasila_profile', DEFAULT_PROFILE);
+const settings = APP_SETTINGS; // shared settings object defined in data.js
+
+// Bilingual toast copy so confirmations match the selected language
+const T = {
+  nameEmpty:      {ar:'الاسم لا يمكن أن يكون فارغًا.', en:'Name cannot be empty.'},
+  badEmail:       {ar:'صيغة البريد الإلكتروني غير صحيحة.', en:'Invalid email format.'},
+  profileSaved:   {ar:'تم حفظ معلوماتك الشخصية.', en:'Your personal information has been saved.'},
+  updated:        {ar:'تم تحديث', en:'Updated'},
+  on:             {ar:'مفعّل', en:'On'},
+  off:            {ar:'متوقف', en:'Off'}
+};
+const tr = k => T[k][settings.lang === 'en' ? 'en' : 'ar'];
+// translate an Arabic UI label via the shared dictionary (for dynamic toast text)
+const L = s => (settings.lang === 'en' && I18N_EN[s]) ? I18N_EN[s] : s;
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function renderAccount(){
+  document.getElementById('pf-name').value = profile.name || '';
+  document.getElementById('pf-email').value = profile.email || '';
+  document.getElementById('pf-phone').value = profile.phone || '';
+  document.getElementById('pf-nid').value = profile.nid || '';
+
+  document.getElementById('st-lang').value = settings.lang;
+  document.getElementById('st-currency').value = settings.currency;
+  setToggle('tg-notif', settings.notifications);
+  setToggle('tg-promo', settings.promotions);
+  setToggle('tg-2fa', settings.twoFactor);
+  setToggle('tg-dark', settings.darkMode);
+}
+
+function setToggle(id, on){
+  document.getElementById(id).classList.toggle('on', !!on);
+}
+
+function saveProfile(){
+  const name = document.getElementById('pf-name').value.trim();
+  const email = document.getElementById('pf-email').value.trim();
+  const phone = document.getElementById('pf-phone').value.trim();
+  if(!name){ showToast(tr('nameEmpty')); return; }
+  if(email && !/^\S+@\S+\.\S+$/.test(email)){ showToast(tr('badEmail')); return; }
+  profile.name = name;
+  profile.email = email;
+  profile.phone = phone;
+  localStorage.setItem('hasila_profile', JSON.stringify(profile));
+  showToast(tr('profileSaved'));
+}
+
+function saveSettings(label){
+  const prevLang = settings.lang;
+  settings.lang = document.getElementById('st-lang').value;
+  settings.currency = document.getElementById('st-currency').value;
+  persistSettings();
+  if(settings.lang !== prevLang) applyLanguage(); // re-translate this page live
+  showToast(`${tr('updated')}: ${L(label)}.`);
+}
+
+function toggleSetting(key, id, label){
+  settings[key] = !settings[key];
+  setToggle(id, settings[key]);
+  persistSettings();
+  showToast(`${L(label)}: ${settings[key] ? tr('on') : tr('off')}.`);
+}
+
+renderAccount();
+</script>
+</body>
+</html>

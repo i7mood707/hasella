@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — الدعم الفني</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="mobile-topbar">
+  <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="القائمة">☰</button>
+  <span class="mobile-topbar-brand">حصيلة</span>
+</div>
+<div class="sidebar-overlay" onclick="closeMobileNav()"></div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
+      <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
+      <a class="nav-item active" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-support">
+      <div class="page-head">
+        <div>
+          <h1>الدعم الفني</h1>
+          <p>نحن هنا لمساعدتك — تواصل معنا أو ارفع شكوى</p>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <a class="card contact-card" href="mailto:support@hasella.sa">
+          <div class="contact-ic">✉</div>
+          <div class="contact-label">البريد الإلكتروني</div>
+          <div class="contact-value">support@hasella.sa</div>
+        </a>
+        <a class="card contact-card" href="tel:+966920001234">
+          <div class="contact-ic">✆</div>
+          <div class="contact-label">الرقم الموحّد</div>
+          <div class="contact-value">920 001 234</div>
+        </a>
+        <a class="card contact-card" href="tel:+966551234567">
+          <div class="contact-ic">☏</div>
+          <div class="contact-label">جوال الطوارئ المالية</div>
+          <div class="contact-value">+966 55 123 4567</div>
+        </a>
+      </div>
+
+      <div class="card" style="margin-bottom:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="contact-ic" style="margin:0; width:40px; height:40px; font-size:18px;">🕑</div>
+        <div>
+          <div style="font-size:13.5px; font-weight:600;">ساعات العمل</div>
+          <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">من الأحد إلى الخميس، 8 صباحًا حتى 10 مساءً · الدعم الآلي متاح 24/7</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>رفع شكوى أو طلب دعم <span class="sub">نرد خلال 24 ساعة</span></h3>
+
+          <div class="field-block" style="margin-top:14px;">
+            <label class="flabel">نوع الطلب</label>
+            <select class="sel" id="cx-category">
+              <option value="حوالة">مشكلة في حوالة</option>
+              <option value="حساب">مشكلة في ربط حساب</option>
+              <option value="مدّ">مشكلة في مدّ / التوكن</option>
+              <option value="أسهم">مشكلة في الأسهم أو التمويل</option>
+              <option value="فني">مشكلة تقنية في التطبيق</option>
+              <option value="أخرى">استفسار عام / أخرى</option>
+            </select>
+          </div>
+
+          <div class="field-block">
+            <label class="flabel">عنوان الشكوى</label>
+            <input type="text" id="cx-subject" class="txt-input" placeholder="مثال: لم تصل حوالتي إلى المستلم">
+          </div>
+
+          <div class="field-block">
+            <label class="flabel">تفاصيل المشكلة</label>
+            <textarea id="cx-message" class="ta" placeholder="اشرح لنا المشكلة بالتفصيل حتى نقدر نساعدك بسرعة..."></textarea>
+          </div>
+
+          <p id="cx-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+
+          <button class="btn btn-emerald" style="width:100%;" onclick="submitComplaint()">إرسال الشكوى</button>
+        </div>
+
+        <div class="card">
+          <h3>شكاواي السابقة <span class="sub" id="cx-count-sub">لا توجد شكاوى</span></h3>
+          <div id="cx-list" style="margin-top:8px;"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<style>
+.contact-card{display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; text-decoration:none; color:inherit; padding:22px 16px;}
+.contact-card:hover{border-color:var(--emerald); transform:translateY(-2px);}
+.contact-ic{width:46px; height:46px; border-radius:12px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--emerald-deep); margin-bottom:4px;}
+.contact-label{font-size:12px; color:var(--text-muted);}
+.contact-value{font-size:14px; font-weight:600; font-family:var(--font-mono); direction:ltr;}
+.txt-input{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; background:#fff; transition:border-color .2s ease;}
+.txt-input:focus, .ta:focus{border-color:var(--emerald); outline:none;}
+.cx-item{padding:12px; border:1px solid #EDE8DA; border-radius:11px; margin-bottom:10px; background:var(--paper);}
+.cx-item-top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:5px;}
+.cx-ticket{font-family:var(--font-mono); font-size:11px; color:var(--text-muted);}
+.cx-status{font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:999px; background:rgba(185,143,74,0.15); color:var(--gold); white-space:nowrap;}
+.cx-subject{font-size:13px; font-weight:600;}
+.cx-cat{font-size:11.5px; color:var(--emerald-deep); margin-top:2px;}
+.cx-msg{font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.7;}
+.cx-empty{font-size:12.5px; color:var(--text-muted); padding:20px 4px; text-align:center; line-height:1.8;}
+</style>
+<div id="toast" class="toast"></div>
+
+<script src="assets/data.js"></script>
+<script>
+requireAuth();
+
+const complaints = loadState('hasila_complaints', []);
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function cxErr(msg){
+  const el = document.getElementById('cx-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function renderComplaints(){
+  const sub = document.getElementById('cx-count-sub');
+  sub.textContent = complaints.length === 0 ? 'لا توجد شكاوى'
+    : complaints.length === 1 ? 'شكوى واحدة' : `${complaints.length} شكاوى`;
+
+  if(complaints.length === 0){
+    document.getElementById('cx-list').innerHTML = `<div class="cx-empty">ما رفعت أي شكوى بعد.<br>إذا واجهتك مشكلة، اكتبها في النموذج وبنتواصل معك.</div>`;
+    return;
+  }
+  document.getElementById('cx-list').innerHTML = complaints.map(c=>`
+    <div class="cx-item">
+      <div class="cx-item-top">
+        <span class="cx-ticket">#${c.ticket}</span>
+        <span class="cx-status">${c.status}</span>
+      </div>
+      <div class="cx-subject">${escapeHtml(c.subject)}</div>
+      <div class="cx-cat">${escapeHtml(c.category)} · ${c.date}</div>
+      <div class="cx-msg">${escapeHtml(c.message)}</div>
+    </div>`).join('');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function submitComplaint(){
+  const category = document.getElementById('cx-category').value;
+  const subject = document.getElementById('cx-subject').value.trim();
+  const message = document.getElementById('cx-message').value.trim();
+  if(!subject){ cxErr('اكتب عنوانًا مختصرًا للشكوى.'); return; }
+  if(!message){ cxErr('اكتب تفاصيل المشكلة حتى نقدر نساعدك.'); return; }
+  document.getElementById('cx-error').style.display = 'none';
+
+  const ticket = 'HS' + Math.floor(100000 + Math.random()*900000);
+  const date = new Date().toLocaleDateString('ar-SA');
+  complaints.unshift({ticket, category, subject, message, date, status: 'قيد المراجعة'});
+  localStorage.setItem('hasila_complaints', JSON.stringify(complaints));
+
+  document.getElementById('cx-subject').value = '';
+  document.getElementById('cx-message').value = '';
+  renderComplaints();
+  showToast(`تم استلام شكواك برقم ${ticket}. بنتواصل معك قريبًا.`);
+}
+
+renderComplaints();
+</script>
+</body>
+</html>
