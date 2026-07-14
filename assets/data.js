@@ -105,7 +105,7 @@ const DEFAULT_INVESTMENTS = [
 ];
 
 const DEFAULT_OTHER_INVESTMENTS = [
-  {bank:'درايه للصكوك', logo:'logos/derayah.jpg', assetType:'صكوك'},
+  {bank:'درايه للصكوك', logo:'logos/derayah-v2.jpg', assetType:'صكوك'},
 ];
 
 const DEFAULT_OTHER_BANKS = [
@@ -153,6 +153,8 @@ const goals = loadState('hasila_goals', DEFAULT_GOALS);
 const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
 const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
 const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS);
+// one-time fix for a stale logo path some browsers may have already persisted before the file was renamed
+investmentPlatforms.forEach(p=>{ if(p.bank === 'درايه للصكوك' && p.logo === 'logos/derayah.jpg') p.logo = 'logos/derayah-v2.jpg'; });
 const otherInvestmentPlatforms = loadState('hasila_other_investments', DEFAULT_OTHER_INVESTMENTS);
 const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
 const otherBanks = loadState('hasila_other_banks', DEFAULT_OTHER_BANKS);

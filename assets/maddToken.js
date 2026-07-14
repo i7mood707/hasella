@@ -106,7 +106,7 @@ function applyTokenDeduction(tokenRecord){
 function renderTokenAccounts(){
   document.getElementById('token-accounts').innerHTML = accounts.map((a,i)=>`
     <div class="token-account">
-      <input type="checkbox" id="tok-chk-${i}" onchange="tokenLimitCheck()">
+      <input type="checkbox" id="tok-chk-${i}">
       <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
       <div style="flex:1;">
         <div class="acc-name">${a.bank}</div>
@@ -118,13 +118,6 @@ function renderTokenAccounts(){
 function onTokenAmountInput(i){
   const amt = parseFloat(document.getElementById('tok-amt-'+i).value);
   document.getElementById('tok-chk-'+i).checked = !!(amt && amt>0);
-  tokenLimitCheck();
-}
-function tokenLimitCheck(){
-  const checked = accounts.map((_,i)=>document.getElementById('tok-chk-'+i).checked).filter(Boolean).length;
-  if(checked>3){
-    alert('يمكنك اختيار 3 حسابات كحد أقصى للمدّ الواحد.');
-  }
 }
 function generateToken(){
   const chosen = [];
@@ -134,7 +127,6 @@ function generateToken(){
     if(chk.checked && amt>0) chosen.push({bank:a.bank, amt});
   });
   if(chosen.length===0){ alert('اختر حسابًا واحدًا على الأقل وحدد مبلغًا.'); return; }
-  if(chosen.length>3){ alert('الحد الأقصى 3 حسابات للمدّ الواحد.'); return; }
 
   const durationChoice = document.getElementById('token-duration').value;
   const customErr = document.getElementById('token-custom-error');

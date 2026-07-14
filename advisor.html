@@ -231,67 +231,8 @@ function buildChatContext(){
   };
 }
 
-function fmtPrice(v, currency){
-  if(v == null) return '—';
-  return v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ' + currency;
-}
-
-function fmtChangePct(v){
-  if(v == null) return '';
-  const sign = v >= 0 ? '+' : '';
-  return `${sign}${v.toFixed(2)}%`;
-}
-
-function renderFundHolding(h){
-  if(!h || h.error){
-    return `<div class="fund-holding fund-holding-error">${escapeHtml((h && (h.name||h.symbol)) || '')} — تعذّر جلب السعر الحي</div>`;
-  }
-  const chgClass = h.changePercent == null ? '' : (h.changePercent >= 0 ? 'pos' : 'neg');
-  return `<div class="fund-holding">
-    <div class="fund-holding-name">${escapeHtml(h.name)} <span class="fund-holding-symbol">${escapeHtml(h.symbol)}</span></div>
-    <div class="fund-holding-price">${fmtPrice(h.price, h.currency)}${h.changePercent != null ? ` <span class="fund-chg ${chgClass}">${fmtChangePct(h.changePercent)}</span>` : ''}</div>
-  </div>`;
-}
-
-function renderFundCard(plan){
-  const goldRow = plan.gold && !plan.gold.error
-    ? `<div class="fund-holding"><div class="fund-holding-name">${escapeHtml(plan.gold.name)}</div><div class="fund-holding-price">${fmtPrice(plan.gold.price, plan.gold.currency)}</div></div>`
-    : `<div class="fund-holding fund-holding-error">تعذّر جلب سعر الذهب الحي</div>`;
-  return `
-  <div class="fund-card">
-    <div class="fund-head">
-      <div class="fund-title">صندوق ${escapeHtml(plan.label)}</div>
-      <div class="fund-desc">${escapeHtml(plan.description)}</div>
-    </div>
-    <div class="fund-alloc-bar">
-      <span style="width:${plan.allocation.gold}%; background:var(--gold);"></span>
-      <span style="width:${plan.allocation.saudi}%; background:var(--emerald);"></span>
-      <span style="width:${plan.allocation.us}%; background:var(--brick);"></span>
-    </div>
-    <div class="fund-alloc-legend">
-      <span><i style="background:var(--gold)"></i> ذهب ${plan.allocation.gold}%</span>
-      <span><i style="background:var(--emerald)"></i> أسهم سعودية ${plan.allocation.saudi}%</span>
-      <span><i style="background:var(--brick)"></i> أسهم أمريكية ${plan.allocation.us}%</span>
-    </div>
-    <div class="fund-section">
-      <div class="fund-section-title">الذهب</div>
-      ${goldRow}
-    </div>
-    <div class="fund-section">
-      <div class="fund-section-title">الأسهم السعودية</div>
-      ${plan.saudi_holdings.map(renderFundHolding).join('')}
-    </div>
-    <div class="fund-section">
-      <div class="fund-section-title">الأسهم الأمريكية</div>
-      ${plan.us_holdings.map(renderFundHolding).join('')}
-    </div>
-    <div class="fund-updated">آخر تحديث للأسعار: ${new Date(plan.generated_at).toLocaleString('ar-SA')}</div>
-  </div>`;
-}
-
 function renderChat(){
   document.getElementById('chat-body').innerHTML = chatLog.map(m=>{
-    if(m.type === 'fund') return `<div class="msg fund-msg">${renderFundCard(m.plan)}</div>`;
     return `<div class="msg ${m.who}">${escapeHtml(m.text)}</div>`;
   }).join('');
   const body = document.getElementById('chat-body');
@@ -363,9 +304,6 @@ async function askAdvisor(q){
     const appliedGoal = applyGoalIntent(data.goal);
     if(appliedGoal){
       chatLog.push({who:'system', text:`✅ تم إنشاء هدف ادخار جديد: "${appliedGoal.name}" بمبلغ مستهدف ${fmt(appliedGoal.targetAmount)} ريال. تقدر تديره من صفحة الأهداف المالية.`});
-    }
-    if(data.investmentPlan){
-      chatLog.push({who:'system', type:'fund', plan: data.investmentPlan});
     }
   }catch(err){
     chatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};

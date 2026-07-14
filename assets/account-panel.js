@@ -98,6 +98,10 @@ function buildAccountModal(){
         <button class="toggle" id="am-tg-dark" onclick="toggleAccountSetting('darkMode','am-tg-dark','الوضع الليلي')"></button>
       </div>
 
+      <h3 style="margin-top:22px;">أرصدة الحسابات <span class="sub">تعديل يدوي لرصيد كل حساب</span></h3>
+      <div id="am-balances-list" style="margin-top:14px; display:flex; flex-direction:column; gap:10px;"></div>
+      <button class="btn btn-emerald" style="width:100%; margin-top:14px;" onclick="saveAccountBalances()">حفظ الأرصدة</button>
+
       <button class="btn btn-outline" style="width:100%; margin-top:20px;" onclick="closeAccountModal()">إغلاق</button>
     </div>`;
   document.body.appendChild(wrap);
@@ -123,7 +127,53 @@ function renderAccountModal(){
   _accSetToggle('am-tg-promo', APP_SETTINGS.promotions);
   _accSetToggle('am-tg-2fa', APP_SETTINGS.twoFactor);
   _accSetToggle('am-tg-dark', APP_SETTINGS.darkMode);
+  renderAccountBalances();
   applyLanguage();
+}
+
+function renderAccountBalances(){
+  const list = document.getElementById('am-balances-list');
+  if(!list) return;
+  list.innerHTML = accounts.map((a,i)=>`
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.bank}</div>
+        <div style="font-size:11px; color:var(--text-muted);">${a.type}</div>
+      </div>
+      <input type="number" class="txt-input" id="am-bal-${i}" value="${a.balance}" style="width:130px; font-family:var(--font-mono); flex-shrink:0;">
+      <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="resetAccountBalanceDefault(${i})" title="استعادة الرصيد الافتراضي">↺</button>
+    </div>`).join('');
+}
+
+function _refreshAccountBalanceViews(){
+  if(typeof renderHome === 'function') renderHome();
+  if(typeof renderTokenAccounts === 'function') renderTokenAccounts();
+  if(typeof renderLinkAccounts === 'function') renderLinkAccounts();
+}
+
+function resetAccountBalanceDefault(i){
+  const defaultAcc = DEFAULT_ACCOUNTS[i];
+  if(!defaultAcc) return;
+  accounts[i].balance = defaultAcc.balance;
+  persistState();
+  renderAccountBalances();
+  _refreshAccountBalanceViews();
+  _accToast(`تمت استعادة رصيد ${accounts[i].bank} الافتراضي.`);
+}
+
+function saveAccountBalances(){
+  let changed = false;
+  accounts.forEach((a,i)=>{
+    const input = document.getElementById('am-bal-'+i);
+    if(!input) return;
+    const val = parseFloat(input.value);
+    if(!isNaN(val) && val >= 0 && val !== a.balance){ a.balance = val; changed = true; }
+  });
+  if(changed){
+    persistState();
+    _refreshAccountBalanceViews();
+  }
+  _accToast('تم تحديث أرصدة الحسابات.');
 }
 
 function openAccountModal(){

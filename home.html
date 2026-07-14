@@ -115,7 +115,7 @@
   <div class="modal-box" style="max-width:480px;">
     <h3>إصدار مدّ دفع</h3>
     <div class="field-block" style="margin-top:14px;">
-      <label class="flabel">اختر الحسابات <span class="sub">حتى 3 حسابات</span></label>
+      <label class="flabel">اختر الحسابات</label>
       <div id="token-accounts"></div>
     </div>
     <div class="field-block">
@@ -270,9 +270,6 @@ async function askMiniAdvisor(q){
     const applied = applyMiniAutomationIntent(data.automation);
     if(applied && !applied.alreadyExisted){
       miniChatLog.push({who:'system', text:`✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}.`});
-    }
-    if(data.investmentPlan){
-      miniChatLog.push({who:'system', text:`📊 خطة استثمار "${data.investmentPlan.label}" جاهزة — افتح المستشار الكامل لعرض التفاصيل.`});
     }
   }catch(err){
     miniChatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};

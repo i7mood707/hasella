@@ -5,7 +5,6 @@ const { handleChatRequest } = require('./lib/chatController');
 const { getGoldPrice } = require('./marketData/goldPrice');
 const { getSaudiQuote } = require('./marketData/saudiMarket');
 const { getUsQuote } = require('./marketData/usMarket');
-const { RISK_PROFILES, buildInvestmentPlan } = require('./marketData/investmentPlans');
 const { createToken, getToken, redeemToken } = require('./lib/maddTokenStore');
 
 const MADD_ALLOWED_ORIGINS = [
@@ -34,8 +33,7 @@ async function handleMarketRoute(req, res, pathname, searchParams){
   if(pathname !== '/api/market/gold'
     && !pathname.startsWith('/api/market/saudi/')
     && !pathname.startsWith('/api/market/us/')
-    && pathname !== '/api/market/summary'
-    && pathname !== '/api/market/investment-plan'){
+    && pathname !== '/api/market/summary'){
     return false; // not a market route — let the caller fall through to static file serving
   }
   try{
@@ -62,15 +60,6 @@ async function handleMarketRoute(req, res, pathname, searchParams){
         getUsQuote('AAPL', 'Apple').catch(err => ({error:true, source:'us', message: err.message}))
       ]);
       sendJson(res, 200, {gold, saudi, us});
-      return true;
-    }
-    if(pathname === '/api/market/investment-plan'){
-      const risk = searchParams.get('risk');
-      if(!RISK_PROFILES[risk]){
-        sendJson(res, 400, {error:true, source:'investment-plan', message:'risk must be one of: low, medium, high'});
-        return true;
-      }
-      sendJson(res, 200, await buildInvestmentPlan(risk));
       return true;
     }
   }catch(err){
