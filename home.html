@@ -89,7 +89,7 @@
             <p style="font-size:12.5px; color:var(--text-muted); line-height:1.8; margin-bottom:14px;">
               أصدر مدّ دفع مؤقت من عدة حسابات بمبلغ ومدة محددة دون كشف بياناتك البنكية الكاملة.
             </p>
-            <a class="btn btn-emerald" style="width:100%; text-align:center;" href="token.html">إصدار مدّ جديد ←</a>
+            <button class="btn btn-emerald" style="width:100%; text-align:center;" onclick="openMaddModal()">إصدار مدّ جديد ←</button>
           </div>
           <div class="card">
             <h3>مستشار مالي سريع</h3>
@@ -111,10 +111,55 @@
   </main>
 </div>
 
+<div class="modal-overlay" id="madd-modal" style="display:none;">
+  <div class="modal-box" style="max-width:480px;">
+    <h3>إصدار مدّ دفع</h3>
+    <div class="field-block" style="margin-top:14px;">
+      <label class="flabel">اختر الحسابات <span class="sub">حتى 3 حسابات</span></label>
+      <div id="token-accounts"></div>
+    </div>
+    <div class="field-block">
+      <label class="flabel">مدة صلاحية مدّ</label>
+      <select class="sel" id="token-duration" onchange="onDurationChange()">
+        <option value="once">استخدام واحد فقط (يُغلق فور الاستخدام)</option>
+        <option value="3">3 دقائق</option>
+        <option value="10">10 دقائق</option>
+        <option value="custom">مدة مخصصة...</option>
+      </select>
+    </div>
+    <div class="field-block" id="token-custom-wrap" style="display:none;">
+      <label class="flabel">حدد المدة (الحد الأقصى 24 ساعة)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="number" class="txt-input" id="token-custom-value" min="1" placeholder="مثال: 30" style="flex:1; font-family:var(--font-mono);">
+        <select class="sel" id="token-custom-unit" style="flex:0 0 110px;">
+          <option value="minutes">دقيقة</option>
+          <option value="hours">ساعة</option>
+        </select>
+      </div>
+      <p id="token-custom-error" style="font-size:12px; color:var(--brick); margin-top:6px; display:none;"></p>
+    </div>
+    <div id="token-receipt-wrap" style="display:none; margin-top:14px;">
+      <div class="token-receipt" id="token-receipt"></div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeMaddModal()">إغلاق</button>
+      <button class="btn btn-emerald" style="flex:1;" onclick="generateToken()">إصدار مدّ</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
 <script src="assets/data.js"></script>
 <script src="assets/account-panel.js"></script>
 <script>
 requireAuth();
+
+function openMaddModal(){
+  document.getElementById('madd-modal').style.display = 'flex';
+}
+function closeMaddModal(){
+  document.getElementById('madd-modal').style.display = 'none';
+}
 
 function renderHome(){
   const total = accounts.reduce((s,a)=>s+a.balance,0);
@@ -252,5 +297,6 @@ document.getElementById('mini-chat-input').addEventListener('keydown', e=>{ if(e
 
 renderMiniChat();
 </script>
+<script src="assets/maddToken.js"></script>
 </body>
 </html>
