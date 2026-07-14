@@ -22,15 +22,15 @@
     </div>
     <nav class="nav-list">
       <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
-      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
-      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item active" href="token.html"><span class="ic">◎</span> مدّ</a>
       <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
-      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
-      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
-      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -60,12 +60,23 @@
 
           <div class="field-block" style="margin-top:18px;">
             <label class="flabel">مدة صلاحية مدّ</label>
-            <select class="sel" id="token-duration">
-              <option value="ساعة واحدة">ساعة واحدة</option>
-              <option value="24 ساعة" selected>24 ساعة</option>
-              <option value="7 أيام">7 أيام</option>
-              <option value="30 يوم">30 يوم</option>
+            <select class="sel" id="token-duration" onchange="onDurationChange()">
+              <option value="once">استخدام واحد فقط (يُغلق فور الاستخدام)</option>
+              <option value="3">3 دقائق</option>
+              <option value="10">10 دقائق</option>
+              <option value="custom">مدة مخصصة...</option>
             </select>
+          </div>
+          <div class="field-block" id="token-custom-wrap" style="display:none;">
+            <label class="flabel">حدد المدة (الحد الأقصى 24 ساعة)</label>
+            <div style="display:flex; gap:8px;">
+              <input type="number" class="txt-input" id="token-custom-value" min="1" placeholder="مثال: 30" style="flex:1; font-family:var(--font-mono);">
+              <select class="sel" id="token-custom-unit" style="flex:0 0 110px;">
+                <option value="minutes">دقيقة</option>
+                <option value="hours">ساعة</option>
+              </select>
+            </div>
+            <p id="token-custom-error" style="font-size:12px; color:var(--brick); margin-top:6px; display:none;"></p>
           </div>
           <button class="btn btn-emerald" style="width:100%; margin-top:10px;" onclick="generateToken()">إصدار مدّ</button>
         </div>
@@ -94,7 +105,13 @@
 <script>
 requireAuth();
 
+const MAX_TOKEN_MINUTES = 24 * 60;
 let currentTokenCode = '';
+let tokenIsOneTime = false;
+let tokenExpiresAt = null;
+let tokenExpired = false;
+let tokenCountdownTimer = null;
+
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -102,10 +119,51 @@ function showToast(msg){
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
 }
+
+function onDurationChange(){
+  const isCustom = document.getElementById('token-duration').value === 'custom';
+  document.getElementById('token-custom-wrap').style.display = isCustom ? 'block' : 'none';
+}
+
+function fmtDuration(minutes){
+  if(minutes % 60 === 0) return `${minutes/60} ${minutes/60===1?'ساعة':'ساعات'}`;
+  return `${minutes} دقيقة`;
+}
+
+function fmtCountdown(ms){
+  const totalSec = Math.max(0, Math.ceil(ms/1000));
+  const h = Math.floor(totalSec/3600);
+  const m = Math.floor((totalSec%3600)/60);
+  const s = totalSec%60;
+  return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
+}
+
+function markTokenExpired(reason){
+  if(tokenExpired) return;
+  tokenExpired = true;
+  clearInterval(tokenCountdownTimer);
+  const statusEl = document.getElementById('token-status-value');
+  if(statusEl) statusEl.innerHTML = `<span style="color:var(--brick);">${reason}</span>`;
+  const btn = document.getElementById('token-copy-btn');
+  if(btn){ btn.disabled = true; btn.style.opacity = '0.45'; btn.style.cursor = 'not-allowed'; }
+}
+
+function tickTokenCountdown(){
+  if(tokenExpiresAt == null) return;
+  const remaining = tokenExpiresAt - Date.now();
+  if(remaining <= 0){
+    markTokenExpired('منتهي الصلاحية ✗');
+    return;
+  }
+  const statusEl = document.getElementById('token-status-value');
+  if(statusEl) statusEl.textContent = `صالح لمدة ${fmtCountdown(remaining)}`;
+}
+
 function copyTokenCode(){
-  if(!currentTokenCode) return;
+  if(!currentTokenCode || tokenExpired) return;
   navigator.clipboard.writeText(currentTokenCode).then(()=>{
     showToast('تم نسخ رمز مدّ.');
+    if(tokenIsOneTime) markTokenExpired('تم استخدامه ✗ — غير صالح بعد الآن');
   }).catch(()=>{
     showToast('تعذر نسخ الرمز.');
   });
@@ -144,25 +202,66 @@ function generateToken(){
   if(chosen.length===0){ alert('اختر حسابًا واحدًا على الأقل وحدد مبلغًا.'); return; }
   if(chosen.length>3){ alert('الحد الأقصى 3 حسابات للمدّ الواحد.'); return; }
 
+  const durationChoice = document.getElementById('token-duration').value;
+  const customErr = document.getElementById('token-custom-error');
+  customErr.style.display = 'none';
+
+  let isOneTime = false;
+  let minutes = null;
+  let durationLabel = '';
+
+  if(durationChoice === 'once'){
+    isOneTime = true;
+    durationLabel = 'استخدام واحد فقط';
+  } else if(durationChoice === 'custom'){
+    const value = parseFloat(document.getElementById('token-custom-value').value);
+    const unit = document.getElementById('token-custom-unit').value;
+    if(!value || value <= 0){
+      customErr.textContent = 'حدد مدة صحيحة أكبر من صفر.';
+      customErr.style.display = 'block';
+      return;
+    }
+    minutes = unit === 'hours' ? value*60 : value;
+    if(minutes > MAX_TOKEN_MINUTES){
+      customErr.textContent = 'الحد الأقصى لمدة مدّ هو 24 ساعة.';
+      customErr.style.display = 'block';
+      return;
+    }
+    durationLabel = fmtDuration(minutes);
+  } else {
+    minutes = Number(durationChoice);
+    durationLabel = fmtDuration(minutes);
+  }
+
   const total = chosen.reduce((s,c)=>s+c.amt,0);
-  const duration = document.getElementById('token-duration').value;
   const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
   currentTokenCode = code;
+
+  clearInterval(tokenCountdownTimer);
+  tokenIsOneTime = isOneTime;
+  tokenExpired = false;
+  tokenExpiresAt = isOneTime ? null : Date.now() + minutes*60000;
 
   document.getElementById('token-placeholder').style.display='none';
   const wrap = document.getElementById('token-receipt-wrap');
   wrap.style.display='block';
+  const initialStatus = isOneTime ? 'صالح لاستخدام واحد فقط' : `صالح لمدة ${fmtCountdown(tokenExpiresAt - Date.now())}`;
   document.getElementById('token-receipt').innerHTML = `
     <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:8px;">إيصال مدّ الدفع</div>
     <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
       <div class="code">${code}</div>
-      <button class="copy-code-btn" onclick="copyTokenCode()" aria-label="نسخ الرمز" title="نسخ الرمز">⧉</button>
+      <button class="copy-code-btn" id="token-copy-btn" onclick="copyTokenCode()" aria-label="نسخ الرمز" title="نسخ الرمز">⧉</button>
     </div>
     <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(36,48,61,0.2) 0 6px, transparent 6px 12px);"></div>
     ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${money(c.amt)}</span></div>`).join('')}
     <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:var(--gold);">${money(total)}</span></div>
-    <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${duration}</span></div>
+    <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${durationLabel}</span></div>
+    <div class="tline" style="border-bottom:none;"><span>الحالة</span><span id="token-status-value">${initialStatus}</span></div>
   `;
+
+  if(!isOneTime){
+    tokenCountdownTimer = setInterval(tickTokenCountdown, 1000);
+  }
 }
 
 renderTokenAccounts();

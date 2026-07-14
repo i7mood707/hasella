@@ -22,15 +22,15 @@
     </div>
     <nav class="nav-list">
       <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
-      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
-      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
       <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
-      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
-      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
-      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item active" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -322,6 +322,16 @@ function applyAutomationIntent(automation){
   return {recipient, amount, freqText, bank:acc.bank, source: automation.source};
 }
 
+function applyGoalIntent(goal){
+  if(!goal) return null;
+  const name = (goal.name || '').toString().trim();
+  const targetAmount = Number(goal.targetAmount);
+  if(!name || !targetAmount || targetAmount <= 0) return null;
+  goals.push({id:'go'+(goals.length+1)+'-'+Date.now(), name, icon:GOAL_ICONS[0], targetAmount, savedAmount:0, targetDate: goal.targetDate || null, createdAt:new Date().toISOString()});
+  persistState();
+  return {name, targetAmount};
+}
+
 async function askAdvisor(q){
   chatLog.push({who:'user', text:q});
   chatLog.push({who:'bot', text:'يفكّر...'});
@@ -348,6 +358,10 @@ async function askAdvisor(q){
         ? `✅ جلبت بيانات العامل من مساند وأنشأت تحويل راتب تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}. تقدر تديره من صفحة الحوالات.`
         : `✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}. تقدر تديره من صفحة الحوالات.`;
       chatLog.push({who:'system', text: msg});
+    }
+    const appliedGoal = applyGoalIntent(data.goal);
+    if(appliedGoal){
+      chatLog.push({who:'system', text:`✅ تم إنشاء هدف ادخار جديد: "${appliedGoal.name}" بمبلغ مستهدف ${fmt(appliedGoal.targetAmount)} ريال. تقدر تديره من صفحة الأهداف المالية.`});
     }
     if(data.investmentPlan){
       chatLog.push({who:'system', type:'fund', plan: data.investmentPlan});
