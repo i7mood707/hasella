@@ -111,6 +111,7 @@ let tokenIsOneTime = false;
 let tokenExpiresAt = null;
 let tokenExpired = false;
 let tokenCountdownTimer = null;
+let tokenPollTimer = null;
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -138,14 +139,19 @@ function fmtCountdown(ms){
   return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');
 }
 
-function markTokenExpired(reason){
+function setTokenStatus(text, color){
   if(tokenExpired) return;
   tokenExpired = true;
   clearInterval(tokenCountdownTimer);
+  clearInterval(tokenPollTimer);
   const statusEl = document.getElementById('token-status-value');
-  if(statusEl) statusEl.innerHTML = `<span style="color:var(--brick);">${reason}</span>`;
+  if(statusEl) statusEl.innerHTML = `<span style="color:${color};">${text}</span>`;
   const btn = document.getElementById('token-copy-btn');
   if(btn){ btn.disabled = true; btn.style.opacity = '0.45'; btn.style.cursor = 'not-allowed'; }
+}
+
+function markTokenExpired(reason){
+  setTokenStatus(reason, 'var(--brick)');
 }
 
 function tickTokenCountdown(){
@@ -163,10 +169,31 @@ function copyTokenCode(){
   if(!currentTokenCode || tokenExpired) return;
   navigator.clipboard.writeText(currentTokenCode).then(()=>{
     showToast('تم نسخ رمز مدّ.');
-    if(tokenIsOneTime) markTokenExpired('تم استخدامه ✗ — غير صالح بعد الآن');
   }).catch(()=>{
     showToast('تعذر نسخ الرمز.');
   });
+}
+
+function startTokenPoll(code){
+  clearInterval(tokenPollTimer);
+  tokenPollTimer = setInterval(async ()=>{
+    if(tokenExpired || code !== currentTokenCode){ clearInterval(tokenPollTimer); return; }
+    try{
+      const res = await fetch('/api/madd?code=' + encodeURIComponent(code));
+      const data = await res.json();
+      if(data.found && data.used) applyTokenDeduction(data);
+    }catch(err){ /* transient network error — try again next tick */ }
+  }, 4000);
+}
+
+function applyTokenDeduction(tokenRecord){
+  (tokenRecord.accounts || []).forEach(c=>{
+    const acc = accounts.find(a=>a.bank === c.bank);
+    if(acc) acc.balance -= c.amt;
+  });
+  persistState();
+  renderTokenAccounts();
+  setTokenStatus(`✅ تم الدفع بموقع الدفع — خُصم ${fmt(tokenRecord.amount)} ر.س`, 'var(--emerald-deep)');
 }
 
 function renderTokenAccounts(){
@@ -238,6 +265,7 @@ function generateToken(){
   currentTokenCode = code;
 
   clearInterval(tokenCountdownTimer);
+  clearInterval(tokenPollTimer);
   tokenIsOneTime = isOneTime;
   tokenExpired = false;
   tokenExpiresAt = isOneTime ? null : Date.now() + minutes*60000;
@@ -262,6 +290,13 @@ function generateToken(){
   if(!isOneTime){
     tokenCountdownTimer = setInterval(tickTokenCountdown, 1000);
   }
+
+  fetch('/api/madd', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action:'create', code, amount: total, accounts: chosen, isOneTime, expiresAt: tokenExpiresAt})
+  }).catch(()=>{});
+  startTokenPoll(code);
 }
 
 renderTokenAccounts();
