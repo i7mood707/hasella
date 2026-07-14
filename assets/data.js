@@ -105,7 +105,7 @@ const DEFAULT_INVESTMENTS = [
 ];
 
 const DEFAULT_OTHER_INVESTMENTS = [
-  {bank:'درايه للصكوك', logoText:'درا', assetType:'صكوك'},
+  {bank:'درايه للصكوك', logo:'logos/derayah.jpg', assetType:'صكوك'},
 ];
 
 const DEFAULT_OTHER_BANKS = [
