@@ -481,9 +481,12 @@ label.flabel{display:block; font-size:12.5px; color:var(--text-muted); margin-bo
 }
 
 @media(max-width:520px){
-  .account-row{flex-wrap:wrap; align-items:flex-start; gap:8px;}
-  .account-row > .acc-left{flex:1 1 100%;}
-  .account-row > div:last-child{flex:1 1 100%; justify-content:space-between;}
-  .acc-name{display:flex; flex-wrap:wrap; align-items:center; gap:6px;}
-  .account-row > div.acc-amount{flex:none; width:100%; text-align:right; padding-right:52px; font-size:16px;}
+  .account-row{gap:8px;}
+  .acc-left{gap:8px; min-width:0; flex:1 1 auto;}
+  .acc-left > div{min-width:0;}
+  .acc-name{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .acc-name .demo-pill{display:none;}
+  .acc-type{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bank-logo, .bank-logo-text{width:32px; height:32px;}
+  .account-row > div.acc-amount{flex-shrink:0; font-size:14px;}
 }
