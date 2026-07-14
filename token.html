@@ -285,6 +285,7 @@ function generateToken(){
     <div class="tline" style="border-bottom:none; padding-top:12px; font-size:14px; font-weight:600;"><span>الإجمالي</span><span style="color:var(--gold);">${money(total)}</span></div>
     <div class="tline" style="border-bottom:none;"><span>الصلاحية</span><span>${durationLabel}</span></div>
     <div class="tline" style="border-bottom:none;"><span>الحالة</span><span id="token-status-value">${initialStatus}</span></div>
+    <p id="token-sync-warning" style="font-size:11.5px; color:var(--brick); margin-top:8px; display:none;"></p>
   `;
 
   if(!isOneTime){
@@ -295,7 +296,22 @@ function generateToken(){
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({action:'create', code, amount: total, accounts: chosen, isOneTime, expiresAt: tokenExpiresAt})
-  }).catch(()=>{});
+  }).then(async res=>{
+    const data = await res.json().catch(()=>null);
+    if(!res.ok || !data || data.ok === false){
+      const warn = document.getElementById('token-sync-warning');
+      if(warn && code === currentTokenCode){
+        warn.textContent = '⚠️ تعذّر مزامنة هذا الرمز مع موقع الدفع — الدفع به من موقع آخر لن يعمل الآن.';
+        warn.style.display = 'block';
+      }
+    }
+  }).catch(()=>{
+    const warn = document.getElementById('token-sync-warning');
+    if(warn && code === currentTokenCode){
+      warn.textContent = '⚠️ تعذّر مزامنة هذا الرمز مع موقع الدفع — الدفع به من موقع آخر لن يعمل الآن.';
+      warn.style.display = 'block';
+    }
+  });
   startTokenPoll(code);
 }
 
