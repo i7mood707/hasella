@@ -49,7 +49,7 @@
       <div class="page-head">
         <div>
           <h1>الاستثمارات</h1>
-          <p>تابع أسهمك، ذهبك، وصكوكك بأسعار محدثة</p>
+          <p>تابع أسهمك وصكوكك بأسعار محدثة</p>
         </div>
       </div>
 
@@ -57,7 +57,7 @@
         <div class="card" style="grid-column:1/-1;">
           <h3>صافي ثروتك من الاستثمارات</h3>
           <div style="font-family:var(--font-mono); font-size:30px; font-weight:600;" id="invest-networth">—</div>
-          <p style="font-size:12px; color:var(--text-muted); margin-top:6px;">القيمة السوقية الحالية لأسهمك وذهبك وصكوكك مجتمعة</p>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:6px;">القيمة السوقية الحالية لأسهمك وصكوكك مجتمعة</p>
         </div>
       </div>
 
@@ -78,11 +78,6 @@
         </h3>
         <input type="text" id="stocks-search" placeholder="ابحث بالاسم أو الرمز..." oninput="renderInvestments()" style="width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; margin-bottom:6px;">
         <div id="stocks-market-list"></div>
-      </div>
-
-      <div class="watchlist-card" style="margin-bottom:18px;">
-        <h3>الذهب</h3>
-        <div id="gold-row"></div>
       </div>
 
       <div class="watchlist-card" style="margin-bottom:18px;">
@@ -130,29 +125,6 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="gold-trade-modal" style="display:none;">
-  <div class="modal-box">
-    <h3 id="gold-trade-title">شراء ذهب</h3>
-    <div class="field-block">
-      <label class="flabel">الكمية (أونصة)</label>
-      <input type="number" id="gold-trade-qty" min="0.01" step="0.01" value="1" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono);">
-    </div>
-    <div class="field-block" id="gold-trade-account-row">
-      <label class="flabel">يُخصم من حساب</label>
-      <select class="sel" id="gold-trade-account-select"></select>
-    </div>
-    <p id="gold-trade-sell-note" style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8; display:none;"></p>
-    <p id="gold-trade-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
-    <div class="modal-total-row">
-      <span>الإجمالي</span>
-      <span id="gold-trade-total">—</span>
-    </div>
-    <div style="display:flex; gap:10px;">
-      <button class="btn btn-outline" style="flex:1;" onclick="closeGoldTradeModal()">إلغاء</button>
-      <button class="btn btn-emerald" style="flex:1;" onclick="confirmGoldTrade()">تأكيد</button>
-    </div>
-  </div>
-</div>
 <div id="toast" class="toast"></div>
 
 <script src="assets/data.js"></script>
@@ -231,49 +203,10 @@ function renderAssetSection(kind){
     : `<p style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:13px;">ما فيه نتائج مطابقة</p>`;
 }
 
-let goldPriceUsd = null;
-async function fetchGoldPrice(){
-  try{
-    const res = await fetch('/api/market/gold');
-    const data = await res.json();
-    if(data.error) throw new Error(data.message);
-    goldPriceUsd = data.price;
-  }catch(err){
-    goldPriceUsd = null;
-  }
-  renderGold();
-  renderNetworth();
-}
-
-function renderGold(){
-  const priceSar = goldPriceUsd != null ? usdToSar(goldPriceUsd) : null;
-  document.getElementById('gold-row').innerHTML = `
-    <div class="watch-row">
-      <div class="watch-id">
-        <div class="watch-logo-text gold">Au</div>
-        <div class="watch-id-text">
-          <div class="watch-name">الذهب</div>
-          <div class="watch-ticker">XAU — سعر الأونصة اللحظي</div>
-        </div>
-      </div>
-      <div class="watch-right">
-        <div class="watch-nums">
-          <div class="watch-price">${priceSar != null ? money(priceSar) : 'جاري التحميل...'}</div>
-          <div class="watch-qty">تملك ${goldHolding.ounces} أونصة${priceSar != null ? ' — ' + money(goldHolding.ounces*priceSar) : ''}</div>
-        </div>
-        <div class="watch-actions">
-          <button onclick="openGoldTrade('buy')" aria-label="شراء ذهب" title="شراء">+</button>
-          <button onclick="openGoldTrade('sell')" aria-label="بيع ذهب" title="بيع">−</button>
-        </div>
-      </div>
-    </div>`;
-}
-
 function investmentsTotal(){
   const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
   const sukukNet = sukuk.reduce((s,k)=>s+k.qty*k.price,0);
-  const goldNet = goldPriceUsd != null ? goldHolding.ounces * usdToSar(goldPriceUsd) : 0;
-  return stocksNet + sukukNet + goldNet;
+  return stocksNet + sukukNet;
 }
 function renderNetworth(){
   animateCount(document.getElementById('invest-networth'), convToCur(investmentsTotal()), ' '+curSym());
@@ -374,85 +307,7 @@ function confirmTrade(){
   }
 }
 
-let currentGoldTrade = null;
-
-function openGoldTrade(action){
-  if(goldPriceUsd == null){ showToast('الأسعار لسه ما وصلت، حاول بعد لحظة'); return; }
-  currentGoldTrade = action;
-  document.getElementById('gold-trade-title').textContent = action==='buy' ? 'شراء ذهب' : 'بيع ذهب';
-  const qtyInput = document.getElementById('gold-trade-qty');
-  qtyInput.value = 1;
-  qtyInput.max = action==='sell' ? goldHolding.ounces : '';
-  document.getElementById('gold-trade-error').style.display='none';
-
-  const accRow = document.getElementById('gold-trade-account-row');
-  const sellNote = document.getElementById('gold-trade-sell-note');
-  if(action==='buy'){
-    accRow.style.display='block';
-    sellNote.style.display='none';
-    document.getElementById('gold-trade-account-select').innerHTML = accounts.map((a,idx)=>`<option value="${idx}">${a.bank} — رصيد ${fmt(a.balance)} ر.س</option>`).join('');
-  } else {
-    accRow.style.display='none';
-    const primary = accounts.find(a=>a.primary) || accounts[0];
-    sellNote.style.display='block';
-    sellNote.textContent = `سيُضاف مبلغ البيع إلى ${primary.bank} (حسابك الرئيسي)`;
-  }
-  updateGoldTradeTotal();
-  document.getElementById('gold-trade-modal').style.display='flex';
-}
-
-function updateGoldTradeTotal(){
-  if(!currentGoldTrade || goldPriceUsd == null) return;
-  const n = parseFloat(document.getElementById('gold-trade-qty').value) || 0;
-  document.getElementById('gold-trade-total').innerHTML = money(n*usdToSar(goldPriceUsd));
-}
-document.getElementById('gold-trade-qty').addEventListener('input', updateGoldTradeTotal);
-
-function closeGoldTradeModal(){
-  document.getElementById('gold-trade-modal').style.display='none';
-  currentGoldTrade = null;
-}
-
-function goldTradeErr(msg){
-  const el = document.getElementById('gold-trade-error');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function confirmGoldTrade(){
-  if(!currentGoldTrade || goldPriceUsd == null) return;
-  const n = parseFloat(document.getElementById('gold-trade-qty').value);
-  if(!n || n<=0){ goldTradeErr('كمية غير صحيحة'); return; }
-  const priceSar = usdToSar(goldPriceUsd);
-  const cost = n * priceSar;
-
-  if(currentGoldTrade === 'buy'){
-    const accIdx = parseInt(document.getElementById('gold-trade-account-select').value);
-    const acc = accounts[accIdx];
-    if(acc.balance < cost){ goldTradeErr(`رصيد ${acc.bank} غير كافٍ لإتمام الشراء.`); return; }
-    acc.balance -= cost;
-    goldHolding.ounces = +(goldHolding.ounces + n).toFixed(4);
-    persistState();
-    renderGold();
-    renderNetworth();
-    closeGoldTradeModal();
-    showToast(`تم شراء ${n} أونصة ذهب بمبلغ ${fmt(cost)} ر.س من ${acc.bank}.`);
-  } else {
-    if(n > goldHolding.ounces){ goldTradeErr('لا تملك هذه الكمية من الذهب'); return; }
-    const primary = accounts.find(a=>a.primary) || accounts[0];
-    primary.balance += cost;
-    goldHolding.ounces = +(goldHolding.ounces - n).toFixed(4);
-    persistState();
-    renderGold();
-    renderNetworth();
-    closeGoldTradeModal();
-    showToast(`تم بيع ${n} أونصة ذهب بمبلغ ${fmt(cost)} ر.س، وأُضيف المبلغ إلى ${primary.bank}.`);
-  }
-}
-
 renderInvestments();
-renderGold();
-fetchGoldPrice();
 </script>
 </body>
 </html>

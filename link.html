@@ -59,7 +59,7 @@
             <h3 style="margin-bottom:4px;">حساباتك المرتبطة</h3>
             <p style="font-size:12.5px; color:var(--text-muted);" id="linked-summary">—</p>
           </div>
-          <button class="btn btn-emerald" onclick="openAddBankModal()">+ ربط بنك جديد</button>
+          <button class="btn btn-emerald" onclick="openAddBankModal()">+ ربط مزود خدمة</button>
         </div>
       </div>
 
@@ -82,10 +82,7 @@
       <div class="card">
         <h3 style="flex-wrap:wrap; row-gap:10px;">
           منصات الاستثمار
-          <span style="display:flex; align-items:center; gap:10px;">
-            <span class="sub" id="inv-count-sub">جهة واحدة</span>
-            <button class="btn btn-outline btn-sm" onclick="openAddInvModal()">+ ربط منصة</button>
-          </span>
+          <span class="sub" id="inv-count-sub">جهة واحدة</span>
         </h3>
         <div id="link-investments-list"></div>
         <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
@@ -108,25 +105,13 @@
 </style>
 <div class="modal-overlay" id="add-bank-modal" style="display:none;">
   <div class="modal-box" style="max-width:640px;">
-    <h3>ربط بنك جديد</h3>
+    <h3>ربط مزود خدمة جديد</h3>
     <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8;">
-      اختر أي بنك من البنوك السعودية المرخّصة من ساما، وأدخل رقم حسابك لتربطه — بعدها ينضم مباشرة إلى قائمة بنوكك بالأسفل.
+      اختر أي بنك مرخّص من ساما أو منصة استثمار لتربطها بحسابك — بعدها تنضم مباشرة إلى قائمة الجهات المرتبطة بالأسفل.
     </p>
     <div id="add-bank-list" class="add-bank-scroll" style="max-height:420px; overflow-y:auto; overflow-x:hidden; padding:10px 14px; -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); mask-image:linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);"></div>
     <div style="display:flex; gap:10px; margin-top:14px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closeAddBankModal()">إغلاق</button>
-    </div>
-  </div>
-</div>
-<div class="modal-overlay" id="add-inv-modal" style="display:none;">
-  <div class="modal-box" style="max-width:480px;">
-    <h3>ربط منصة استثمار جديدة</h3>
-    <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8;">
-      اختر منصة الأسهم أو الصكوك التي تبغى تربطها — بعدها تنضم لقائمة منصاتك بالأسفل وتقدر تتابع مقتنياتك منها في صفحة الاستثمارات.
-    </p>
-    <div id="add-inv-list"></div>
-    <div style="display:flex; gap:10px; margin-top:14px;">
-      <button class="btn btn-outline" style="flex:1;" onclick="closeAddInvModal()">إغلاق</button>
     </div>
   </div>
 </div>
@@ -379,38 +364,57 @@ function showToast(msg){
 let addBankFormIndex = null;
 
 function renderAddBankList(){
-  if(otherBanks.length === 0){
-    document.getElementById('add-bank-list').innerHTML = `<p style="font-size:12.5px; color:var(--text-muted); padding:14px 4px;">ربطت كل البنوك المتاحة بالفعل 🎉</p>`;
-    return;
-  }
-  document.getElementById('add-bank-list').innerHTML = otherBanks.map((a,i)=>{
-    if(addBankFormIndex === i){
+  const bankItems = otherBanks.length === 0
+    ? `<p style="font-size:12.5px; color:var(--text-muted); padding:6px 4px 14px;">ربطت كل البنوك المتاحة بالفعل 🎉</p>`
+    : otherBanks.map((a,i)=>{
+      if(addBankFormIndex === i){
+        return `
+        <div class="account-row" style="display:block; padding:14px 8px;">
+          <div class="acc-left" style="margin-bottom:12px;">
+            <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+            <div class="acc-name">${a.bank}</div>
+          </div>
+          <label class="flabel">رقم الحساب / الآيبان</label>
+          <input type="text" id="new-bank-iban" placeholder="SA•• •••• •••• •••• ••••" style="width:100%; padding:10px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); direction:ltr; text-align:right; margin-bottom:12px;">
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-outline btn-sm" style="flex:1;" onclick="cancelAddBankForm()">إلغاء</button>
+            <button class="btn btn-emerald btn-sm" style="flex:1;" onclick="confirmAddBank(${i})">تأكيد الربط</button>
+          </div>
+        </div>`;
+      }
       return `
-      <div class="account-row" style="display:block; padding:14px 8px;">
-        <div class="acc-left" style="margin-bottom:12px;">
+      <div class="account-row" style="flex-wrap:wrap;">
+        <div class="acc-left" style="min-width:0; flex:1;">
           <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
-          <div class="acc-name">${a.bank}</div>
+          <div style="min-width:0;">
+            <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
+            <div class="acc-type">بنك مرخّص من ساما</div>
+          </div>
         </div>
-        <label class="flabel">رقم الحساب / الآيبان</label>
-        <input type="text" id="new-bank-iban" placeholder="SA•• •••• •••• •••• ••••" style="width:100%; padding:10px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); direction:ltr; text-align:right; margin-bottom:12px;">
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="cancelAddBankForm()">إلغاء</button>
-          <button class="btn btn-emerald btn-sm" style="flex:1;" onclick="confirmAddBank(${i})">تأكيد الربط</button>
-        </div>
+        <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="startAddBankForm(${i})">+ ربط</button>
       </div>`;
-    }
-    return `
-    <div class="account-row" style="flex-wrap:wrap;">
-      <div class="acc-left" style="min-width:0; flex:1;">
-        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
-        <div style="min-width:0;">
-          <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
-          <div class="acc-type">بنك مرخّص من ساما</div>
+    }).join('');
+
+  const invItems = otherInvestmentPlatforms.length === 0
+    ? `<p style="font-size:12.5px; color:var(--text-muted); padding:6px 4px 4px;">ربطت كل منصات الاستثمار المتاحة بالفعل 🎉</p>`
+    : otherInvestmentPlatforms.map((a,i)=>`
+      <div class="account-row" style="flex-wrap:wrap;">
+        <div class="acc-left" style="min-width:0; flex:1;">
+          ${a.logo ? `<img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">` : `<div class="bank-logo-text">${a.logoText}</div>`}
+          <div style="min-width:0;">
+            <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
+            <div class="acc-type">منصة استثمار — ${a.assetType}</div>
+          </div>
         </div>
-      </div>
-      <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="startAddBankForm(${i})">+ ربط</button>
-    </div>`;
-  }).join('');
+        <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="confirmAddInv(${i})">+ ربط</button>
+      </div>`).join('');
+
+  document.getElementById('add-bank-list').innerHTML = `
+    <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin:4px 4px 8px;">البنوك</div>
+    ${bankItems}
+    <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin:18px 4px 8px;">منصات الاستثمار</div>
+    ${invItems}
+  `;
 }
 function startAddBankForm(i){
   addBankFormIndex = i;
@@ -441,38 +445,13 @@ function closeAddBankModal(){
   document.getElementById('add-bank-modal').style.display = 'none';
 }
 
-function renderAddInvList(){
-  if(otherInvestmentPlatforms.length === 0){
-    document.getElementById('add-inv-list').innerHTML = `<p style="font-size:12.5px; color:var(--text-muted); padding:14px 4px;">ربطت كل المنصات المتاحة بالفعل 🎉</p>`;
-    return;
-  }
-  document.getElementById('add-inv-list').innerHTML = otherInvestmentPlatforms.map((a,i)=>`
-    <div class="account-row" style="flex-wrap:wrap;">
-      <div class="acc-left" style="min-width:0; flex:1;">
-        ${a.logo ? `<img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">` : `<div class="bank-logo-text">${a.logoText}</div>`}
-        <div style="min-width:0;">
-          <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
-          <div class="acc-type">منصة استثمار — ${a.assetType}</div>
-        </div>
-      </div>
-      <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="confirmAddInv(${i})">+ ربط</button>
-    </div>`).join('');
-}
 function confirmAddInv(i){
   const a = otherInvestmentPlatforms[i];
   investmentPlatforms.push({id:'v'+(investmentPlatforms.length+1), bank:a.bank, logo:a.logo, logoText:a.logoText, linked:true, lastSync:'الآن', assetType:a.assetType});
   otherInvestmentPlatforms.splice(i, 1);
   persistState();
   renderLinkAccounts();
-  renderAddInvList();
   showToast(`تم ربط ${a.bank} وإضافته إلى منصات استثمارك.`);
-}
-function openAddInvModal(){
-  renderAddInvList();
-  document.getElementById('add-inv-modal').style.display = 'flex';
-}
-function closeAddInvModal(){
-  document.getElementById('add-inv-modal').style.display = 'none';
 }
 
 renderLinkAccounts();

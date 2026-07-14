@@ -185,27 +185,13 @@ function renderHome(){
   txList.innerHTML = transactions.slice(0, 6).map(txRowHtml).join('');
 }
 
-let homeGoldPriceUsd = null;
 function renderInvestNetworthMini(){
   const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
   const sukukNet = sukuk.reduce((s,k)=>s+k.qty*k.price,0);
-  const goldNet = homeGoldPriceUsd != null ? goldHolding.ounces * usdToSar(homeGoldPriceUsd) : 0;
-  document.getElementById('invest-networth-mini').innerHTML = money(stocksNet + sukukNet + goldNet);
-}
-async function fetchHomeGoldPrice(){
-  try{
-    const res = await fetch('/api/market/gold');
-    const data = await res.json();
-    if(data.error) throw new Error(data.message);
-    homeGoldPriceUsd = data.price;
-  }catch(err){
-    homeGoldPriceUsd = null;
-  }
-  renderInvestNetworthMini();
+  document.getElementById('invest-networth-mini').innerHTML = money(stocksNet + sukukNet);
 }
 
 renderHome();
-fetchHomeGoldPrice();
 
 /* ---------------- مستشار مالي سريع (mini chat) ---------------- */
 const MINI_AI_COMMITMENT_DUES = {'تابي':160, 'تمارا':300};

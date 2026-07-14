@@ -276,7 +276,6 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .watch-id{display:flex; align-items:center; gap:10px; min-width:0;}
 .watch-logo{width:34px; height:34px; border-radius:9px; object-fit:contain; background:#fff; box-shadow:inset 0 0 0 1px rgba(36,48,61,0.12); flex-shrink:0; padding:4px;}
 .watch-logo-text{width:34px; height:34px; border-radius:9px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--emerald-deep); flex-shrink:0;}
-.watch-logo-text.gold{background:rgba(185,143,74,0.16); color:var(--gold);}
 .watch-id-text{display:flex; flex-direction:column; gap:3px; min-width:0;}
 .watch-name{font-weight:700; font-size:14.5px; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;}
 .watch-ticker{font-family:var(--font-mono); font-size:11px; color:var(--text-muted);}

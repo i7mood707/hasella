@@ -76,8 +76,6 @@ const DEFAULT_SUKUK = [
   {name:'صكوك مصرف الراجحي', code:'RJHI-SUK-2029', qty:0, price:1010.30, chg:0.05, rate:'5.20%'},
 ];
 
-const DEFAULT_GOLD_HOLDING = {ounces:3};
-
 const GOAL_ICONS = ['🎯','🕋','🚗','🏠','🎓','💍','✈️','💰','🏥'];
 const DEFAULT_GOALS = [
   {id:'go1', name:'عمرة العائلة', icon:'🕋', targetAmount:15000, savedAmount:6000, targetDate:'2026-12-01', createdAt:'2026-04-01'},
@@ -151,7 +149,6 @@ function accountLogo(accountId){
 const accounts = loadState('hasila_accounts', DEFAULT_ACCOUNTS);
 const stocks = loadState('hasila_stocks', DEFAULT_STOCKS);
 const sukuk = loadState('hasila_sukuk', DEFAULT_SUKUK);
-const goldHolding = loadState('hasila_gold', DEFAULT_GOLD_HOLDING);
 const goals = loadState('hasila_goals', DEFAULT_GOALS);
 const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
 const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
@@ -169,7 +166,6 @@ function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
   localStorage.setItem('hasila_stocks', JSON.stringify(stocks));
   localStorage.setItem('hasila_sukuk', JSON.stringify(sukuk));
-  localStorage.setItem('hasila_gold', JSON.stringify(goldHolding));
   localStorage.setItem('hasila_goals', JSON.stringify(goals));
   localStorage.setItem('hasila_automations', JSON.stringify(automations));
   localStorage.setItem('hasila_bnpl', JSON.stringify(bnplProviders));
@@ -207,8 +203,6 @@ function txRowHtml(t){
       <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${money(Math.abs(t.amount))}</div>
     </div>`;
 }
-function usdToSar(usd){ return usd * 3.75; }
-
 /* ---------------- Savings goals ---------------- */
 function goalProgressPct(g){ return g.targetAmount > 0 ? Math.min(100, Math.round((g.savedAmount / g.targetAmount) * 100)) : 0; }
 function goalRemaining(g){ return Math.max(0, g.targetAmount - g.savedAmount); }
