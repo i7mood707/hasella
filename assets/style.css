@@ -268,8 +268,8 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 /* ---------- Watchlist (stock rows) ---------- */
 .watchlist-card{background:#fff; border-radius:var(--radius); padding:6px 22px 10px; color:var(--text-dark); border:1px solid #E7E1D1; box-shadow:0 1px 3px rgba(36,48,61,0.04); transition:box-shadow .3s ease, transform .3s ease, border-color .3s ease;}
 .watchlist-card:hover{box-shadow:0 14px 32px rgba(36,48,61,0.10); transform:translateY(-3px); border-color:#D9E6E1;}
-.watchlist-card h3{color:var(--text-dark); padding-top:16px;}
-.watchlist-card h3 .sub{color:var(--text-muted);}
+.watchlist-card h3{color:var(--text-dark); padding-top:16px; font-family:var(--font-display); font-size:15.5px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;}
+.watchlist-card h3 .sub{color:var(--text-muted); font-size:11px; font-weight:500; font-family:var(--font-body);}
 .watch-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid #F0ECDF; transition:background .2s ease;}
 .watch-row:last-child{border-bottom:none;}
 .watch-row:hover{background:var(--paper-dim); margin:0 -12px; padding-inline:12px; border-radius:10px;}
