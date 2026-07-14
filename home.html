@@ -241,6 +241,22 @@ function applyMiniAutomationIntent(automation){
   return {recipient, amount, freqText, bank:acc.bank};
 }
 
+function applyMiniTokenIntent(tokenIntent){
+  if(!tokenIntent) return null;
+  const amount = Number(tokenIntent.amount);
+  if(!amount || amount <= 0) return null;
+  let acc = null;
+  if(tokenIntent.bankName){
+    const needle = tokenIntent.bankName.trim();
+    acc = accounts.find(a => a.bank.includes(needle) || needle.includes(a.bank));
+  }
+  if(!acc) acc = accounts.find(a=>a.primary) || accounts[0];
+  const isOneTime = tokenIntent.durationType !== 'minutes';
+  const minutes = isOneTime ? null : tokenIntent.minutes;
+  const {code, total, durationLabel} = issueMaddToken({accounts:[{bank:acc.bank, amt:amount}], isOneTime, minutes});
+  return {code, total, durationLabel, bank: acc.bank};
+}
+
 function sendMiniChat(){
   const input = document.getElementById('mini-chat-input');
   const text = input.value.trim();
@@ -270,6 +286,10 @@ async function askMiniAdvisor(q){
     const applied = applyMiniAutomationIntent(data.automation);
     if(applied && !applied.alreadyExisted){
       miniChatLog.push({who:'system', text:`✅ تم إنشاء تحويل تلقائي: ${fmt(applied.amount)} ريال ${applied.freqText} إلى ${applied.recipient} من ${applied.bank}.`});
+    }
+    const appliedToken = applyMiniTokenIntent(data.tokenIntent);
+    if(appliedToken){
+      miniChatLog.push({who:'system', text:`✅ تم إنشاء رمز مدّ: ${appliedToken.code} بمبلغ ${fmt(appliedToken.total)} ريال من ${appliedToken.bank} — ${appliedToken.durationLabel}.`});
     }
   }catch(err){
     miniChatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};

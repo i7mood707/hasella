@@ -274,6 +274,22 @@ function applyGoalIntent(goal){
   return {name, targetAmount};
 }
 
+function applyTokenIntentFromChat(tokenIntent){
+  if(!tokenIntent) return null;
+  const amount = Number(tokenIntent.amount);
+  if(!amount || amount <= 0) return null;
+  let acc = null;
+  if(tokenIntent.bankName){
+    const needle = tokenIntent.bankName.trim();
+    acc = accounts.find(a => a.bank.includes(needle) || needle.includes(a.bank));
+  }
+  if(!acc) acc = accounts.find(a=>a.primary) || accounts[0];
+  const isOneTime = tokenIntent.durationType !== 'minutes';
+  const minutes = isOneTime ? null : tokenIntent.minutes;
+  const {code, total, durationLabel} = issueMaddToken({accounts:[{bank:acc.bank, amt:amount}], isOneTime, minutes});
+  return {code, total, durationLabel, bank: acc.bank};
+}
+
 async function askAdvisor(q){
   chatLog.push({who:'user', text:q});
   chatLog.push({who:'bot', text:'يفكّر...'});
@@ -305,6 +321,10 @@ async function askAdvisor(q){
     if(appliedGoal){
       chatLog.push({who:'system', text:`✅ تم إنشاء هدف ادخار جديد: "${appliedGoal.name}" بمبلغ مستهدف ${fmt(appliedGoal.targetAmount)} ريال. تقدر تديره من صفحة الأهداف المالية.`});
     }
+    const appliedToken = applyTokenIntentFromChat(data.tokenIntent);
+    if(appliedToken){
+      chatLog.push({who:'system', text:`✅ تم إنشاء رمز مدّ: ${appliedToken.code} بمبلغ ${fmt(appliedToken.total)} ريال من ${appliedToken.bank} — ${appliedToken.durationLabel}. تقدر تديره من صفحة مدّ.`});
+    }
   }catch(err){
     chatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};
   }
@@ -316,5 +336,6 @@ document.getElementById('chat-input').addEventListener('keydown', e=>{ if(e.key=
 renderChat();
 fetchAIAdvice();
 </script>
+<script src="assets/maddToken.js"></script>
 </body>
 </html>

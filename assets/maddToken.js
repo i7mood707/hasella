@@ -119,6 +119,34 @@ function onTokenAmountInput(i){
   const amt = parseFloat(document.getElementById('tok-amt-'+i).value);
   document.getElementById('tok-chk-'+i).checked = !!(amt && amt>0);
 }
+/* Headless core: creates + syncs a مدّ token with the server. No DOM dependency —
+   usable both from the account-picker UI below and from the chat advisor flow. */
+function issueMaddToken({accounts: chosen, isOneTime, minutes}){
+  const total = chosen.reduce((s,c)=>s+c.amt,0);
+  const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  const durationLabel = isOneTime ? 'استخدام واحد فقط' : fmtDuration(minutes);
+  const expiresAt = isOneTime ? null : Date.now() + minutes*60000;
+
+  currentTokenCode = code;
+  clearInterval(tokenCountdownTimer);
+  clearInterval(tokenPollTimer);
+  tokenIsOneTime = isOneTime;
+  tokenExpired = false;
+  tokenExpiresAt = expiresAt;
+
+  const syncPromise = fetch('/api/madd', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action:'create', code, amount: total, accounts: chosen, isOneTime, expiresAt})
+  }).then(async res=>{
+    const data = await res.json().catch(()=>null);
+    return !!(res.ok && data && data.ok !== false);
+  }).catch(()=> false);
+
+  startTokenPoll(code);
+  return {code, total, chosen, durationLabel, expiresAt, isOneTime, syncPromise};
+}
+
 function generateToken(){
   const chosen = [];
   accounts.forEach((a,i)=>{
@@ -134,11 +162,9 @@ function generateToken(){
 
   let isOneTime = false;
   let minutes = null;
-  let durationLabel = '';
 
   if(durationChoice === 'once'){
     isOneTime = true;
-    durationLabel = 'استخدام واحد فقط';
   } else if(durationChoice === 'custom'){
     const value = parseFloat(document.getElementById('token-custom-value').value);
     const unit = document.getElementById('token-custom-unit').value;
@@ -153,21 +179,11 @@ function generateToken(){
       customErr.style.display = 'block';
       return;
     }
-    durationLabel = fmtDuration(minutes);
   } else {
     minutes = Number(durationChoice);
-    durationLabel = fmtDuration(minutes);
   }
 
-  const total = chosen.reduce((s,c)=>s+c.amt,0);
-  const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
-  currentTokenCode = code;
-
-  clearInterval(tokenCountdownTimer);
-  clearInterval(tokenPollTimer);
-  tokenIsOneTime = isOneTime;
-  tokenExpired = false;
-  tokenExpiresAt = isOneTime ? null : Date.now() + minutes*60000;
+  const {code, total, durationLabel, syncPromise} = issueMaddToken({accounts: chosen, isOneTime, minutes});
 
   const placeholder = document.getElementById('token-placeholder');
   if(placeholder) placeholder.style.display = 'none';
@@ -192,27 +208,15 @@ function generateToken(){
     tokenCountdownTimer = setInterval(tickTokenCountdown, 1000);
   }
 
-  fetch('/api/madd', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({action:'create', code, amount: total, accounts: chosen, isOneTime, expiresAt: tokenExpiresAt})
-  }).then(async res=>{
-    const data = await res.json().catch(()=>null);
-    if(!res.ok || !data || data.ok === false){
+  syncPromise.then(ok=>{
+    if(!ok && code === currentTokenCode){
       const warn = document.getElementById('token-sync-warning');
-      if(warn && code === currentTokenCode){
+      if(warn){
         warn.textContent = '⚠️ تعذّر مزامنة هذا الرمز مع موقع الدفع — الدفع به من موقع آخر لن يعمل الآن.';
         warn.style.display = 'block';
       }
     }
-  }).catch(()=>{
-    const warn = document.getElementById('token-sync-warning');
-    if(warn && code === currentTokenCode){
-      warn.textContent = '⚠️ تعذّر مزامنة هذا الرمز مع موقع الدفع — الدفع به من موقع آخر لن يعمل الآن.';
-      warn.style.display = 'block';
-    }
   });
-  startTokenPoll(code);
 }
 
-renderTokenAccounts();
+if(document.getElementById('token-accounts')) renderTokenAccounts();
