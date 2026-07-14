@@ -224,6 +224,7 @@ function buildChatContext(){
     debts_total: debtsTotal,
     stocks_held: stocks.filter(s=>s.qty>0).map(s=>({name:s.name, ticker:s.ticker, qty:s.qty, price:s.price, change_pct:s.chg})),
     stocks_net_worth: stocksNet,
+    stocks_market: stocks.map(s=>({name:s.name, ticker:s.ticker, price:s.price, change_pct:s.chg})),
     monthly_commitments: bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: AI_COMMITMENT_DUES[b.bank] || 0})),
     savings_goals: goals.map(g=>({name:g.name, target_amount:g.targetAmount, saved_amount:g.savedAmount, remaining:goalRemaining(g), progress_pct:goalProgressPct(g), target_date:g.targetDate})),
     ai_health_analysis: aiAdvice
