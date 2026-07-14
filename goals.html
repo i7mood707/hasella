@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — الأهداف المالية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="mobile-topbar">
+  <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="القائمة">☰</button>
+  <span class="mobile-topbar-brand">حصيلة</span>
+</div>
+<div class="sidebar-overlay" onclick="closeMobileNav()"></div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
+      <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item active" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-goals">
+      <div class="page-head">
+        <div>
+          <h1>الأهداف المالية</h1>
+          <p>خطط لأهدافك الكبيرة وتابع تقدمك بالادخار — والمستشار المالي يراها ويبني نصايحه عليها</p>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card">
+          <h3>عدد الأهداف</h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;" id="goals-count">—</div>
+        </div>
+        <div class="card">
+          <h3>إجمالي المدّخر</h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--emerald-deep);" id="goals-saved-total">—</div>
+        </div>
+        <div class="card">
+          <h3>إجمالي المستهدف</h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;" id="goals-target-total">—</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h3 style="margin-bottom:4px;">أهدافك</h3>
+          <p style="font-size:12.5px; color:var(--text-muted);" id="goals-sub">لا توجد أهداف بعد</p>
+        </div>
+        <button class="btn btn-emerald" onclick="openAddGoalModal()">+ هدف جديد</button>
+      </div>
+
+      <div class="grid grid-2" id="goals-grid"></div>
+    </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
+  </main>
+</div>
+
+<div class="modal-overlay" id="add-goal-modal" style="display:none;">
+  <div class="modal-box" style="max-width:440px;">
+    <h3>هدف جديد</h3>
+    <div class="field-block" style="margin-top:14px;">
+      <label class="flabel">اسم الهدف</label>
+      <input type="text" id="goal-name" class="txt-input" placeholder="مثال: عمرة العائلة">
+    </div>
+    <div class="field-block">
+      <label class="flabel">اختر رمزًا</label>
+      <div id="goal-icon-picker" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+    </div>
+    <div class="field-block">
+      <label class="flabel">المبلغ المستهدف</label>
+      <input type="number" id="goal-target" class="txt-input" min="1" style="font-family:var(--font-mono);" placeholder="100000">
+    </div>
+    <div class="field-block">
+      <label class="flabel">مبلغ مدّخر مسبقًا (اختياري)</label>
+      <input type="number" id="goal-saved" class="txt-input" min="0" style="font-family:var(--font-mono);" placeholder="0">
+    </div>
+    <div class="field-block">
+      <label class="flabel">تاريخ مستهدف (اختياري)</label>
+      <input type="date" id="goal-date" class="txt-input">
+    </div>
+    <p id="goal-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeAddGoalModal()">إلغاء</button>
+      <button class="btn btn-emerald" style="flex:1;" onclick="confirmAddGoal()">إنشاء الهدف</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="contribute-modal" style="display:none;">
+  <div class="modal-box" style="max-width:420px;">
+    <h3 id="contribute-title">إضافة مبلغ للهدف</h3>
+    <div class="field-block" style="margin-top:14px;">
+      <label class="flabel">المبلغ</label>
+      <input type="number" id="contribute-amount" class="txt-input" min="1" style="font-family:var(--font-mono);" value="500">
+    </div>
+    <div class="field-block">
+      <label class="flabel">من حساب</label>
+      <select class="sel" id="contribute-account-select"></select>
+    </div>
+    <p id="contribute-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeContributeModal()">إلغاء</button>
+      <button class="btn btn-emerald" style="flex:1;" onclick="confirmContribute()">تأكيد</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
+<script>
+requireAuth();
+
+let selectedGoalIcon = GOAL_ICONS[0];
+let openGoalMenu = null;
+let deletingGoalIndex = null;
+
+function renderGoals(){
+  document.getElementById('goals-count').textContent = goals.length;
+  document.getElementById('goals-saved-total').innerHTML = money(goals.reduce((s,g)=>s+g.savedAmount,0));
+  document.getElementById('goals-target-total').innerHTML = money(goals.reduce((s,g)=>s+g.targetAmount,0));
+  document.getElementById('goals-sub').textContent = goals.length === 0 ? 'لا توجد أهداف بعد'
+    : goals.length === 1 ? 'هدف واحد نشط' : `${goals.length} أهداف نشطة`;
+
+  document.getElementById('goals-grid').innerHTML = goals.length ? goals.map((g,i)=>{
+    const pct = goalProgressPct(g);
+    const reached = pct >= 100;
+    const estimate = reached ? null : formatGoalEstimate(g);
+    const estimateHtml = reached ? '' : estimate === 'unknown'
+      ? `<div style="font-size:11.5px; color:var(--text-muted); margin-bottom:10px;">أضف مبلغًا لحساب الوقت المتوقع للاكتمال</div>`
+      : `<div style="font-size:11.5px; color:var(--text-muted); margin-bottom:10px;">⏳ متوقع تكمل الهدف خلال ${estimate.monthsLabel} — تقريبًا ${estimate.dateStr}</div>`;
+    return `
+    <div class="card" style="border-right:4px solid ${reached ? 'var(--gold)' : 'var(--emerald)'}; position:relative;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+          <div class="avatar-lg" style="width:46px; height:46px; font-size:20px; background:${reached?'var(--gold)':'var(--emerald)'};">${g.icon}</div>
+          <div style="min-width:0;">
+            <div style="font-weight:700; font-size:14.5px;">${g.name}</div>
+            <div style="font-size:11px; color:var(--text-muted);">${g.targetDate ? 'الموعد المستهدف: ' + g.targetDate : 'بدون موعد محدد'}</div>
+          </div>
+        </div>
+        <div class="acc-menu-wrap">
+          <button class="acc-menu-btn" onclick="toggleGoalMenu(event, ${i})" aria-label="خيارات ${g.name}">⋮</button>
+          ${openGoalMenu === i ? `
+          <div class="acc-menu">
+            <button class="danger" onclick="askDeleteGoal(${i})">حذف الهدف</button>
+          </div>` : ''}
+        </div>
+      </div>
+      ${deletingGoalIndex === i ? `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <span style="font-size:12px; color:var(--brick); font-weight:600;">حذف الهدف نهائيًا؟</span>
+        <button class="btn btn-outline btn-sm" onclick="cancelDeleteGoal()">إلغاء</button>
+        <button class="btn btn-sm" style="background:var(--brick); color:#fff; border-color:var(--brick);" onclick="deleteGoalConfirmed(${i})">تأكيد الحذف</button>
+      </div>` : ''}
+      <div class="debt-progress"><div class="fill" style="width:${pct}%; ${reached ? 'background:var(--gold);' : ''}"></div></div>
+      <div class="debt-meta" style="margin-bottom:12px;">
+        <span>${money(g.savedAmount)} محقق</span>
+        <b>${pct}%</b>
+        <span>الهدف ${money(g.targetAmount)}</span>
+      </div>
+      ${estimateHtml}
+      ${reached
+        ? `<div style="text-align:center; font-size:12.5px; font-weight:700; color:var(--gold);">🎉 حققت هذا الهدف</div>`
+        : `<button class="btn btn-emerald btn-sm" style="width:100%;" onclick="openContributeModal(${i})">+ أضف مبلغ للهدف</button>`}
+    </div>`;
+  }).join('') : `<div class="card" style="grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--text-muted); font-size:13px;">ما عندك أهداف بعد — أنشئ أول هدف من الزر بالأعلى.</div>`;
+}
+
+function toggleGoalMenu(e, i){
+  e.stopPropagation();
+  openGoalMenu = (openGoalMenu === i) ? null : i;
+  deletingGoalIndex = null;
+  renderGoals();
+}
+function askDeleteGoal(i){
+  openGoalMenu = null;
+  deletingGoalIndex = i;
+  renderGoals();
+}
+function cancelDeleteGoal(){
+  deletingGoalIndex = null;
+  renderGoals();
+}
+function deleteGoalConfirmed(i){
+  const removed = goals[i];
+  goals.splice(i, 1);
+  deletingGoalIndex = null;
+  persistState();
+  renderGoals();
+  showToast(`تم حذف هدف "${removed.name}".`);
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.acc-menu-wrap') && openGoalMenu !== null){
+    openGoalMenu = null;
+    renderGoals();
+  }
+});
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function renderIconPicker(){
+  document.getElementById('goal-icon-picker').innerHTML = GOAL_ICONS.map(ic=>`
+    <button type="button" onclick="selectGoalIcon('${ic}')" style="width:40px; height:40px; border-radius:10px; border:1.5px solid ${ic===selectedGoalIcon?'var(--emerald)':'#DAD4C2'}; background:${ic===selectedGoalIcon?'rgba(62,124,111,0.12)':'#fff'}; font-size:18px; cursor:pointer;">${ic}</button>`).join('');
+}
+function selectGoalIcon(ic){
+  selectedGoalIcon = ic;
+  renderIconPicker();
+}
+
+function openAddGoalModal(){
+  document.getElementById('goal-name').value = '';
+  document.getElementById('goal-target').value = '';
+  document.getElementById('goal-saved').value = '';
+  document.getElementById('goal-date').value = '';
+  document.getElementById('goal-error').style.display = 'none';
+  selectedGoalIcon = GOAL_ICONS[0];
+  renderIconPicker();
+  document.getElementById('add-goal-modal').style.display = 'flex';
+}
+function closeAddGoalModal(){
+  document.getElementById('add-goal-modal').style.display = 'none';
+}
+function goalErr(msg){
+  const el = document.getElementById('goal-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function confirmAddGoal(){
+  const name = document.getElementById('goal-name').value.trim();
+  const target = parseFloat(document.getElementById('goal-target').value);
+  const saved = parseFloat(document.getElementById('goal-saved').value) || 0;
+  const date = document.getElementById('goal-date').value;
+  if(!name){ goalErr('اكتب اسم الهدف.'); return; }
+  if(!target || target <= 0){ goalErr('اكتب مبلغًا مستهدفًا صحيحًا.'); return; }
+  if(saved < 0){ goalErr('المبلغ المدّخر لا يمكن أن يكون سالبًا.'); return; }
+  goals.push({id:'go'+(goals.length+1)+'-'+Date.now(), name, icon:selectedGoalIcon, targetAmount:target, savedAmount:saved, targetDate:date || null, createdAt:new Date().toISOString()});
+  persistState();
+  renderGoals();
+  closeAddGoalModal();
+  showToast(`تم إنشاء هدف "${name}".`);
+}
+
+let currentContributeGoal = null;
+function openContributeModal(i){
+  currentContributeGoal = i;
+  const g = goals[i];
+  document.getElementById('contribute-title').textContent = `إضافة مبلغ لهدف "${g.name}"`;
+  document.getElementById('contribute-amount').value = Math.min(500, goalRemaining(g)) || 100;
+  document.getElementById('contribute-account-select').innerHTML = accounts.map((a,idx)=>`<option value="${idx}">${a.bank} — رصيد ${fmt(a.balance)} ر.س</option>`).join('');
+  document.getElementById('contribute-error').style.display = 'none';
+  document.getElementById('contribute-modal').style.display = 'flex';
+}
+function closeContributeModal(){
+  document.getElementById('contribute-modal').style.display = 'none';
+  currentContributeGoal = null;
+}
+function contributeErr(msg){
+  const el = document.getElementById('contribute-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function confirmContribute(){
+  if(currentContributeGoal == null) return;
+  const g = goals[currentContributeGoal];
+  const amount = parseFloat(document.getElementById('contribute-amount').value);
+  if(!amount || amount <= 0){ contributeErr('اكتب مبلغًا صحيحًا.'); return; }
+  const accIdx = parseInt(document.getElementById('contribute-account-select').value);
+  const acc = accounts[accIdx];
+  if(acc.balance < amount){ contributeErr(`رصيد ${acc.bank} غير كافٍ.`); return; }
+  acc.balance -= amount;
+  g.savedAmount += amount;
+  persistState();
+  renderGoals();
+  closeContributeModal();
+  const reached = goalProgressPct(g) >= 100;
+  showToast(reached
+    ? `🎉 تم إضافة ${fmt(amount)} ريال من ${acc.bank} — حققت هدف "${g.name}"!`
+    : `تم إضافة ${fmt(amount)} ريال من ${acc.bank} إلى هدف "${g.name}".`);
+}
+
+renderGoals();
+</script>
+</body>
+</html>

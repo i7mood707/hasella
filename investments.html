@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — الاستثمارات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="mobile-topbar">
+  <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="القائمة">☰</button>
+  <span class="mobile-topbar-brand">حصيلة</span>
+</div>
+<div class="sidebar-overlay" onclick="closeMobileNav()"></div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
+      <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item active" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-investments">
+      <div class="page-head">
+        <div>
+          <h1>الاستثمارات</h1>
+          <p>تابع أسهمك، ذهبك، وصكوكك بأسعار محدثة</p>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card" style="grid-column:1/-1;">
+          <h3>صافي ثروتك من الاستثمارات</h3>
+          <div style="font-family:var(--font-mono); font-size:30px; font-weight:600;" id="invest-networth">—</div>
+          <p style="font-size:12px; color:var(--text-muted); margin-top:6px;">القيمة السوقية الحالية لأسهمك وذهبك وصكوكك مجتمعة</p>
+        </div>
+      </div>
+
+      <div class="watchlist-card" style="margin-bottom:18px;">
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          الأسهم <span class="sub" id="stocks-count-sub">4 شركات</span>
+        </h3>
+        <p style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-muted); margin:-8px 0 12px;">
+          <img src="logos/awaed.jpg" alt="عوائد" style="width:16px; height:16px; border-radius:5px; object-fit:contain; background:#fff; box-shadow:inset 0 0 0 1px rgba(36,48,61,0.12);">
+          محفظتك متزامنة عبر تطبيق عوائد
+        </p>
+        <div id="stocks-list"></div>
+      </div>
+
+      <div class="watchlist-card" style="margin-bottom:18px;">
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          سوق الأسهم <span class="sub" id="stocks-market-count-sub">10 شركات</span>
+        </h3>
+        <input type="text" id="stocks-search" placeholder="ابحث بالاسم أو الرمز..." oninput="renderInvestments()" style="width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; margin-bottom:6px;">
+        <div id="stocks-market-list"></div>
+      </div>
+
+      <div class="watchlist-card" style="margin-bottom:18px;">
+        <h3>الذهب</h3>
+        <div id="gold-row"></div>
+      </div>
+
+      <div class="watchlist-card" style="margin-bottom:18px;">
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          الصكوك <span class="sub" id="sukuk-count-sub">2 صكوك</span>
+        </h3>
+        <div id="sukuk-list"></div>
+      </div>
+
+      <div class="watchlist-card">
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          سوق الصكوك <span class="sub" id="sukuk-market-count-sub">5 صكوك</span>
+        </h3>
+        <input type="text" id="sukuk-search" placeholder="ابحث بالاسم أو الرمز..." oninput="renderInvestments()" style="width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; margin-bottom:6px;">
+        <div id="sukuk-market-list"></div>
+      </div>
+    </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
+  </main>
+</div>
+
+<div class="modal-overlay" id="trade-modal" style="display:none;">
+  <div class="modal-box">
+    <h3 id="trade-title">شراء</h3>
+    <div class="field-block">
+      <label class="flabel" id="trade-qty-label">عدد الأسهم</label>
+      <input type="number" id="trade-qty" min="1" value="1" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono);">
+    </div>
+    <div class="field-block" id="trade-account-row">
+      <label class="flabel">يُخصم من حساب</label>
+      <select class="sel" id="trade-account-select"></select>
+    </div>
+    <p id="trade-sell-note" style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8; display:none;"></p>
+    <p id="trade-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+    <div class="modal-total-row">
+      <span>الإجمالي</span>
+      <span id="trade-total">—</span>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeTradeModal()">إلغاء</button>
+      <button class="btn btn-emerald" style="flex:1;" onclick="confirmTrade()">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="gold-trade-modal" style="display:none;">
+  <div class="modal-box">
+    <h3 id="gold-trade-title">شراء ذهب</h3>
+    <div class="field-block">
+      <label class="flabel">الكمية (أونصة)</label>
+      <input type="number" id="gold-trade-qty" min="0.01" step="0.01" value="1" style="width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-family:var(--font-mono);">
+    </div>
+    <div class="field-block" id="gold-trade-account-row">
+      <label class="flabel">يُخصم من حساب</label>
+      <select class="sel" id="gold-trade-account-select"></select>
+    </div>
+    <p id="gold-trade-sell-note" style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8; display:none;"></p>
+    <p id="gold-trade-error" style="font-size:12.5px; color:var(--brick); margin-bottom:10px; display:none;"></p>
+    <div class="modal-total-row">
+      <span>الإجمالي</span>
+      <span id="gold-trade-total">—</span>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeGoldTradeModal()">إلغاء</button>
+      <button class="btn btn-emerald" style="flex:1;" onclick="confirmGoldTrade()">تأكيد</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
+<script>
+requireAuth();
+
+const TRADE_UNIT = {stocks:'سهم', sukuk:'صك'};
+const TRADE_UNIT_PLURAL = {stocks:'الأسهم', sukuk:'الصكوك'};
+
+function sparkSvg(chg, seed){
+  const w=300, h=48, n=22;
+  const color = chg>=0 ? '#4ADE80' : '#F87171';
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = i/(n-1);
+    const trend = (chg>=0 ? -1 : 1) * t * (h*0.34);
+    const jitter = Math.sin((seed+i)*1.7)*5 + Math.sin((seed+i)*0.6)*4;
+    let y = h/2 + trend + jitter;
+    y = Math.max(4, Math.min(h-4, y));
+    pts.push(`${(t*w).toFixed(1)},${y.toFixed(1)}`);
+  }
+  return `<svg class="watch-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function assetRowHtml(kind, s, ownedView){
+  const logo = kind==='stocks'
+    ? `<img class="watch-logo" src="${s.logo}" alt="${s.name}">`
+    : `<div class="watch-logo-text">صك</div>`;
+  const subLabel = kind==='stocks' ? s.ticker : `${s.code} — عائد ${s.rate}`;
+  return `
+    <div class="watch-row">
+      <div class="watch-id">
+        ${logo}
+        <div class="watch-id-text">
+          <div class="watch-name">${s.name}</div>
+          <div class="watch-ticker">${subLabel}</div>
+        </div>
+      </div>
+      ${sparkSvg(s.chg, s.i*7+3)}
+      <div class="watch-right">
+        <div class="watch-nums">
+          <div class="watch-price">${money(s.price)}</div>
+          <span class="watch-chg ${s.chg>=0?'pos':'neg'}">${s.chg>=0?'+':''}${s.chg}%</span>
+          ${ownedView ? `<div class="watch-qty">تملك ${s.qty} — ${money(s.qty*s.price)}</div>` : (s.qty>0 ? `<div class="watch-qty">تملك ${s.qty}</div>` : '')}
+        </div>
+        <div class="watch-actions">
+          <button onclick="tradeAsset('${kind}',${s.i},'buy')" aria-label="شراء ${s.name}" title="شراء">+</button>
+          ${ownedView ? `<button onclick="tradeAsset('${kind}',${s.i},'sell')" aria-label="بيع ${s.name}" title="بيع">−</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderAssetSection(kind){
+  const listData = kind==='stocks' ? stocks : sukuk;
+  const unitPlural = kind==='stocks' ? 'شركات' : 'صكوك';
+  const ownedListId = kind==='stocks' ? 'stocks-list' : 'sukuk-list';
+  const ownedCountId = kind==='stocks' ? 'stocks-count-sub' : 'sukuk-count-sub';
+  const marketListId = kind==='stocks' ? 'stocks-market-list' : 'sukuk-market-list';
+  const marketCountId = kind==='stocks' ? 'stocks-market-count-sub' : 'sukuk-market-count-sub';
+  const searchId = kind==='stocks' ? 'stocks-search' : 'sukuk-search';
+  const emptyMsg = kind==='stocks' ? 'ما عندك أسهم بعد — اشترِ من سوق الأسهم تحت' : 'ما عندك صكوك بعد — اشترِ من سوق الصكوك تحت';
+
+  const held = listData.map((s,i)=>({...s,i})).filter(s=>s.qty>0);
+  document.getElementById(ownedCountId).textContent = held.length + ' ' + unitPlural;
+  document.getElementById(ownedListId).innerHTML = held.length
+    ? held.map(s=>assetRowHtml(kind,s,true)).join('')
+    : `<p style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:13px;">${emptyMsg}</p>`;
+
+  const q = (document.getElementById(searchId).value||'').trim().toLowerCase();
+  const filtered = listData.map((s,i)=>({...s,i})).filter(s=> !q || s.name.toLowerCase().includes(q) || (s.ticker||s.code||'').toLowerCase().includes(q));
+  document.getElementById(marketCountId).textContent = listData.length + ' ' + unitPlural;
+  document.getElementById(marketListId).innerHTML = filtered.length
+    ? filtered.map(s=>assetRowHtml(kind,s,false)).join('')
+    : `<p style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:13px;">ما فيه نتائج مطابقة</p>`;
+}
+
+let goldPriceUsd = null;
+async function fetchGoldPrice(){
+  try{
+    const res = await fetch('/api/market/gold');
+    const data = await res.json();
+    if(data.error) throw new Error(data.message);
+    goldPriceUsd = data.price;
+  }catch(err){
+    goldPriceUsd = null;
+  }
+  renderGold();
+  renderNetworth();
+}
+
+function renderGold(){
+  const priceSar = goldPriceUsd != null ? usdToSar(goldPriceUsd) : null;
+  document.getElementById('gold-row').innerHTML = `
+    <div class="watch-row">
+      <div class="watch-id">
+        <div class="watch-logo-text gold">Au</div>
+        <div class="watch-id-text">
+          <div class="watch-name">الذهب</div>
+          <div class="watch-ticker">XAU — سعر الأونصة اللحظي</div>
+        </div>
+      </div>
+      <div class="watch-right">
+        <div class="watch-nums">
+          <div class="watch-price">${priceSar != null ? money(priceSar) : 'جاري التحميل...'}</div>
+          <div class="watch-qty">تملك ${goldHolding.ounces} أونصة${priceSar != null ? ' — ' + money(goldHolding.ounces*priceSar) : ''}</div>
+        </div>
+        <div class="watch-actions">
+          <button onclick="openGoldTrade('buy')" aria-label="شراء ذهب" title="شراء">+</button>
+          <button onclick="openGoldTrade('sell')" aria-label="بيع ذهب" title="بيع">−</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function investmentsTotal(){
+  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  const sukukNet = sukuk.reduce((s,k)=>s+k.qty*k.price,0);
+  const goldNet = goldPriceUsd != null ? goldHolding.ounces * usdToSar(goldPriceUsd) : 0;
+  return stocksNet + sukukNet + goldNet;
+}
+function renderNetworth(){
+  animateCount(document.getElementById('invest-networth'), convToCur(investmentsTotal()), ' '+curSym());
+}
+
+function renderInvestments(){
+  renderAssetSection('stocks');
+  renderAssetSection('sukuk');
+  renderNetworth();
+}
+
+let currentTrade = null;
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function tradeAsset(kind, i, action){
+  currentTrade = {kind, i, action};
+  const list = kind==='stocks' ? stocks : sukuk;
+  const s = list[i];
+  document.getElementById('trade-title').textContent = (action==='buy'?'شراء ':'بيع ') + s.name;
+  document.getElementById('trade-qty-label').textContent = kind==='stocks' ? 'عدد الأسهم' : 'عدد الصكوك';
+  const qtyInput = document.getElementById('trade-qty');
+  qtyInput.value = 1;
+  qtyInput.max = action==='sell' ? s.qty : '';
+  document.getElementById('trade-error').style.display='none';
+
+  const accRow = document.getElementById('trade-account-row');
+  const sellNote = document.getElementById('trade-sell-note');
+  if(action==='buy'){
+    accRow.style.display='block';
+    sellNote.style.display='none';
+    document.getElementById('trade-account-select').innerHTML = accounts.map((a,idx)=>`<option value="${idx}">${a.bank} — رصيد ${fmt(a.balance)} ر.س</option>`).join('');
+  } else {
+    accRow.style.display='none';
+    const primary = accounts.find(a=>a.primary) || accounts[0];
+    sellNote.style.display='block';
+    sellNote.textContent = `سيُضاف مبلغ البيع إلى ${primary.bank} (حسابك الرئيسي)`;
+  }
+  updateTradeTotal();
+  document.getElementById('trade-modal').style.display='flex';
+}
+
+function updateTradeTotal(){
+  if(!currentTrade) return;
+  const list = currentTrade.kind==='stocks' ? stocks : sukuk;
+  const s = list[currentTrade.i];
+  const n = parseInt(document.getElementById('trade-qty').value) || 0;
+  document.getElementById('trade-total').innerHTML = money(n*s.price);
+}
+document.getElementById('trade-qty').addEventListener('input', updateTradeTotal);
+
+function closeTradeModal(){
+  document.getElementById('trade-modal').style.display='none';
+  currentTrade = null;
+}
+
+function tradeErr(msg){
+  const el = document.getElementById('trade-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function confirmTrade(){
+  if(!currentTrade) return;
+  const {kind, i, action} = currentTrade;
+  const list = kind==='stocks' ? stocks : sukuk;
+  const unit = TRADE_UNIT[kind];
+  const s = list[i];
+  const n = parseInt(document.getElementById('trade-qty').value);
+  if(!n || n<=0){ tradeErr('كمية غير صحيحة'); return; }
+  const cost = n * s.price;
+
+  if(action==='buy'){
+    const accIdx = parseInt(document.getElementById('trade-account-select').value);
+    const acc = accounts[accIdx];
+    if(acc.balance < cost){ tradeErr(`رصيد ${acc.bank} غير كافٍ لإتمام الشراء.`); return; }
+    acc.balance -= cost;
+    s.qty += n;
+    persistState();
+    renderInvestments();
+    closeTradeModal();
+    showToast(`تم شراء ${n} ${unit} من ${s.name} بمبلغ ${fmt(cost)} ر.س من ${acc.bank}.`);
+  } else {
+    if(n > s.qty){ tradeErr(`لا تملك هذا العدد من ${TRADE_UNIT_PLURAL[kind]}`); return; }
+    const primary = accounts.find(a=>a.primary) || accounts[0];
+    primary.balance += cost;
+    s.qty -= n;
+    persistState();
+    renderInvestments();
+    closeTradeModal();
+    showToast(`تم بيع ${n} ${unit} من ${s.name} بمبلغ ${fmt(cost)} ر.س، وأُضيف المبلغ إلى ${primary.bank}.`);
+  }
+}
+
+let currentGoldTrade = null;
+
+function openGoldTrade(action){
+  if(goldPriceUsd == null){ showToast('الأسعار لسه ما وصلت، حاول بعد لحظة'); return; }
+  currentGoldTrade = action;
+  document.getElementById('gold-trade-title').textContent = action==='buy' ? 'شراء ذهب' : 'بيع ذهب';
+  const qtyInput = document.getElementById('gold-trade-qty');
+  qtyInput.value = 1;
+  qtyInput.max = action==='sell' ? goldHolding.ounces : '';
+  document.getElementById('gold-trade-error').style.display='none';
+
+  const accRow = document.getElementById('gold-trade-account-row');
+  const sellNote = document.getElementById('gold-trade-sell-note');
+  if(action==='buy'){
+    accRow.style.display='block';
+    sellNote.style.display='none';
+    document.getElementById('gold-trade-account-select').innerHTML = accounts.map((a,idx)=>`<option value="${idx}">${a.bank} — رصيد ${fmt(a.balance)} ر.س</option>`).join('');
+  } else {
+    accRow.style.display='none';
+    const primary = accounts.find(a=>a.primary) || accounts[0];
+    sellNote.style.display='block';
+    sellNote.textContent = `سيُضاف مبلغ البيع إلى ${primary.bank} (حسابك الرئيسي)`;
+  }
+  updateGoldTradeTotal();
+  document.getElementById('gold-trade-modal').style.display='flex';
+}
+
+function updateGoldTradeTotal(){
+  if(!currentGoldTrade || goldPriceUsd == null) return;
+  const n = parseFloat(document.getElementById('gold-trade-qty').value) || 0;
+  document.getElementById('gold-trade-total').innerHTML = money(n*usdToSar(goldPriceUsd));
+}
+document.getElementById('gold-trade-qty').addEventListener('input', updateGoldTradeTotal);
+
+function closeGoldTradeModal(){
+  document.getElementById('gold-trade-modal').style.display='none';
+  currentGoldTrade = null;
+}
+
+function goldTradeErr(msg){
+  const el = document.getElementById('gold-trade-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function confirmGoldTrade(){
+  if(!currentGoldTrade || goldPriceUsd == null) return;
+  const n = parseFloat(document.getElementById('gold-trade-qty').value);
+  if(!n || n<=0){ goldTradeErr('كمية غير صحيحة'); return; }
+  const priceSar = usdToSar(goldPriceUsd);
+  const cost = n * priceSar;
+
+  if(currentGoldTrade === 'buy'){
+    const accIdx = parseInt(document.getElementById('gold-trade-account-select').value);
+    const acc = accounts[accIdx];
+    if(acc.balance < cost){ goldTradeErr(`رصيد ${acc.bank} غير كافٍ لإتمام الشراء.`); return; }
+    acc.balance -= cost;
+    goldHolding.ounces = +(goldHolding.ounces + n).toFixed(4);
+    persistState();
+    renderGold();
+    renderNetworth();
+    closeGoldTradeModal();
+    showToast(`تم شراء ${n} أونصة ذهب بمبلغ ${fmt(cost)} ر.س من ${acc.bank}.`);
+  } else {
+    if(n > goldHolding.ounces){ goldTradeErr('لا تملك هذه الكمية من الذهب'); return; }
+    const primary = accounts.find(a=>a.primary) || accounts[0];
+    primary.balance += cost;
+    goldHolding.ounces = +(goldHolding.ounces - n).toFixed(4);
+    persistState();
+    renderGold();
+    renderNetworth();
+    closeGoldTradeModal();
+    showToast(`تم بيع ${n} أونصة ذهب بمبلغ ${fmt(cost)} ر.س، وأُضيف المبلغ إلى ${primary.bank}.`);
+  }
+}
+
+renderInvestments();
+renderGold();
+fetchGoldPrice();
+</script>
+</body>
+</html>

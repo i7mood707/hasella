@@ -22,15 +22,15 @@
     </div>
     <nav class="nav-list">
       <a class="nav-item active" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
       <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
       <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
-      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
-      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
-      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -63,7 +63,7 @@
           </div>
           <div class="hero-sub-row">
             <div class="item">عدد الحسابات <b id="acc-count">0</b></div>
-            <div class="item">صافي الأسهم <b id="stocks-networth-mini">0</b></div>
+            <div class="item">صافي الاستثمارات <b id="invest-networth-mini">0</b></div>
             <div class="item">إجمالي الديون <b id="debts-total-mini">0</b></div>
             <div class="item">عمليات هذا الشهر <b id="tx-count-mini">0</b></div>
           </div>
@@ -77,8 +77,9 @@
             <div id="accounts-list"></div>
           </div>
           <div class="card">
-            <h3>أرشيف العمليات <span class="sub" id="tx-sub-count">آخر 14 عملية</span></h3>
+            <h3>أرشيف العمليات <span class="sub" id="tx-sub-count">آخر 6 عمليات</span></h3>
             <div class="tx-list" id="tx-list"></div>
+            <a class="btn btn-outline btn-sm" style="width:100%; text-align:center; margin-top:14px;" href="transactions.html">عرض كل العمليات ←</a>
           </div>
         </div>
 
@@ -104,10 +105,14 @@
         </div>
       </div>
     </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
   </main>
 </div>
 
 <script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
 <script>
 requireAuth();
 
@@ -119,8 +124,7 @@ function renderHome(){
   document.getElementById('tx-count-mini').textContent = transactions.length;
   document.getElementById('debts-total-mini').innerHTML = money(debtsTotal);
 
-  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
-  document.getElementById('stocks-networth-mini').innerHTML = money(stocksNet);
+  renderInvestNetworthMini();
 
   const accList = document.getElementById('accounts-list');
   accList.innerHTML = accounts.map(a=>`
@@ -133,17 +137,30 @@ function renderHome(){
     </div>`).join('');
 
   const txList = document.getElementById('tx-list');
-  txList.innerHTML = transactions.map(t=>`
-    <div class="tx-row">
-      <div class="tx-left">
-        <div class="tx-ic">${t.ic}</div>
-        <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div></div>
-      </div>
-      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${money(Math.abs(t.amount))}</div>
-    </div>`).join('');
+  txList.innerHTML = transactions.slice(0, 6).map(txRowHtml).join('');
+}
+
+let homeGoldPriceUsd = null;
+function renderInvestNetworthMini(){
+  const stocksNet = stocks.reduce((s,st)=>s+st.qty*st.price,0);
+  const sukukNet = sukuk.reduce((s,k)=>s+k.qty*k.price,0);
+  const goldNet = homeGoldPriceUsd != null ? goldHolding.ounces * usdToSar(homeGoldPriceUsd) : 0;
+  document.getElementById('invest-networth-mini').innerHTML = money(stocksNet + sukukNet + goldNet);
+}
+async function fetchHomeGoldPrice(){
+  try{
+    const res = await fetch('/api/market/gold');
+    const data = await res.json();
+    if(data.error) throw new Error(data.message);
+    homeGoldPriceUsd = data.price;
+  }catch(err){
+    homeGoldPriceUsd = null;
+  }
+  renderInvestNetworthMini();
 }
 
 renderHome();
+fetchHomeGoldPrice();
 
 /* ---------------- مستشار مالي سريع (mini chat) ---------------- */
 const MINI_AI_COMMITMENT_DUES = {'تابي':160, 'تمارا':300};
@@ -166,7 +183,8 @@ function buildMiniChatContext(){
     debts_total: debtsTotal,
     stocks_held: stocks.filter(s=>s.qty>0).map(s=>({name:s.name, ticker:s.ticker, qty:s.qty, price:s.price, change_pct:s.chg})),
     stocks_net_worth: stocksNet,
-    monthly_commitments: bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: MINI_AI_COMMITMENT_DUES[b.bank] || 0}))
+    monthly_commitments: bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: MINI_AI_COMMITMENT_DUES[b.bank] || 0})),
+    savings_goals: goals.map(g=>({name:g.name, target_amount:g.targetAmount, saved_amount:g.savedAmount, remaining:goalRemaining(g), progress_pct:goalProgressPct(g), target_date:g.targetDate}))
   };
 }
 

@@ -132,7 +132,8 @@ nav.nav-list{display:flex; flex-direction:column; gap:3px; flex:1;}
 .nav-item.active{background:var(--ink); color:#fff; box-shadow:0 4px 14px rgba(36,48,61,0.3);}
 .nav-item.active .ic{transform:scale(1.05);}
 .sidebar-foot{border-top:1px solid var(--ink-line); padding-top:14px; margin-top:10px;}
-.user-chip{display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px;}
+.user-chip{display:flex; align-items:center; gap:10px; padding:8px; border-radius:10px; cursor:pointer; transition:background .2s ease;}
+.user-chip:hover{background:var(--paper-dim);}
 .user-chip .avatar{width:34px; height:34px; border-radius:50%; background:var(--gold); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0;}
 .user-chip .uname{font-size:13px; font-weight:600;}
 .user-chip .urole{font-size:11px; color:var(--text-muted);}
@@ -202,6 +203,7 @@ nav.nav-list{display:flex; flex-direction:column; gap:3px; flex:1;}
 .account-row:last-child{border-bottom:none;}
 .acc-left{display:flex; align-items:center; gap:12px;}
 .bank-logo{width:40px; height:40px; border-radius:11px; object-fit:contain; background:#fff; box-shadow:inset 0 0 0 1px rgba(36,48,61,0.12); flex-shrink:0; padding:5px;}
+.bank-logo-text{width:40px; height:40px; border-radius:11px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--emerald-deep); flex-shrink:0;}
 .acc-name{font-size:13.5px; font-weight:600;}
 .acc-type{font-size:11.5px; color:var(--text-muted);}
 .acc-amount{font-family:var(--font-mono); font-size:15px; font-weight:600;}
@@ -216,6 +218,9 @@ nav.nav-list{display:flex; flex-direction:column; gap:3px; flex:1;}
 .tx-left{display:flex; align-items:center; gap:12px;}
 .tx-ic{width:34px; height:34px; border-radius:9px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; transition:transform .25s ease;}
 .tx-row:hover .tx-ic{transform:scale(1.1) rotate(-4deg);}
+.tx-logo{width:34px; height:34px; border-radius:9px; object-fit:contain; background:#fff; box-shadow:inset 0 0 0 1px rgba(36,48,61,0.12); flex-shrink:0; padding:5px; transition:transform .25s ease;}
+.tx-row:hover .tx-logo{transform:scale(1.06);}
+.tx-source{font-size:10.5px; color:var(--text-muted); margin-top:1px;}
 .tx-name{font-size:13.5px; font-weight:600;}
 .tx-date{font-size:11px; color:var(--text-muted); font-family:var(--font-mono);}
 .tx-amt{font-family:var(--font-mono); font-size:14px; font-weight:600;}
@@ -270,6 +275,8 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .watch-row:hover{background:var(--paper-dim); margin:0 -12px; padding-inline:12px; border-radius:10px;}
 .watch-id{display:flex; align-items:center; gap:10px; min-width:0;}
 .watch-logo{width:34px; height:34px; border-radius:9px; object-fit:contain; background:#fff; box-shadow:inset 0 0 0 1px rgba(36,48,61,0.12); flex-shrink:0; padding:4px;}
+.watch-logo-text{width:34px; height:34px; border-radius:9px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--emerald-deep); flex-shrink:0;}
+.watch-logo-text.gold{background:rgba(185,143,74,0.16); color:var(--gold);}
 .watch-id-text{display:flex; flex-direction:column; gap:3px; min-width:0;}
 .watch-name{font-weight:700; font-size:14.5px; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px;}
 .watch-ticker{font-family:var(--font-mono); font-size:11px; color:var(--text-muted);}
@@ -353,6 +360,10 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .chat-input-row .btn{flex-shrink:0;}
 .suggest-chip{font-size:11.5px; padding:6px 12px; border-radius:99px; border:1px solid #DAD4C2; background:#fff; color:var(--text-muted);}
 .suggest-chip:hover{border-color:var(--emerald); color:var(--emerald-deep);}
+
+.range-chip{font-size:12.5px; padding:8px 18px; border-radius:99px; border:1.5px solid #DAD4C2; background:#fff; color:var(--text-muted); cursor:pointer; font-family:inherit; transition:background .2s ease, color .2s ease, border-color .2s ease;}
+.range-chip:hover{border-color:var(--emerald); color:var(--emerald-deep);}
+.range-chip.active{background:var(--ink); color:#fff; border-color:var(--ink);}
 .suggest-row{display:flex; gap:8px; flex-wrap:wrap; padding:0 16px 12px;}
 
 /* ---------- Trade modal ---------- */
@@ -417,6 +428,19 @@ select.auto-acc-sel{margin-top:7px; padding:5px 8px; border-radius:7px; border:1
 textarea.ta{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; min-height:80px; resize:vertical;}
 label.flabel{display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:6px; font-weight:500;}
 .field-block{margin-bottom:16px;}
+.txt-input{width:100%; padding:11px 12px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; background:#fff; transition:border-color .2s ease;}
+.txt-input:focus{border-color:var(--emerald); outline:none;}
+.txt-input[readonly]{background:var(--paper-dim); color:var(--text-muted); cursor:not-allowed;}
+.setting-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px solid #F0ECDF;}
+.setting-title{font-size:13.5px; font-weight:600;}
+.setting-desc{font-size:11.5px; color:var(--text-muted); margin-top:2px; line-height:1.6;}
+.avatar-lg{width:56px; height:56px; border-radius:50%; background:var(--gold); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px; flex-shrink:0; font-family:var(--font-display);}
+
+/* ---------- Page footer (support link) ---------- */
+.page-footer{margin-top:40px; padding-top:20px; border-top:1px solid var(--ink-line); display:flex; justify-content:center;}
+.footer-support-link{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-muted); text-decoration:none; padding:9px 18px; border-radius:9px; transition:background .2s ease, color .2s ease;}
+.footer-support-link:hover{background:var(--paper-dim); color:var(--emerald-deep);}
+.footer-support-link .ic{font-size:14px;}
 
 .mobile-topbar{display:none;}
 .sidebar-overlay{display:none;}

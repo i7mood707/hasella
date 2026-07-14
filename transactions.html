@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصيلة — أرشيف العمليات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="mobile-topbar">
+  <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="القائمة">☰</button>
+  <span class="mobile-topbar-brand">حصيلة</span>
+</div>
+<div class="sidebar-overlay" onclick="closeMobileNav()"></div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>حصيلة</h2>
+    </div>
+    <nav class="nav-list">
+      <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item active" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
+      <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
+      <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
+      <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
+      <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
+      <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
+      <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">فع</div>
+        <div>
+          <div class="uname">فيصل العتيبي</div>
+          <div class="urole">حساب تجريبي</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="page" id="page-transactions">
+      <div class="page-head">
+        <div>
+          <h1>أرشيف العمليات</h1>
+          <p>كل عملياتك المالية من جميع حساباتك في مكان واحد</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;">
+        <button type="button" class="range-chip" data-range="month" onclick="setRange('month')">آخر شهر</button>
+        <button type="button" class="range-chip" data-range="quarter" onclick="setRange('quarter')">آخر 3 أشهر</button>
+        <button type="button" class="range-chip" data-range="year" onclick="setRange('year')">آخر سنة</button>
+        <button type="button" class="range-chip active" data-range="all" onclick="setRange('all')">الكل</button>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:18px;">
+        <div class="card">
+          <h3>إجمالي العمليات</h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600;" id="tx-total-count">—</div>
+        </div>
+        <div class="card">
+          <h3>إجمالي الوارد</h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--emerald-deep);" id="tx-total-in">—</div>
+        </div>
+        <div class="card">
+          <h3>إجمالي الصادر</h3>
+          <div style="font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--brick);" id="tx-total-out">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          كل العمليات <span class="sub" id="tx-count-sub">0 عملية</span>
+        </h3>
+        <input type="text" id="tx-search" placeholder="ابحث باسم العملية أو البنك أو الحساب..." oninput="renderTransactions()" style="width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #DAD4C2; font-size:13.5px; margin-bottom:10px;">
+        <div class="tx-list" id="tx-full-list"></div>
+      </div>
+    </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
+<script>
+requireAuth();
+
+const RANGE_DAYS = {month:30, quarter:90, year:365};
+let currentRange = 'all';
+
+function setRange(range){
+  currentRange = range;
+  document.querySelectorAll('.range-chip').forEach(b=> b.classList.toggle('active', b.dataset.range === range));
+  renderTransactions();
+}
+
+function txInRange(t){
+  if(currentRange === 'all') return true;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - RANGE_DAYS[currentRange]);
+  return new Date(t.dateISO) >= cutoff;
+}
+
+function renderTransactions(){
+  const rangeFiltered = transactions.filter(txInRange);
+
+  const q = (document.getElementById('tx-search').value || '').trim().toLowerCase();
+  const filtered = rangeFiltered.filter(t=>{
+    if(!q) return true;
+    const source = accountLabel(t.accountId).toLowerCase();
+    return t.name.toLowerCase().includes(q) || source.includes(q);
+  });
+
+  document.getElementById('tx-count-sub').textContent = filtered.length === 1 ? 'عملية واحدة' : filtered.length + ' عملية';
+  document.getElementById('tx-full-list').innerHTML = filtered.length
+    ? filtered.map(txRowHtml).join('')
+    : `<p style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:13px;">ما فيه نتائج مطابقة</p>`;
+
+  document.getElementById('tx-total-count').textContent = rangeFiltered.length;
+  const totalIn = rangeFiltered.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+  const totalOut = rangeFiltered.filter(t=>t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0);
+  document.getElementById('tx-total-in').innerHTML = money(totalIn);
+  document.getElementById('tx-total-out').innerHTML = money(totalOut);
+}
+
+renderTransactions();
+</script>
+</body>
+</html>

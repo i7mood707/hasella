@@ -22,15 +22,15 @@
     </div>
     <nav class="nav-list">
       <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
       <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
       <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
-      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
-      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
-      <a class="nav-item active" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -89,7 +89,7 @@
               <option value="حوالة">مشكلة في حوالة</option>
               <option value="حساب">مشكلة في ربط حساب</option>
               <option value="مدّ">مشكلة في مدّ / التوكن</option>
-              <option value="أسهم">مشكلة في الأسهم أو التمويل</option>
+              <option value="استثمارات">مشكلة في الاستثمارات أو التمويل</option>
               <option value="فني">مشكلة تقنية في التطبيق</option>
               <option value="أخرى">استفسار عام / أخرى</option>
             </select>
@@ -116,6 +116,9 @@
         </div>
       </div>
     </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
   </main>
 </div>
 
@@ -139,6 +142,7 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
 <script>
 requireAuth();
 

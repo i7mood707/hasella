@@ -22,15 +22,15 @@
     </div>
     <nav class="nav-list">
       <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
       <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
       <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
-      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item active" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
-      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
-      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -78,10 +78,14 @@
         </div>
       </div>
     </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
   </main>
 </div>
 
 <script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
 <script>
 requireAuth();
 
@@ -110,7 +114,8 @@ function buildAIAdvisorPayload(){
   });
   const txPayload = Object.entries(byCategory).map(([category,amount])=>({category, amount: Math.round(amount*100)/100}));
   const commitments = bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: AI_COMMITMENT_DUES[b.bank] || 0}));
-  return {income, transactions: txPayload, commitments, savings_goal: 2000};
+  const goalsRemaining = goals.reduce((s,g)=>s+goalRemaining(g), 0);
+  return {income, transactions: txPayload, commitments, savings_goal: goalsRemaining || 2000};
 }
 
 function renderAILoading(){
@@ -220,6 +225,7 @@ function buildChatContext(){
     stocks_held: stocks.filter(s=>s.qty>0).map(s=>({name:s.name, ticker:s.ticker, qty:s.qty, price:s.price, change_pct:s.chg})),
     stocks_net_worth: stocksNet,
     monthly_commitments: bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: AI_COMMITMENT_DUES[b.bank] || 0})),
+    savings_goals: goals.map(g=>({name:g.name, target_amount:g.targetAmount, saved_amount:g.savedAmount, remaining:goalRemaining(g), progress_pct:goalProgressPct(g), target_date:g.targetDate})),
     ai_health_analysis: aiAdvice
   };
 }

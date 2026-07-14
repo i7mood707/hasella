@@ -22,15 +22,15 @@
     </div>
     <nav class="nav-list">
       <a class="nav-item" href="home.html"><span class="ic">⌂</span> الرئيسية</a>
+      <a class="nav-item" href="transactions.html"><span class="ic">▦</span> أرشيف العمليات</a>
       <a class="nav-item" href="transfers.html"><span class="ic">⇄</span> الحوالات</a>
       <a class="nav-item" href="token.html"><span class="ic">◎</span> مدّ</a>
       <a class="nav-item" href="debts.html"><span class="ic">▤</span> الديون</a>
-      <a class="nav-item" href="stocks.html"><span class="ic">▲</span> الأسهم</a>
+      <a class="nav-item" href="investments.html"><span class="ic">▲</span> الاستثمارات</a>
+      <a class="nav-item" href="goals.html"><span class="ic">⚑</span> الأهداف المالية</a>
       <a class="nav-item" href="financing.html"><span class="ic">◈</span> التمويل</a>
       <a class="nav-item" href="advisor.html"><span class="ic">☰</span> المستشار المالي</a>
       <a class="nav-item active" href="link.html"><span class="ic">⛓</span> ربط الحسابات</a>
-      <a class="nav-item" href="account.html"><span class="ic">⚙</span> الحساب</a>
-      <a class="nav-item" href="support.html"><span class="ic">✆</span> الدعم الفني</a>
     </nav>
     <div class="sidebar-foot">
       <div class="user-chip">
@@ -80,13 +80,22 @@
       </div>
 
       <div class="card">
-        <h3>منصات الاستثمار <span class="sub" id="inv-count-sub">جهة واحدة</span></h3>
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          منصات الاستثمار
+          <span style="display:flex; align-items:center; gap:10px;">
+            <span class="sub" id="inv-count-sub">جهة واحدة</span>
+            <button class="btn btn-outline btn-sm" onclick="openAddInvModal()">+ ربط منصة</button>
+          </span>
+        </h3>
         <div id="link-investments-list"></div>
         <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
-          🔒 ربط عوائد يخلي التطبيق يقرأ محفظة أسهمك ويعرضها في صفحة الأسهم.
+          🔒 ربط منصات الأسهم والصكوك يخلي التطبيق يقرأ محفظتك ويعرضها في صفحة الاستثمارات.
         </p>
       </div>
     </section>
+    <footer class="page-footer">
+      <a href="support.html" class="footer-support-link"><span class="ic">✆</span> الدعم الفني</a>
+    </footer>
   </main>
 </div>
 
@@ -109,9 +118,22 @@
     </div>
   </div>
 </div>
+<div class="modal-overlay" id="add-inv-modal" style="display:none;">
+  <div class="modal-box" style="max-width:480px;">
+    <h3>ربط منصة استثمار جديدة</h3>
+    <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.8;">
+      اختر منصة الأسهم أو الصكوك التي تبغى تربطها — بعدها تنضم لقائمة منصاتك بالأسفل وتقدر تتابع مقتنياتك منها في صفحة الاستثمارات.
+    </p>
+    <div id="add-inv-list"></div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeAddInvModal()">إغلاق</button>
+    </div>
+  </div>
+</div>
 <div id="toast" class="toast"></div>
 
 <script src="assets/data.js"></script>
+<script src="assets/account-panel.js"></script>
 <script>
 requireAuth();
 
@@ -122,7 +144,7 @@ function renderLinkAccounts(){
   document.getElementById('linked-summary').textContent = `${linkedCount} من ${totalCount} حسابات وخدمات متصلة الآن`;
   document.getElementById('banks-count-sub').textContent = accounts.length + ' جهات';
   document.getElementById('bnpl-count-sub').textContent = bnplProviders.length === 2 ? 'جهتان' : bnplProviders.length + ' جهات';
-  document.getElementById('inv-count-sub').textContent = investmentPlatforms.length === 1 ? 'جهة واحدة' : investmentPlatforms.length + ' جهات';
+  document.getElementById('inv-count-sub').textContent = investmentPlatforms.length === 1 ? 'جهة واحدة' : investmentPlatforms.length === 2 ? 'جهتان' : investmentPlatforms.length + ' جهات';
 
   document.getElementById('link-accounts-list').innerHTML = accounts.map((a,i)=>`
     <div class="account-row">
@@ -191,10 +213,10 @@ function renderLinkAccounts(){
   document.getElementById('link-investments-list').innerHTML = investmentPlatforms.map((a,i)=>`
     <div class="account-row">
       <div class="acc-left">
-        <img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
+        ${a.logo ? `<img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">` : `<div class="bank-logo-text">${a.logoText}</div>`}
         <div>
           <div class="acc-name">${a.bank}</div>
-          <div class="acc-type">منصة استثمار — أسهم</div>
+          <div class="acc-type">منصة استثمار — ${a.assetType || 'أسهم'}</div>
         </div>
       </div>
       ${deletingInvIndex === i ? `
@@ -417,6 +439,40 @@ function openAddBankModal(){
 }
 function closeAddBankModal(){
   document.getElementById('add-bank-modal').style.display = 'none';
+}
+
+function renderAddInvList(){
+  if(otherInvestmentPlatforms.length === 0){
+    document.getElementById('add-inv-list').innerHTML = `<p style="font-size:12.5px; color:var(--text-muted); padding:14px 4px;">ربطت كل المنصات المتاحة بالفعل 🎉</p>`;
+    return;
+  }
+  document.getElementById('add-inv-list').innerHTML = otherInvestmentPlatforms.map((a,i)=>`
+    <div class="account-row" style="flex-wrap:wrap;">
+      <div class="acc-left" style="min-width:0; flex:1;">
+        ${a.logo ? `<img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">` : `<div class="bank-logo-text">${a.logoText}</div>`}
+        <div style="min-width:0;">
+          <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
+          <div class="acc-type">منصة استثمار — ${a.assetType}</div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="confirmAddInv(${i})">+ ربط</button>
+    </div>`).join('');
+}
+function confirmAddInv(i){
+  const a = otherInvestmentPlatforms[i];
+  investmentPlatforms.push({id:'v'+(investmentPlatforms.length+1), bank:a.bank, logo:a.logo, logoText:a.logoText, linked:true, lastSync:'الآن', assetType:a.assetType});
+  otherInvestmentPlatforms.splice(i, 1);
+  persistState();
+  renderLinkAccounts();
+  renderAddInvList();
+  showToast(`تم ربط ${a.bank} وإضافته إلى منصات استثمارك.`);
+}
+function openAddInvModal(){
+  renderAddInvList();
+  document.getElementById('add-inv-modal').style.display = 'flex';
+}
+function closeAddInvModal(){
+  document.getElementById('add-inv-modal').style.display = 'none';
 }
 
 renderLinkAccounts();

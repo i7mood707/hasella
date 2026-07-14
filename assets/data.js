@@ -22,20 +22,37 @@ const DEFAULT_ACCOUNTS = [
 ];
 
 const transactions = [
-  {name:'مطعم نجد الأصيل', date:'٦ يوليو', amount:-186.00, ic:'🍽️'},
-  {name:'راتب شهري', date:'٥ يوليو', amount:11200.00, ic:'💼'},
-  {name:'اشتراك STC', date:'٤ يوليو', amount:-249.00, ic:'📶'},
-  {name:'تحويل إلى محمد', date:'٢ يوليو', amount:-500.00, ic:'↗️'},
-  {name:'خصم تابي', date:'١ يوليو', amount:-160.00, ic:'🛍️'},
-  {name:'بيع سهم سابك', date:'٢٩ يونيو', amount:1322.00, ic:'📈'},
-  {name:'كافيه ريفر', date:'٢٨ يونيو', amount:-32.00, ic:'☕'},
-  {name:'محطة وقود أرامكو', date:'٢٧ يونيو', amount:-140.00, ic:'⛽'},
-  {name:'سحب نقدي — صراف آلي', date:'٢٦ يونيو', amount:-400.00, ic:'💵'},
-  {name:'تسوق أونلاين — نون', date:'٢٤ يونيو', amount:-215.50, ic:'📦'},
-  {name:'فاتورة كهرباء', date:'٢٢ يونيو', amount:-310.00, ic:'💡'},
-  {name:'من: عبدالرحمن العتيبي', date:'٢٠ يونيو', amount:250.00, ic:'↙️'},
-  {name:'اشتراك نتفليكس', date:'١٨ يونيو', amount:-45.00, ic:'🎬'},
-  {name:'بقالة العائلة', date:'١٥ يونيو', amount:-96.75, ic:'🧺'},
+  {name:'فاتورة جوال — موبايلي', date:'٦ يوليو', dateISO:'2026-07-06', amount:-120.00, logo:'logos/mobily.png', accountId:'a3'},
+  {name:'راتب شهري — أرامكو السعودية', date:'٥ يوليو', dateISO:'2026-07-05', amount:11200.00, logo:'logos/aramco.jpg', accountId:'a1'},
+  {name:'اشتراك STC', date:'٤ يوليو', dateISO:'2026-07-04', amount:-249.00, logo:'logos/stc-bank.jpg', accountId:'a4'},
+  {name:'تحويل إلى محمد العتيبي', date:'٢ يوليو', dateISO:'2026-07-02', amount:-500.00, ic:'↗️', accountId:'a1'},
+  {name:'إيجار الشقة — تحويل آيبان', date:'١ يوليو', dateISO:'2026-07-01', amount:-3000.00, ic:'🏠', accountId:'a1'},
+  {name:'خصم تابي — Apple Store', date:'١ يوليو', dateISO:'2026-07-01', amount:-160.00, logo:'logos/tabby.png', accountId:'a1'},
+  {name:'بيع سهم سابك', date:'٢٩ يونيو', dateISO:'2026-06-29', amount:1322.00, ic:'📈', accountId:'a1'},
+  {name:'شحن رصيد — موبايلي', date:'٣٠ يونيو', dateISO:'2026-06-30', amount:-50.00, logo:'logos/mobily.png', accountId:'a4'},
+  {name:'مطعم نجد الأصيل', date:'٢٨ يونيو', dateISO:'2026-06-28', amount:-47.00, ic:'🍽️', accountId:'a3'},
+  {name:'حوالة دولية — SWIFT', date:'٢٨ يونيو', dateISO:'2026-06-28', amount:-1200.00, ic:'🌍', accountId:'a5'},
+  {name:'محطة وقود أرامكو', date:'٢٧ يونيو', dateISO:'2026-06-27', amount:-140.00, logo:'logos/aramco.jpg', accountId:'a1'},
+  {name:'سحب نقدي — صراف آلي', date:'٢٦ يونيو', dateISO:'2026-06-26', amount:-400.00, ic:'💵', accountId:'a1'},
+  {name:'من: سارة العتيبي', date:'٢٥ يونيو', dateISO:'2026-06-25', amount:800.00, ic:'↙️', accountId:'a3'},
+  {name:'تسوق أونلاين — نون', date:'٢٤ يونيو', dateISO:'2026-06-24', amount:-215.50, logo:'logos/noon.png', accountId:'a2'},
+  {name:'فاتورة كهرباء — الشركة السعودية للكهرباء', date:'٢٢ يونيو', dateISO:'2026-06-22', amount:-310.00, logo:'logos/sec.svg', accountId:'a5'},
+  {name:'من: عبدالرحمن العتيبي', date:'٢٠ يونيو', dateISO:'2026-06-20', amount:250.00, ic:'↙️', accountId:'a1'},
+  {name:'STC Bank إلى عبدالله', date:'٢٠ يونيو', dateISO:'2026-06-20', amount:-250.00, ic:'↗️', accountId:'a4'},
+  {name:'اشتراك نتفليكس', date:'١٨ يونيو', dateISO:'2026-06-18', amount:-45.00, logo:'logos/netflix.png', accountId:'a2'},
+  {name:'بقالة العائلة', date:'١٥ يونيو', dateISO:'2026-06-15', amount:-96.75, ic:'🧺', accountId:'a3'},
+  {name:'اشتراك سبوتيفاي', date:'١٤ يونيو', dateISO:'2026-06-14', amount:-19.99, logo:'logos/spotify.png', accountId:'a2'},
+  {name:'شراء من جرير للتسويق', date:'١٢ يونيو', dateISO:'2026-06-12', amount:-540.00, logo:'logos/jarir.jpg', accountId:'a2'},
+  {name:'فاتورة مياه — شركة المياه الوطنية', date:'١٠ يونيو', dateISO:'2026-06-10', amount:-85.00, ic:'💧', accountId:'a5'},
+  {name:'خصم تمارا — أثاث المنزل', date:'٩ يونيو', dateISO:'2026-06-09', amount:-320.00, logo:'logos/tamara.jpg', accountId:'a1'},
+  {name:'اشتراك نادي رياضي', date:'٧ يونيو', dateISO:'2026-06-07', amount:-299.00, ic:'🏋️', accountId:'a2'},
+  {name:'مكافأة أداء', date:'٥ يونيو', dateISO:'2026-06-05', amount:2000.00, ic:'🎁', accountId:'a1'},
+  {name:'شحن رصيد — موبايلي', date:'١ يونيو', dateISO:'2026-06-01', amount:-30.00, logo:'logos/mobily.png', accountId:'a3'},
+  {name:'اشتراك نتفليكس', date:'١٨ مارس', dateISO:'2026-03-18', amount:-45.00, logo:'logos/netflix.png', accountId:'a2'},
+  {name:'فاتورة كهرباء — الشركة السعودية للكهرباء', date:'١٥ ديسمبر', dateISO:'2025-12-15', amount:-280.00, logo:'logos/sec.svg', accountId:'a5'},
+  {name:'شراء لابتوب — جرير للتسويق', date:'١٠ سبتمبر', dateISO:'2025-09-10', amount:-3200.00, logo:'logos/jarir.jpg', accountId:'a2'},
+  {name:'مكافأة نهاية السنة', date:'٢٠ أغسطس', dateISO:'2025-08-20', amount:3000.00, ic:'🎁', accountId:'a1'},
+  {name:'إيجار الشقة السابقة — تحويل آيبان', date:'١ أبريل', dateISO:'2025-04-01', amount:-2800.00, ic:'🏠', accountId:'a1'},
 ];
 
 const DEFAULT_STOCKS = [
@@ -49,6 +66,22 @@ const DEFAULT_STOCKS = [
   {name:'بنك البلاد', ticker:'1140', qty:0, price:33.60, chg:-0.2, logo:'logos/albilad.png'},
   {name:'جرير للتسويق', ticker:'4190', qty:0, price:165.00, chg:0.9, logo:'logos/jarir.jpg'},
   {name:'مصرف الإنماء', ticker:'1150', qty:0, price:28.75, chg:0.3, logo:'logos/alinma.jpg'},
+];
+
+const DEFAULT_SUKUK = [
+  {name:'صكوك حكومية سعودية', code:'GOV-SUK-2030', qty:20, price:1005.50, chg:0.08, rate:'5.10%'},
+  {name:'صكوك أرامكو السعودية', code:'ARMCO-SUK-2027', qty:10, price:998.20, chg:-0.04, rate:'4.85%'},
+  {name:'صكوك سابك', code:'SABIC-SUK-2026', qty:0, price:1002.75, chg:0.02, rate:'4.95%'},
+  {name:'صكوك stc', code:'STC-SUK-2028', qty:0, price:1000.00, chg:0.0, rate:'5.00%'},
+  {name:'صكوك مصرف الراجحي', code:'RJHI-SUK-2029', qty:0, price:1010.30, chg:0.05, rate:'5.20%'},
+];
+
+const DEFAULT_GOLD_HOLDING = {ounces:3};
+
+const GOAL_ICONS = ['🎯','🕋','🚗','🏠','🎓','💍','✈️','💰','🏥'];
+const DEFAULT_GOALS = [
+  {id:'go1', name:'عمرة العائلة', icon:'🕋', targetAmount:15000, savedAmount:6000, targetDate:'2026-12-01', createdAt:'2026-04-01'},
+  {id:'go2', name:'سيارة جديدة', icon:'🚗', targetAmount:100000, savedAmount:22000, targetDate:'2027-06-01', createdAt:'2026-01-05'},
 ];
 
 const DEFAULT_TRANSFERS = [
@@ -70,7 +103,11 @@ const DEFAULT_BNPL = [
 ];
 
 const DEFAULT_INVESTMENTS = [
-  {id:'v1', bank:'عوائد', logo:'logos/awaed.jpg', linked:true, lastSync:'قبل 20 دقيقة'},
+  {id:'v1', bank:'عوائد', logo:'logos/awaed.jpg', linked:true, lastSync:'قبل 20 دقيقة', assetType:'أسهم'},
+];
+
+const DEFAULT_OTHER_INVESTMENTS = [
+  {bank:'درايه للصكوك', logoText:'درا', assetType:'صكوك'},
 ];
 
 const DEFAULT_OTHER_BANKS = [
@@ -103,11 +140,23 @@ function loadState(key, fallback){
   localStorage.setItem(key, JSON.stringify(clone));
   return clone;
 }
+function accountLabel(accountId){
+  const acc = accounts.find(a=>a.id === accountId);
+  return acc ? `${acc.bank} — ${acc.type}` : '';
+}
+function accountLogo(accountId){
+  const acc = accounts.find(a=>a.id === accountId);
+  return acc ? acc.logo : '';
+}
 const accounts = loadState('hasila_accounts', DEFAULT_ACCOUNTS);
 const stocks = loadState('hasila_stocks', DEFAULT_STOCKS);
+const sukuk = loadState('hasila_sukuk', DEFAULT_SUKUK);
+const goldHolding = loadState('hasila_gold', DEFAULT_GOLD_HOLDING);
+const goals = loadState('hasila_goals', DEFAULT_GOALS);
 const automations = loadState('hasila_automations', DEFAULT_AUTOMATIONS);
 const bnplProviders = loadState('hasila_bnpl', DEFAULT_BNPL);
 const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS);
+const otherInvestmentPlatforms = loadState('hasila_other_investments', DEFAULT_OTHER_INVESTMENTS);
 const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
 const otherBanks = loadState('hasila_other_banks', DEFAULT_OTHER_BANKS);
 
@@ -118,9 +167,13 @@ function persistSettings(){ localStorage.setItem('hasila_settings', JSON.stringi
 function persistState(){
   localStorage.setItem('hasila_accounts', JSON.stringify(accounts));
   localStorage.setItem('hasila_stocks', JSON.stringify(stocks));
+  localStorage.setItem('hasila_sukuk', JSON.stringify(sukuk));
+  localStorage.setItem('hasila_gold', JSON.stringify(goldHolding));
+  localStorage.setItem('hasila_goals', JSON.stringify(goals));
   localStorage.setItem('hasila_automations', JSON.stringify(automations));
   localStorage.setItem('hasila_bnpl', JSON.stringify(bnplProviders));
   localStorage.setItem('hasila_investments', JSON.stringify(investmentPlatforms));
+  localStorage.setItem('hasila_other_investments', JSON.stringify(otherInvestmentPlatforms));
   localStorage.setItem('hasila_transfers', JSON.stringify(transfersData));
   localStorage.setItem('hasila_other_banks', JSON.stringify(otherBanks));
 }
@@ -139,10 +192,53 @@ function curSym(){ return CURRENCIES[curCode()].sym; }
 function convToCur(sar){ return sar * CURRENCIES[curCode()].rate; }
 function money(sar){ return fmt(convToCur(sar)) + ' ' + curSym(); }
 
+/* ---------------- Transaction row markup (shared by the home preview + the full archive page) ---------------- */
+function txRowHtml(t){
+  const icon = t.logo ? `<img class="tx-logo" src="${t.logo}" alt="${t.name}">` : `<div class="tx-ic">${t.ic || '💳'}</div>`;
+  const source = accountLabel(t.accountId);
+  return `
+    <div class="tx-row">
+      <div class="tx-left">
+        ${icon}
+        <div><div class="tx-name">${t.name}</div><div class="tx-date">${t.date}</div>${source ? `<div class="tx-source">${source}</div>` : ''}</div>
+      </div>
+      <div class="tx-amt ${t.amount<0?'neg':'pos'}">${t.amount<0?'-':'+'}${money(Math.abs(t.amount))}</div>
+    </div>`;
+}
+function usdToSar(usd){ return usd * 3.75; }
+
+/* ---------------- Savings goals ---------------- */
+function goalProgressPct(g){ return g.targetAmount > 0 ? Math.min(100, Math.round((g.savedAmount / g.targetAmount) * 100)) : 0; }
+function goalRemaining(g){ return Math.max(0, g.targetAmount - g.savedAmount); }
+
+/* Projects a completion date from the average daily saving rate since the goal was created
+   (savedAmount / days elapsed) — the only signal we have without a full contribution history. */
+function goalEstimatedCompletion(g){
+  const remaining = goalRemaining(g);
+  if(remaining <= 0) return {status:'done'};
+  if(!g.createdAt || !g.savedAmount) return {status:'unknown'};
+  const daysElapsed = Math.max(1, Math.floor((Date.now() - new Date(g.createdAt).getTime()) / 86400000));
+  const dailyRate = g.savedAmount / daysElapsed;
+  if(dailyRate <= 0) return {status:'unknown'};
+  const daysRemaining = Math.ceil(remaining / dailyRate);
+  const estDate = new Date(Date.now() + daysRemaining * 86400000);
+  const monthsRemaining = Math.max(1, Math.round(daysRemaining / 30));
+  return {status:'estimated', daysRemaining, monthsRemaining, estDate};
+}
+function formatGoalEstimate(g){
+  const est = goalEstimatedCompletion(g);
+  if(est.status !== 'estimated') return est.status;
+  const m = est.monthsRemaining;
+  const monthsLabel = m === 1 ? 'شهر واحد' : m === 2 ? 'شهرين' : m <= 10 ? `${m} أشهر` : `${m} شهرًا`;
+  const dateStr = est.estDate.toISOString().slice(0, 10);
+  return {monthsLabel, dateStr};
+}
+
 /* ---------------- Language (interface strings only — data content stays Arabic) ---------------- */
 const I18N_EN = {
   // nav + shell
   'الرئيسية':'Home', 'الحوالات':'Transfers', 'مدّ':'Madd', 'الديون':'Debts', 'الأسهم':'Stocks',
+  'الاستثمارات':'Investments', 'الذهب':'Gold', 'الصكوك':'Sukuk',
   'التمويل':'Financing', 'المستشار المالي':'Financial Advisor', 'ربط الحسابات':'Link Accounts',
   'الحساب':'Account', 'الدعم الفني':'Support', 'تسجيل الخروج':'Log out', 'حساب تجريبي':'Demo account',
   // page-head titles + subtitles
@@ -152,6 +248,7 @@ const I18N_EN = {
   'حدد الحسابات، المبلغ من كل حساب، ومدة صلاحية مدّ':'Choose accounts, the amount from each, and the Madd validity period',
   'تابي، تمارا، وأقساط البنوك في جميع حساباتك':'Tabby, Tamara, and bank installments across all your accounts',
   'محفظتك متزامنة عبر تطبيق عوائد':'Your portfolio is synced via Awaed',
+  'تابع أسهمك، ذهبك، وصكوكك بأسعار محدثة':'Track your stocks, gold, and sukuk with live prices',
   'قارن عروض الأقساط أو اطلب تمويلًا لشركتك':'Compare installment offers or request business financing',
   'يرى حساباتك وديونك، ويتوقع احتياجك القادم':'Sees your accounts and debts, and anticipates your next need',
   'أدر اتصال حساباتك البنكية وخدمات الدفع الآجل في مكان واحد':'Manage your bank and BNPL connections in one place',
@@ -164,7 +261,7 @@ const I18N_EN = {
   'سجل الحوالات':'Transfer log', 'إجمالي الديون':'Total debts', 'جميع الأقساط':'All installments',
   'البنوك':'Banks', 'خدمات الدفع الآجل':'Buy now, pay later', 'منصات الاستثمار':'Investment platforms',
   'حساباتك المرتبطة':'Your linked accounts', 'اختر الحسابات':'Choose accounts', 'إيصال مدّ':'Madd receipt',
-  'صافي ثروتك من الأسهم':'Your net stock wealth', 'مقتنياتك':'Your holdings',
+  'صافي ثروتك من الأسهم':'Your net stock wealth', 'صافي ثروتك من الاستثمارات':'Your net investment wealth', 'مقتنياتك':'Your holdings',
   'مقارنة عروض الأقساط':'Compare installment offers', 'طلب تمويل للشركات':'Business financing request',
   'المعلومات الشخصية':'Personal information', 'التفضيلات والإعدادات':'Preferences & settings',
   'رفع شكوى أو طلب دعم':'File a complaint or request support', 'شكاواي السابقة':'Your past complaints',
@@ -173,7 +270,7 @@ const I18N_EN = {
   'الإجابات مبنية على تحليل الذكاء الاصطناعي الفعلي لبياناتك أعلاه':'Answers are based on real AI analysis of your data above',
   // home hero
   'إجمالي الرصيد في جميع الحسابات':'Total balance across all accounts', 'عدد الحسابات':'Accounts',
-  'صافي الأسهم':'Net stocks', 'إجمالي الديون':'Total debts', 'عمليات هذا الشهر':'Transactions this month',
+  'صافي الأسهم':'Net stocks', 'صافي الاستثمارات':'Net investments', 'إجمالي الديون':'Total debts', 'عمليات هذا الشهر':'Transactions this month',
   // sub-labels
   'تحليل مباشر بالذكاء الاصطناعي':'Live AI analysis', 'بياناتك التعريفية':'Your identity details',
   'تُحفظ تلقائيًا':'Saved automatically', 'نرد خلال 24 ساعة':'We reply within 24 hours',
