@@ -21,7 +21,7 @@ const DEFAULT_ACCOUNTS = [
   {id:'a5', bank:'مصرف الإنماء', type:'حساب توفير', balance:8930.20, logo:'logos/alinma.jpg', iban:'SA•• •••• •••• •••• 4821', linked:false, lastSync:'—'},
 ];
 
-const transactions = [
+const DEFAULT_TRANSACTIONS = [
   {name:'فاتورة جوال — موبايلي', date:'٦ يوليو', dateISO:'2026-07-06', amount:-120.00, logo:'logos/mobily.png', accountId:'a3'},
   {name:'راتب شهري — أرامكو السعودية', date:'٥ يوليو', dateISO:'2026-07-05', amount:11200.00, logo:'logos/aramco.jpg', accountId:'a1'},
   {name:'اشتراك STC', date:'٤ يوليو', dateISO:'2026-07-04', amount:-249.00, logo:'logos/stc-bank.jpg', accountId:'a4'},
@@ -159,6 +159,7 @@ const investmentPlatforms = loadState('hasila_investments', DEFAULT_INVESTMENTS)
 const otherInvestmentPlatforms = loadState('hasila_other_investments', DEFAULT_OTHER_INVESTMENTS);
 const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
 const otherBanks = loadState('hasila_other_banks', DEFAULT_OTHER_BANKS);
+const transactions = loadState('hasila_transactions', DEFAULT_TRANSACTIONS);
 
 const DEFAULT_SETTINGS = {lang:'ar', currency:'SAR', notifications:true, promotions:false, twoFactor:true, darkMode:false};
 const APP_SETTINGS = loadState('hasila_settings', DEFAULT_SETTINGS);
@@ -176,6 +177,7 @@ function persistState(){
   localStorage.setItem('hasila_other_investments', JSON.stringify(otherInvestmentPlatforms));
   localStorage.setItem('hasila_transfers', JSON.stringify(transfersData));
   localStorage.setItem('hasila_other_banks', JSON.stringify(otherBanks));
+  localStorage.setItem('hasila_transactions', JSON.stringify(transactions));
 }
 
 /* ---------------- Formatting ---------------- */

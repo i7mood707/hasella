@@ -43,9 +43,9 @@ module.exports = async (req, res) => {
       }
 
       if(action === 'redeem'){
-        const { code, amount } = body;
+        const { code, amount, desc } = body;
         if(!code || amount == null){ res.status(400).json({error:'missing code or amount'}); return; }
-        const result = await redeemToken(code, amount);
+        const result = await redeemToken(code, amount, desc);
         res.status(result.ok ? 200 : 409).json(result);
         return;
       }

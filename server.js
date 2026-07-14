@@ -122,7 +122,7 @@ async function handleMaddRoute(req, res, pathname, searchParams){
     req.on('data', chunk=> body += chunk);
     await new Promise(resolve=> req.on('end', resolve));
     try{
-      const { action, code, amount, accounts, isOneTime, expiresAt } = JSON.parse(body || '{}');
+      const { action, code, amount, accounts, isOneTime, expiresAt, desc } = JSON.parse(body || '{}');
       if(action === 'create'){
         if(!code || !amount){ sendJson(res, 400, {error:'missing code or amount'}); return true; }
         const token = await createToken(code, {amount, accounts, isOneTime, expiresAt});
@@ -131,7 +131,7 @@ async function handleMaddRoute(req, res, pathname, searchParams){
       }
       if(action === 'redeem'){
         if(!code || amount == null){ sendJson(res, 400, {error:'missing code or amount'}); return true; }
-        const result = await redeemToken(code, amount);
+        const result = await redeemToken(code, amount, desc);
         sendJson(res, result.ok ? 200 : 409, result);
         return true;
       }

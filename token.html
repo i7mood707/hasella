@@ -186,11 +186,23 @@ function startTokenPoll(code){
   }, 4000);
 }
 
+function recordTokenTransactions(tokenRecord, debitedAccounts){
+  const today = new Date();
+  const dateLabel = today.toLocaleDateString('ar-SA', {day:'numeric', month:'long'});
+  const dateISO = today.toISOString().slice(0,10);
+  const name = tokenRecord.desc ? `دفع بمدّ — ${tokenRecord.desc}` : 'دفع بمدّ';
+  debitedAccounts.forEach(({acc, amt})=>{
+    transactions.unshift({name, date:dateLabel, dateISO, amount:-amt, ic:'◎', accountId:acc.id});
+  });
+}
+
 function applyTokenDeduction(tokenRecord){
+  const debitedAccounts = [];
   (tokenRecord.accounts || []).forEach(c=>{
     const acc = accounts.find(a=>a.bank === c.bank);
-    if(acc) acc.balance -= c.amt;
+    if(acc){ acc.balance -= c.amt; debitedAccounts.push({acc, amt:c.amt}); }
   });
+  recordTokenTransactions(tokenRecord, debitedAccounts);
   persistState();
   renderTokenAccounts();
   setTokenStatus(`✅ تم الدفع بموقع الدفع — خُصم ${fmt(tokenRecord.amount)} ر.س`, 'var(--emerald-deep)');
