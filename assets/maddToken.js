@@ -105,8 +105,15 @@ function recordTokenTransactions(tokenRecord, debitedAccounts){
 }
 
 function applyTokenDeduction(tokenRecord){
+  // Only the charged accounts (smallest contribution first) actually leave the
+  // balance — any leftover مدّ amount was never withdrawn, so it's already
+  // "back" in the account with no extra step needed.
+  const chargedAccounts = tokenRecord.chargedAccounts || tokenRecord.accounts || [];
+  const chargedAmount = tokenRecord.chargedAmount != null ? tokenRecord.chargedAmount : tokenRecord.amount;
+  const changeAmount = tokenRecord.changeAmount || 0;
+
   const debitedAccounts = [];
-  (tokenRecord.accounts || []).forEach(c=>{
+  chargedAccounts.forEach(c=>{
     const acc = accounts.find(a=>a.bank === c.bank);
     if(acc){ acc.balance -= c.amt; debitedAccounts.push({acc, amt:c.amt}); }
   });
@@ -114,7 +121,10 @@ function applyTokenDeduction(tokenRecord){
   persistState();
   renderTokenAccounts();
   if(typeof renderHome === 'function') renderHome();
-  setTokenStatus(`✅ تم الدفع بموقع الدفع — خُصم ${fmt(tokenRecord.amount)} ر.س`, 'var(--emerald-deep)');
+  const statusText = changeAmount > 0
+    ? `✅ تم الدفع بموقع الدفع — خُصم ${fmt(chargedAmount)} ر.س ورجع ${fmt(changeAmount)} ر.س لحسابك`
+    : `✅ تم الدفع بموقع الدفع — خُصم ${fmt(chargedAmount)} ر.س`;
+  setTokenStatus(statusText, 'var(--emerald-deep)');
 }
 
 function renderTokenAccounts(){
