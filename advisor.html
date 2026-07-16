@@ -74,7 +74,7 @@
         </div>
         <div class="chat-input-row">
           <input id="chat-input" type="text" placeholder="اكتب سؤالك عن وضعك المالي...">
-          <button class="btn btn-emerald" onclick="sendChat()">إرسال</button>
+          <button class="btn btn-emerald" id="chat-send-btn" onclick="sendChat()">إرسال</button>
         </div>
       </div>
     </section>
@@ -239,7 +239,10 @@ function renderChat(){
   body.scrollTop = body.scrollHeight;
 }
 
+let chatPending = false;
+
 function sendChat(){
+  if(chatPending) return;
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if(!text) return;
@@ -291,6 +294,8 @@ function applyTokenIntentFromChat(tokenIntent){
 }
 
 async function askAdvisor(q){
+  chatPending = true;
+  document.getElementById('chat-send-btn').disabled = true;
   chatLog.push({who:'user', text:q});
   chatLog.push({who:'bot', text:'يفكّر...'});
   renderChat();
@@ -299,12 +304,16 @@ async function askAdvisor(q){
     .filter(m=>m.text !== 'يفكّر...')
     .slice(-8)
     .map(m=>({role: m.who==='user' ? 'user' : 'assistant', content: m.text}));
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 30000);
   try{
     const res = await fetch('/api/chat', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question:q, context: buildChatContext(), history})
+      body: JSON.stringify({question:q, context: buildChatContext(), history}),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     const data = await res.json();
     if(!res.ok || !data.answer) throw new Error(data.error || 'HTTP '+res.status);
     chatLog[pendingIndex] = {who:'bot', text: data.answer};
@@ -326,8 +335,11 @@ async function askAdvisor(q){
       chatLog.push({who:'system', text:`✅ تم إنشاء رمز مدّ: ${appliedToken.code} بمبلغ ${fmt(appliedToken.total)} ريال من ${appliedToken.bank} — ${appliedToken.durationLabel}. تقدر تديره من صفحة مدّ.`});
     }
   }catch(err){
-    chatLog[pendingIndex] = {who:'bot', text:'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};
+    clearTimeout(timeout);
+    chatLog[pendingIndex] = {who:'bot', text: err.name==='AbortError' ? 'استغرق الرد وقتًا أطول من المتوقع، جرّب مرة ثانية بعد لحظات.' : 'تعذّر الوصول للمستشار الذكي حاليًا، جرّب مرة ثانية بعد لحظات.'};
   }
+  chatPending = false;
+  document.getElementById('chat-send-btn').disabled = false;
   renderChat();
 }
 
