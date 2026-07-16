@@ -1,6 +1,7 @@
 /* ---------------- مدّ token issuance widget — shared by home.html's modal and token.html's page ---------------- */
 const MAX_TOKEN_MINUTES = 24 * 60;
 let currentTokenCode = '';
+let currentOtpCode = '';
 let tokenIsOneTime = false;
 let tokenExpiresAt = null;
 let tokenExpired = false;
@@ -68,6 +69,19 @@ function copyTokenCode(){
   });
 }
 
+function genOtpCode(){
+  return String(Math.floor(100000 + Math.random()*900000));
+}
+
+function copyOtpCode(){
+  if(!currentOtpCode || tokenExpired) return;
+  navigator.clipboard.writeText(currentOtpCode).then(()=>{
+    showToast('تم نسخ رمز التحقق (OTP).');
+  }).catch(()=>{
+    showToast('تعذر نسخ الرمز.');
+  });
+}
+
 function startTokenPoll(code){
   clearInterval(tokenPollTimer);
   tokenPollTimer = setInterval(async ()=>{
@@ -124,10 +138,12 @@ function onTokenAmountInput(i){
 function issueMaddToken({accounts: chosen, isOneTime, minutes}){
   const total = chosen.reduce((s,c)=>s+c.amt,0);
   const code = 'TKN-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  const otp = genOtpCode();
   const durationLabel = isOneTime ? 'استخدام واحد فقط' : fmtDuration(minutes);
   const expiresAt = isOneTime ? null : Date.now() + minutes*60000;
 
   currentTokenCode = code;
+  currentOtpCode = otp;
   clearInterval(tokenCountdownTimer);
   clearInterval(tokenPollTimer);
   tokenIsOneTime = isOneTime;
@@ -137,14 +153,14 @@ function issueMaddToken({accounts: chosen, isOneTime, minutes}){
   const syncPromise = fetch('/api/madd', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({action:'create', code, amount: total, accounts: chosen, isOneTime, expiresAt})
+    body: JSON.stringify({action:'create', code, amount: total, accounts: chosen, isOneTime, expiresAt, otp})
   }).then(async res=>{
     const data = await res.json().catch(()=>null);
     return !!(res.ok && data && data.ok !== false);
   }).catch(()=> false);
 
   startTokenPoll(code);
-  return {code, total, chosen, durationLabel, expiresAt, isOneTime, syncPromise};
+  return {code, otp, total, chosen, durationLabel, expiresAt, isOneTime, syncPromise};
 }
 
 function generateToken(){
@@ -183,7 +199,7 @@ function generateToken(){
     minutes = Number(durationChoice);
   }
 
-  const {code, total, durationLabel, syncPromise} = issueMaddToken({accounts: chosen, isOneTime, minutes});
+  const {code, otp, total, durationLabel, syncPromise} = issueMaddToken({accounts: chosen, isOneTime, minutes});
 
   const placeholder = document.getElementById('token-placeholder');
   if(placeholder) placeholder.style.display = 'none';
@@ -195,6 +211,13 @@ function generateToken(){
     <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
       <div class="code">${code}</div>
       <button class="copy-code-btn" id="token-copy-btn" onclick="copyTokenCode()" aria-label="نسخ الرمز" title="نسخ الرمز">⧉</button>
+    </div>
+    <div class="tline" style="border-bottom:none; padding-top:0;">
+      <span>رمز التحقق (OTP)</span>
+      <span style="display:inline-flex; align-items:center; gap:6px;">
+        <span style="font-family:var(--font-mono); letter-spacing:2px; font-weight:600;">${otp}</span>
+        <button class="copy-code-btn" onclick="copyOtpCode()" aria-label="نسخ رمز التحقق" title="نسخ رمز التحقق" style="width:22px; height:22px; font-size:12px;">⧉</button>
+      </span>
     </div>
     <div class="perforation" style="background:repeating-linear-gradient(90deg, rgba(36,48,61,0.2) 0 6px, transparent 6px 12px);"></div>
     ${chosen.map(c=>`<div class="tline"><span>${c.bank}</span><span>${money(c.amt)}</span></div>`).join('')}
