@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChatRequest } = require('./lib/chatController');
+const { getFinancialAdvice } = require('./lib/advisorController');
 const { getGoldPrice } = require('./marketData/goldPrice');
 const { getSaudiQuote } = require('./marketData/saudiMarket');
 const { getUsQuote } = require('./marketData/usMarket');
@@ -155,6 +156,19 @@ const server = http.createServer((req, res)=>{
         sendJson(res, 200, result);
       }catch(err){
         sendJson(res, err.status || 502, {error: err.message});
+      }
+    });
+    return;
+  }
+  if(req.method === 'POST' && req.url === '/api/advisor'){
+    let body = '';
+    req.on('data', chunk=> body += chunk);
+    req.on('end', async ()=>{
+      try{
+        const advice = await getFinancialAdvice(JSON.parse(body || '{}'));
+        sendJson(res, 200, {success:true, advice});
+      }catch(err){
+        sendJson(res, err.status || 502, {success:false, error: err.message});
       }
     });
     return;
