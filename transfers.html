@@ -117,7 +117,7 @@
     </div>
 
     <div id="transfer-step-form" style="display:none;">
-      <button type="button" class="modal-back-btn" onclick="goToTransferStep('kind')">→ رجوع</button>
+      <button type="button" class="modal-back-btn" onclick="goToTransferStep(transferMode==='madd' ? 'type' : 'kind')">→ رجوع</button>
 
       <div id="transfer-normal-fields">
         <div class="field-block">
@@ -325,6 +325,11 @@ function goToTransferStep(step){
 
 function chooseTransferMode(mode){
   transferMode = mode;
+  // حوالة مدّ تُنفَّذ لمرة واحدة فقط — لا تعرض خيار "تلقائية"، تخطَّ خطوة الاختيار مباشرة.
+  if(mode === 'madd'){
+    chooseTransferKind('new');
+    return;
+  }
   goToTransferStep('kind');
 }
 
