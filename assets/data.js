@@ -128,9 +128,9 @@ const DEFAULT_OTHER_GOV_PLATFORMS = [
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
-const DATA_VERSION = '7';
+const DATA_VERSION = '8';
 if(localStorage.getItem('hasila_data_version') !== DATA_VERSION){
-  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_transfers','hasila_other_banks'].forEach(k=>localStorage.removeItem(k));
+  ['hasila_accounts','hasila_stocks','hasila_automations','hasila_bnpl','hasila_investments','hasila_other_investments','hasila_transfers','hasila_other_banks','hasila_gov','hasila_other_gov'].forEach(k=>localStorage.removeItem(k));
   localStorage.setItem('hasila_data_version', DATA_VERSION);
 }
 
