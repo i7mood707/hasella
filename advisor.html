@@ -157,8 +157,8 @@ async function requestAIAdvice(){
       signal: controller.signal
     });
     clearTimeout(timeout);
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
+    const data = await res.json().catch(()=>null);
+    if(!res.ok) throw new Error((data && data.error) || 'HTTP '+res.status);
     if(!data.success || !data.advice) throw new Error('استجابة غير صالحة');
     localStorage.setItem(AI_ADVICE_CACHE_KEY, JSON.stringify({advice:data.advice, fetchedAt:Date.now()}));
     return data.advice;
