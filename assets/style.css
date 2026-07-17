@@ -291,6 +291,19 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 .watch-actions button:hover{background:#E7E1D1; transform:translateY(-1px);}
 .watch-qty{font-size:10.5px; color:var(--text-muted); font-family:var(--font-mono);}
 
+/* Below this the sparkline's fixed 60px+56px margins leave almost nothing for
+   the company name/ticker — drop the decorative chart and let the name use
+   that space instead of collapsing to nothing. */
+@media(max-width:700px){
+  .watch-spark{display:none;}
+  .watch-id{flex:1 1 auto;}
+  .watch-name{max-width:none;}
+}
+@media(max-width:420px){
+  .watch-row{gap:8px;}
+  .watch-right{gap:8px;}
+}
+
 /* ---------- Financing ---------- */
 .offer-card{border:1.5px solid #E7E1D1; border-radius:12px; padding:18px; position:relative;}
 .offer-card.best{border-color:var(--gold); background:linear-gradient(180deg,#FFFBF3,#fff);}
