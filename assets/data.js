@@ -367,6 +367,65 @@ function animateCount(el, target, suffixHtml, duration){
   requestAnimationFrame(tick);
 }
 
+/* ---------------- AI Financial Advisor prefetch ----------------
+   This is a classic multi-page app (full reload per nav link), so a fetch
+   started on one page is aborted the moment the user navigates away. To make
+   advisor.html feel instant, every authenticated page kicks this fetch off
+   as soon as data.js runs (i.e. as soon as the app is opened), caches the
+   result in localStorage, and advisor.html just reads the cache instead of
+   re-requesting on its own load. */
+const AI_ADVICE_CACHE_KEY = 'hasila_ai_advice_cache';
+const AI_ADVICE_TTL_MS = 3 * 60 * 1000;
+const AI_CATEGORY_MAP = {
+  '🍽️':'مطاعم', '☕':'مقاهي', '📶':'فواتير واشتراكات', '💡':'فواتير واشتراكات',
+  '🎬':'اشتراكات', '📦':'تسوق أونلاين', '🧺':'بقالة', '⛽':'مواصلات ووقود',
+  '💵':'سحب نقدي', '↗️':'تحويلات صادرة'
+};
+const AI_COMMITMENT_DUES = {'تابي':160, 'تمارا':300};
+
+function buildAIAdvisorPayload(){
+  const incomeTx = transactions.find(t=>t.name==='راتب شهري');
+  const income = incomeTx ? incomeTx.amount : 11200;
+  const byCategory = {};
+  transactions.forEach(t=>{
+    if(t.amount>=0) return;
+    const cat = AI_CATEGORY_MAP[t.ic];
+    if(!cat) return;
+    byCategory[cat] = (byCategory[cat]||0) + Math.abs(t.amount);
+  });
+  const txPayload = Object.entries(byCategory).map(([category,amount])=>({category, amount: Math.round(amount*100)/100}));
+  const commitments = bnplProviders.filter(b=>b.linked).map(b=>({name:b.bank, monthly_due: AI_COMMITMENT_DUES[b.bank] || 0}));
+  const goalsRemaining = goals.reduce((s,g)=>s+goalRemaining(g), 0);
+  return {income, transactions: txPayload, commitments, savings_goal: goalsRemaining || 2000};
+}
+
+function getCachedAIAdvice(){
+  try{
+    const raw = localStorage.getItem(AI_ADVICE_CACHE_KEY);
+    if(!raw) return null;
+    const cached = JSON.parse(raw);
+    if(!cached || Date.now() - cached.fetchedAt > AI_ADVICE_TTL_MS) return null;
+    return cached.advice;
+  }catch(err){ return null; }
+}
+
+async function prefetchAIAdvice(){
+  if(getCachedAIAdvice()) return;
+  try{
+    const res = await fetch('/api/advisor', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(buildAIAdvisorPayload())
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    if(!data.success || !data.advice) return;
+    localStorage.setItem(AI_ADVICE_CACHE_KEY, JSON.stringify({advice:data.advice, fetchedAt:Date.now()}));
+  }catch(err){ /* advisor.html will retry on its own if the cache stays empty */ }
+}
+
+if(localStorage.getItem('hasila_logged_in') === '1') prefetchAIAdvice();
+
 /* ---------------- Mobile nav drawer ---------------- */
 function toggleMobileNav(){
   const sb = document.querySelector('.sidebar');
