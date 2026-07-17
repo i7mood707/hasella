@@ -132,7 +132,7 @@ function renderTokenAccounts(){
     <div class="token-account">
       <input type="checkbox" id="tok-chk-${i}">
       <img class="bank-logo" style="width:32px; height:32px; border-radius:9px; padding:4px;" src="${a.logo}" alt="${a.bank}" title="${a.bank}">
-      <div style="flex:1;">
+      <div class="token-account-info">
         <div class="acc-name">${a.bank}</div>
         <div class="acc-type">${a.type} — الرصيد: ${money(a.balance)}</div>
       </div>

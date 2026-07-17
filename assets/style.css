@@ -385,8 +385,16 @@ table.stocks-table td{padding:12px 8px; border-bottom:1px solid #F0ECDF;}
 
 /* ---------- Token ---------- */
 .token-account{display:flex; align-items:center; gap:12px; padding:12px; border:1.5px solid #E7E1D1; border-radius:11px; margin-bottom:10px;}
-.token-account input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
-.token-account .amt-input{width:110px; padding:8px 10px; border-radius:8px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); font-size:13px;}
+.token-account input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald); flex-shrink:0;}
+.token-account .bank-logo{flex-shrink:0;}
+.token-account-info{flex:1; min-width:0;}
+.token-account-info .acc-name, .token-account-info .acc-type{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.token-account .amt-input{width:110px; flex-shrink:0; padding:8px 10px; border-radius:8px; border:1.5px solid #DAD4C2; font-family:var(--font-mono); font-size:13px;}
+
+@media(max-width:520px){
+  .token-account{gap:8px; padding:10px;}
+  .token-account .amt-input{width:78px; padding:8px 6px; font-size:12.5px;}
+}
 .token-receipt{
   background:var(--paper-dim); color:var(--text-dark); border-radius:14px; padding:22px;
   font-family:var(--font-mono); position:relative;
