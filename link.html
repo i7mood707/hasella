@@ -79,7 +79,7 @@
         </p>
       </div>
 
-      <div class="card">
+      <div class="card" style="margin-bottom:18px;">
         <h3 style="flex-wrap:wrap; row-gap:10px;">
           منصات الاستثمار
           <span class="sub" id="inv-count-sub">جهة واحدة</span>
@@ -87,6 +87,17 @@
         <div id="link-investments-list"></div>
         <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
           🔒 ربط منصات الأسهم والصكوك يخلي التطبيق يقرأ محفظتك ويعرضها في صفحة الاستثمارات.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="flex-wrap:wrap; row-gap:10px;">
+          المنصات الحكومية
+          <span class="sub" id="gov-count-sub">لا جهات مرتبطة</span>
+        </h3>
+        <div id="link-gov-list"></div>
+        <p style="font-size:11.5px; color:var(--text-muted); margin-top:14px; line-height:1.8;">
+          🔒 ربط منصة مساند يخلي التطبيق يقرأ بيانات العمالة المنزلية ورواتبها ليسهّل عليك تفعيل التحويلات التلقائية لها.
         </p>
       </div>
     </section>
@@ -123,13 +134,14 @@
 requireAuth();
 
 function renderLinkAccounts(){
-  const linkedCount = accounts.filter(a=>a.linked).length + bnplProviders.filter(a=>a.linked).length + investmentPlatforms.filter(a=>a.linked).length + otherBanks.filter(a=>a.linked).length;
-  const totalCount = accounts.length + bnplProviders.length + investmentPlatforms.length + otherBanks.length;
+  const linkedCount = accounts.filter(a=>a.linked).length + bnplProviders.filter(a=>a.linked).length + investmentPlatforms.filter(a=>a.linked).length + govPlatforms.filter(a=>a.linked).length + otherBanks.filter(a=>a.linked).length;
+  const totalCount = accounts.length + bnplProviders.length + investmentPlatforms.length + govPlatforms.length + otherBanks.length;
   renderAddBankList();
   document.getElementById('linked-summary').textContent = `${linkedCount} من ${totalCount} حسابات وخدمات متصلة الآن`;
   document.getElementById('banks-count-sub').textContent = accounts.length + ' جهات';
   document.getElementById('bnpl-count-sub').textContent = bnplProviders.length === 2 ? 'جهتان' : bnplProviders.length + ' جهات';
   document.getElementById('inv-count-sub').textContent = investmentPlatforms.length === 1 ? 'جهة واحدة' : investmentPlatforms.length === 2 ? 'جهتان' : investmentPlatforms.length + ' جهات';
+  document.getElementById('gov-count-sub').textContent = govPlatforms.length === 0 ? 'لا جهات مرتبطة' : govPlatforms.length === 1 ? 'جهة واحدة' : govPlatforms.length === 2 ? 'جهتان' : govPlatforms.length + ' جهات';
 
   document.getElementById('link-accounts-list').innerHTML = accounts.map((a,i)=>`
     <div class="account-row">
@@ -222,6 +234,36 @@ function renderLinkAccounts(){
       </div>
       `}
     </div>`).join('');
+
+  document.getElementById('link-gov-list').innerHTML = govPlatforms.length === 0
+    ? `<p style="font-size:12.5px; color:var(--text-muted); padding:6px 4px 4px;">ما ربطت أي منصة حكومية بعد.</p>`
+    : govPlatforms.map((a,i)=>`
+    <div class="account-row">
+      <div class="acc-left">
+        ${a.logo ? `<img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">` : `<div class="bank-logo-text">${a.logoText}</div>`}
+        <div>
+          <div class="acc-name">${a.bank}</div>
+          <div class="acc-type">${a.desc || 'منصة حكومية'}</div>
+        </div>
+      </div>
+      ${deletingGovIndex === i ? `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12px; color:var(--brick); font-weight:600;">حذف الحساب نهائيًا؟</span>
+        <button class="btn btn-outline btn-sm" onclick="cancelDeleteGov()">إلغاء</button>
+        <button class="btn btn-sm" style="background:var(--brick); color:#fff; border-color:var(--brick);" onclick="deleteGovConfirmed(${i})">تأكيد الحذف</button>
+      </div>
+      ` : `
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="acc-menu-wrap">
+          <button class="acc-menu-btn" onclick="toggleGovMenu(event, ${i})" aria-label="خيارات ${a.bank}">⋮</button>
+          ${openGovMenu === i ? `
+          <div class="acc-menu">
+            <button class="danger" onclick="askDeleteGov(${i})">حذف الحساب</button>
+          </div>` : ''}
+        </div>
+      </div>
+      `}
+    </div>`).join('');
 }
 let openAccMenu = null;
 let renamingAccIndex = null;
@@ -230,11 +272,14 @@ let openBnplMenu = null;
 let deletingBnplIndex = null;
 let openInvMenu = null;
 let deletingInvIndex = null;
+let openGovMenu = null;
+let deletingGovIndex = null;
 
 function closeAllMenus(){
   openAccMenu = null;
   openBnplMenu = null;
   openInvMenu = null;
+  openGovMenu = null;
 }
 function toggleAccMenu(e, i){
   e.stopPropagation();
@@ -288,6 +333,7 @@ function deleteAccountConfirmed(i){
   const wasPrimary = removed.primary;
   accounts.splice(i, 1);
   if(wasPrimary && accounts.length > 0){ accounts[0].primary = true; }
+  otherBanks.push({bank:removed.bank, logo:removed.logo});
   deletingAccIndex = null;
   persistState();
   renderLinkAccounts();
@@ -338,17 +384,45 @@ function cancelDeleteInv(){
 function deleteInvConfirmed(i){
   const removed = investmentPlatforms[i];
   investmentPlatforms.splice(i, 1);
+  otherInvestmentPlatforms.push({bank:removed.bank, logo:removed.logo, logoText:removed.logoText, assetType:removed.assetType});
   deletingInvIndex = null;
+  persistState();
+  renderLinkAccounts();
+  showToast(`تم حذف ${removed.bank}.`);
+}
+function toggleGovMenu(e, i){
+  e.stopPropagation();
+  const next = (openGovMenu === i) ? null : i;
+  closeAllMenus();
+  openGovMenu = next;
+  deletingGovIndex = null;
+  renderLinkAccounts();
+}
+function askDeleteGov(i){
+  openGovMenu = null;
+  deletingGovIndex = i;
+  renderLinkAccounts();
+}
+function cancelDeleteGov(){
+  deletingGovIndex = null;
+  renderLinkAccounts();
+}
+function deleteGovConfirmed(i){
+  const removed = govPlatforms[i];
+  govPlatforms.splice(i, 1);
+  otherGovPlatforms.push({bank:removed.bank, logo:removed.logo, logoText:removed.logoText, desc:removed.desc});
+  deletingGovIndex = null;
   persistState();
   renderLinkAccounts();
   showToast(`تم حذف ${removed.bank}.`);
 }
 document.addEventListener('click', function(e){
   if(!e.target.closest('.acc-menu-wrap')){
-    if(openAccMenu !== null || openBnplMenu !== null || openInvMenu !== null){
+    if(openAccMenu !== null || openBnplMenu !== null || openInvMenu !== null || openGovMenu !== null){
       openAccMenu = null;
       openBnplMenu = null;
       openInvMenu = null;
+      openGovMenu = null;
       renderLinkAccounts();
     }
   }
@@ -409,11 +483,27 @@ function renderAddBankList(){
         <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="confirmAddInv(${i})">+ ربط</button>
       </div>`).join('');
 
+  const govItems = otherGovPlatforms.length === 0
+    ? `<p style="font-size:12.5px; color:var(--text-muted); padding:6px 4px 4px;">ربطت كل المنصات الحكومية المتاحة بالفعل 🎉</p>`
+    : otherGovPlatforms.map((a,i)=>`
+      <div class="account-row" style="flex-wrap:wrap;">
+        <div class="acc-left" style="min-width:0; flex:1;">
+          ${a.logo ? `<img class="bank-logo" src="${a.logo}" alt="${a.bank}" title="${a.bank}">` : `<div class="bank-logo-text">${a.logoText}</div>`}
+          <div style="min-width:0;">
+            <div class="acc-name" style="white-space:normal; line-height:1.4;">${a.bank}</div>
+            <div class="acc-type">${a.desc || 'منصة حكومية'}</div>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="confirmAddGov(${i})">+ ربط</button>
+      </div>`).join('');
+
   document.getElementById('add-bank-list').innerHTML = `
     <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin:4px 4px 8px;">البنوك</div>
     ${bankItems}
     <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin:18px 4px 8px;">منصات الاستثمار</div>
     ${invItems}
+    <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin:18px 4px 8px;">المنصات الحكومية</div>
+    ${govItems}
   `;
 }
 function startAddBankForm(i){
@@ -452,6 +542,16 @@ function confirmAddInv(i){
   persistState();
   renderLinkAccounts();
   showToast(`تم ربط ${a.bank} وإضافته إلى منصات استثمارك.`);
+}
+
+function confirmAddGov(i){
+  const a = otherGovPlatforms[i];
+  govPlatforms.push({id:'g'+(govPlatforms.length+1), bank:a.bank, logo:a.logo, logoText:a.logoText, desc:a.desc, linked:true, lastSync:'الآن'});
+  otherGovPlatforms.splice(i, 1);
+  persistState();
+  renderLinkAccounts();
+  closeAddBankModal();
+  showToast(`تم ربط ${a.bank} وإضافته إلى منصاتك الحكومية.`);
 }
 
 renderLinkAccounts();

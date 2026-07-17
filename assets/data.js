@@ -120,6 +120,11 @@ const DEFAULT_OTHER_BANKS = [
   {bank:'بنك فيجن', logo:'logos/visionbank.png'},
 ];
 
+const DEFAULT_GOV_PLATFORMS = [];
+const DEFAULT_OTHER_GOV_PLATFORMS = [
+  {bank:'مساند', logo:'logos/musaned.jpg', desc:'بيانات العمالة المنزلية ورواتبها'},
+];
+
 const debtsTotal = 640 + 900 + 18500 + 2100 + 31200;
 
 /* ---------------- Persisted state (accounts / stocks / automations) ---------------- */
@@ -158,6 +163,8 @@ investmentPlatforms.forEach(p=>{ if(p.bank === 'درايه للصكوك' && p.lo
 const otherInvestmentPlatforms = loadState('hasila_other_investments', DEFAULT_OTHER_INVESTMENTS);
 const transfersData = loadState('hasila_transfers', DEFAULT_TRANSFERS);
 const otherBanks = loadState('hasila_other_banks', DEFAULT_OTHER_BANKS);
+const govPlatforms = loadState('hasila_gov', DEFAULT_GOV_PLATFORMS);
+const otherGovPlatforms = loadState('hasila_other_gov', DEFAULT_OTHER_GOV_PLATFORMS);
 const transactions = loadState('hasila_transactions', DEFAULT_TRANSACTIONS);
 
 const DEFAULT_SETTINGS = {lang:'ar', currency:'SAR', notifications:true, promotions:false, twoFactor:true, darkMode:false};
@@ -175,6 +182,8 @@ function persistState(){
   localStorage.setItem('hasila_other_investments', JSON.stringify(otherInvestmentPlatforms));
   localStorage.setItem('hasila_transfers', JSON.stringify(transfersData));
   localStorage.setItem('hasila_other_banks', JSON.stringify(otherBanks));
+  localStorage.setItem('hasila_gov', JSON.stringify(govPlatforms));
+  localStorage.setItem('hasila_other_gov', JSON.stringify(otherGovPlatforms));
   localStorage.setItem('hasila_transactions', JSON.stringify(transactions));
 }
 
